@@ -21,9 +21,11 @@
     "household_order_preference", "social_image_sensitivity"
   ];
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
   onMount(async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/onboarding/questions');
+      const response = await fetch(`${API_URL}/api/onboarding/questions`);
       if (response.ok) {
         const data = await response.json();
         sections = data.sections;
@@ -77,7 +79,7 @@
   async function submitSurvey() {
     loading = true;
     try {
-      await fetch('http://localhost:8000/api/onboarding/submit', {
+      await fetch(`${API_URL}/api/onboarding/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: 1, answers })

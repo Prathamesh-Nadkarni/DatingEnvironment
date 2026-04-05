@@ -7,10 +7,11 @@
   let loading = false;
   let result: any = null;
   let activeTab = 'summary';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
   onMount(async () => {
     try {
-      const resp = await fetch('http://localhost:8000/api/scenarios');
+      const resp = await fetch(`${API_URL}/api/scenarios`);
       if (resp.ok) {
         const data = await resp.json();
         scenarios = data.scenarios;
@@ -26,7 +27,7 @@
   async function runSimulation() {
     loading = true;
     try {
-      const response = await fetch('http://localhost:8000/api/simulation/run', {
+      const response = await fetch(`${API_URL}/api/simulation/run`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
