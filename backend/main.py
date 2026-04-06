@@ -1,14 +1,21 @@
+import logging
 from fastapi import FastAPI
 from pydantic import BaseModel
 import uvicorn
 from typing import List, Dict, Any, Optional
 from fastapi.middleware.cors import CORSMiddleware
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(name)s | %(message)s",
+)
+
 import scenarios
 from intake_questions import get_intake_data
 from persona_synthesis import analyze_answers
 from simulation_engine import run_simulation
 from evaluation_engine import compute_harmony_index
+from compatibility_engine import run_full_compatibility_report
 
 app = FastAPI(title="MiroFish Agentic Matchmaking API")
 
@@ -88,8 +95,29 @@ def start_simulation(req: SimulationRequest):
         "cultural_stressors": analysis["cultural_stressors"],
         "synergies": analysis["synergies"],
         "trajectory": analysis["trajectory"],
+        "inference": analysis.get("inference", ""),
         "dialogue_history": result["dialogue_history"]
     }
+
+class CompatibilityRequest(BaseModel):
+    user_a_id: int
+    user_b_id: int
+    max_turns: int = 4
+
+@app.post("/api/compatibility/report")
+def get_compatibility_report(req: CompatibilityRequest):
+    prompt_a = db["user_prompts"].get(req.user_a_id, "You are a standard persona.")
+    prompt_b = db["user_prompts"].get(req.user_b_id, "You are a traditional match.")
+
+    report = run_full_compatibility_report(prompt_a, prompt_b, max_turns=req.max_turns)
+
+    return {
+        "status": "success",
+        "user_a_id": req.user_a_id,
+        "user_b_id": req.user_b_id,
+        **report,
+    }
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

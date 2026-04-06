@@ -18,74 +18,205 @@ MAPPING_TABLE = {
     # FAMILY & BOUNDARIES
     "3.2": {
         "spouse_primary": {"couple_first_orientation": 0.3, "family_deference": -0.2},
-        "parents_primary": {"couple_first_orientation": -0.4, "family_deference": 0.4}
+        "parents_primary": {"couple_first_orientation": -0.4, "family_deference": 0.4},
     },
     "4.4": {
         "elders": {"family_deference": 0.4, "public_harmony_preference": 0.3},
-        "couple": {"couple_first_orientation": 0.4, "boundary_strength": 0.3}
+        "couple": {"couple_first_orientation": 0.4, "boundary_strength": 0.3},
     },
     "4.5": {
         "defend": {"partner_advocacy": 0.5, "boundary_strength": 0.4},
         "calm": {"co_regulation_capacity": 0.3, "public_harmony_preference": 0.2},
         "silent": {"public_harmony_preference": 0.4, "shame_sensitivity": 0.3, "partner_advocacy": -0.4},
-        "private": {"boundary_strength": 0.2, "conflict_dominance": -0.2}
+        "private": {"boundary_strength": 0.2, "conflict_dominance": -0.2},
     },
     "15.4": {
-        "fairness": {"moral_reasoning_style": 0.4},
-        "spouse": {"partner_advocacy": 0.5, "couple_first_orientation": 0.3},
-        "parent": {"family_deference": 0.5},
-        "de-escalate": {"public_harmony_preference": 0.4}
+        "Protect fairness": {"moral_reasoning_style": 0.4},
+        "Protect spouse": {"partner_advocacy": 0.5, "couple_first_orientation": 0.3},
+        "Protect parent": {"family_deference": 0.5},
+        "De-escalate first": {"public_harmony_preference": 0.4},
+        "Stay neutral": {"withdrawal_tendency": 0.2},
     },
 
     # GENDER & EQUALITY
     "5.3": {
         "adjusts": {"tradition_compliance": 0.4, "egalitarianism": -0.4},
-        "redesign": {"egalitarianism": 0.5, "autonomy_need": 0.3}
+        "redesign": {"egalitarianism": 0.5, "autonomy_need": 0.3},
     },
-    "5.4": "scale_egalitarianism_inverse", # 1=low trad, 7=high trad
+    "5.4": "scale_egalitarianism_inverse",
     "12.3": {
-        "mother's": {"tradition_compliance": 0.3, "egalitarianism": -0.3},
-        "father's": {"egalitarianism": 0.4},
-        "shared": {"egalitarianism": 0.5},
-        "outsource": {"career_priority": 0.4}
+        "Mother's": {"tradition_compliance": 0.3, "egalitarianism": -0.3},
+        "Father's": {"egalitarianism": 0.4},
+        "Shared": {"egalitarianism": 0.5},
+        "Flexibility-based": {"egalitarianism": 0.3, "autonomy_need": 0.2},
+        "Outsource support": {"career_priority": 0.4},
     },
 
     # FINANCE
     "6.1": {
         "saved": {"security_need": 0.4, "risk_tolerance": -0.3},
-        "enjoy": {"risk_tolerance": 0.4, "security_need": -0.2}
+        "enjoy": {"risk_tolerance": 0.4, "security_need": -0.2},
     },
     "6.6": {
         "spends": {"security_need": 0.3},
-        "controls": {"autonomy_need": 0.5, "financial_mutuality": -0.4}
+        "controls": {"autonomy_need": 0.5, "financial_mutuality": -0.4},
     },
 
-    # CONFLICT & EMOTIONS
+    # CONFLICT & EMOTIONS (fixed: keys now match actual option strings)
     "7.1": {
-        "talk": {"conflict_dominance": 0.3},
-        "wait": {"distress_tolerance": 0.3},
-        "withdraw": {"withdrawal_tendency": 0.5},
-        "humor": {"repair_skill": 0.2},
-        "reassurance": {"co_regulation_capacity": -0.3, "security_need": 0.4}
+        "Talk immediately": {"conflict_dominance": 0.3},
+        "Wait/Cool down": {"distress_tolerance": 0.3},
+        "Withdraw": {"withdrawal_tendency": 0.5},
+        "Use humor": {"repair_skill": 0.3},
+        "Seek reassurance": {"co_regulation_capacity": -0.3, "security_need": 0.4},
+        "Pretend it's fine": {"public_harmony_preference": 0.3, "withdrawal_tendency": 0.2},
     },
     "7.2": {
         "criticism": {"shame_sensitivity": 0.4},
-        "silence": {"withdrawal_tendency": 0.2, "co_regulation_capacity": 0.3}
+        "silence": {"withdrawal_tendency": 0.2, "co_regulation_capacity": 0.3},
     },
     "19.2": {
         "fights": {"distress_tolerance": -0.4},
-        "resentment": {"resentment_accumulation_rate": 0.5, "burnout_vulnerability": 0.3}
+        "resentment": {"resentment_accumulation_rate": 0.5, "burnout_vulnerability": 0.3},
+    },
+
+    # ELDERCARE & CAREGIVING
+    "14.2": {
+        "Responsible": {"caregiving_flexibility": 0.3},
+        "Acceptable": {"caregiving_flexibility": 0.2},
+        "Last resort": {"caregiving_flexibility": -0.3, "family_deference": 0.3},
+        "Wrong": {"caregiving_flexibility": -0.4, "tradition_compliance": 0.3},
+        "Depends": {},
+    },
+    "14.4": {
+        "sacrifice": {"caregiving_flexibility": -0.3, "family_deference": 0.4},
+        "protect": {"caregiving_flexibility": 0.3, "couple_first_orientation": 0.3},
+    },
+
+    # PARENTING
+    "13.3": {
+        "Never acceptable": {"parenting_alignment": 0.4},
+        "Rarely acceptable": {"parenting_alignment": 0.2},
+        "Sometimes necessary": {"parenting_alignment": -0.2, "tradition_compliance": 0.2},
+        "Depends on context": {},
+        "Traditional discipline": {"parenting_alignment": -0.4, "tradition_compliance": 0.3},
+    },
+    "13.4": {
+        "obedience": {"parenting_alignment": -0.3, "tradition_compliance": 0.3},
+        "safety": {"parenting_alignment": 0.4, "egalitarianism": 0.2},
+    },
+    "13.5": {
+        "ignore": {"family_deference": 0.3, "parenting_alignment": -0.3},
+        "correct": {"parenting_alignment": 0.2, "boundary_strength": 0.2},
+        "firm": {"parenting_alignment": 0.4, "boundary_strength": 0.4},
+        "adjust": {"family_deference": 0.3, "parenting_alignment": -0.2},
+    },
+
+    # JEALOUSY & TRUST
+    "17.1": {
+        "emotional": {"jealousy_threshold": -0.3},
+        "physical": {"jealousy_threshold": 0.2},
+    },
+
+    # HOUSEHOLD
+    "10.2": {
+        "Family rules dominate": {"household_order_preference": 0.3, "family_deference": 0.3},
+        "Separate arrangements": {"household_order_preference": 0.2, "autonomy_need": 0.2},
+        "Spouse adjust for peace": {"household_order_preference": -0.2, "public_harmony_preference": 0.3},
+        "Mutual compromise": {"egalitarianism": 0.2},
+        "Depends on ownership": {},
+    },
+    "5.5": {
+        "Whoever notices first": {"egalitarianism": 0.3, "household_order_preference": 0.2},
+        "Whoever is less tired": {"egalitarianism": 0.2},
+        "Split equally": {"egalitarianism": 0.4, "household_order_preference": 0.3},
+        "The woman more often": {"egalitarianism": -0.4, "tradition_compliance": 0.3},
+        "The man more often": {"egalitarianism": 0.3},
+        "Outsource": {"career_priority": 0.2},
+    },
+
+    # FINANCIAL (thin coverage)
+    "6.3": {
+        "Fully joint": {"financial_mutuality": 0.5},
+        "Mostly joint": {"financial_mutuality": 0.3},
+        "Mostly separate": {"financial_mutuality": -0.2, "autonomy_need": 0.2},
+        "Fully separate": {"financial_mutuality": -0.4, "autonomy_need": 0.3},
+        "Depends on stage": {},
+    },
+    "6.5": {
+        "support": {"family_deference": 0.3, "financial_mutuality": -0.2},
+        "cap": {"financial_mutuality": 0.3, "boundary_strength": 0.2},
+        "refuse": {"boundary_strength": 0.3, "financial_mutuality": 0.2},
+        "delay": {"withdrawal_tendency": 0.2},
+        "evaluate": {"financial_mutuality": 0.3},
+    },
+
+    # SOCIAL IMAGE (used in engine now)
+    "11.3": {
+        "embarrassing_family": {"social_image_sensitivity": 0.4, "public_harmony_preference": 0.3},
+        "not_protecting_spouse": {"partner_advocacy": 0.4},
     },
 
     # MORAL LOGIC
     "20.1": {
         "fair": {"moral_reasoning_style": 0.5},
-        "preserves": {"public_harmony_preference": 0.4, "identity_rigidity": -0.2}
+        "preserves": {"public_harmony_preference": 0.4, "identity_rigidity": -0.2},
     },
     "20.3": {
         "duty": {"tradition_compliance": 0.4, "guilt_susceptibility": 0.3},
-        "wellbeing": {"autonomy_need": 0.4}
-    }
+        "wellbeing": {"autonomy_need": 0.4},
+    },
+}
+
+# Scale questions: map score (1-7) to trait shifts via direction (+1 = agree→high, -1 = agree→low)
+SCALE_MAPPINGS = {
+    "1.4": {"family_deference": -1, "boundary_strength": 1},
+    "1.5": {"egalitarianism": -1},
+    "4.1": {"family_deference": 1},
+    "4.2": {"boundary_strength": 1, "autonomy_need": 1},
+    "4.3": {"boundary_strength": 1, "couple_first_orientation": 1},
+    "4.6": {"family_deference": 1, "boundary_strength": -1},
+    "5.1": {"egalitarianism": 1},
+    "7.3": {"public_harmony_preference": 1, "withdrawal_tendency": 1},
+    "7.4": {"co_regulation_capacity": 1, "distress_tolerance": 1},
+    "7.6": {"conflict_dominance": 1, "repair_skill": -1},
+    "8.2": {"co_regulation_capacity": -1, "burnout_vulnerability": 1},
+    "9.5": {"social_image_sensitivity": 1, "public_harmony_preference": 1},
+    "11.1": {"social_image_sensitivity": 1},
+    "11.4": {"public_harmony_preference": 1, "family_deference": 1},
+    "12.1": {"career_priority": 1},
+    "12.4": {"distress_tolerance": 1},
+    "14.1": {"family_deference": 1, "caregiving_flexibility": -1},
+    "15.1": {"partner_advocacy": 1, "boundary_strength": 1},
+    "15.3": {"partner_advocacy": 1},
+    "16.1": {"privacy_need": 1, "boundary_strength": 1},
+    "16.4": {"privacy_need": 1, "autonomy_need": 1},
+    "19.1": {"distress_tolerance": 1, "resentment_accumulation_rate": 1},
+    "19.3": {"co_regulation_capacity": 1},
+    "19.6": {"burnout_vulnerability": 1},
+    "19.7": {"resentment_accumulation_rate": 1, "forgiveness_rate": -1},
+    "19.11": {"egalitarianism": 1},
+    "20.4": {"boundary_strength": 1, "autonomy_need": 1},
+    "20.7": {"public_harmony_preference": 1, "moral_reasoning_style": -1},
+    "22.1": {"autonomy_need": 1, "couple_first_orientation": 1},
+    "22.2": {"family_deference": 1},
+    "22.3": {"egalitarianism": 1, "moral_reasoning_style": 1},
+    "22.4": {"public_harmony_preference": 1, "withdrawal_tendency": 1},
+    "22.5": {"tradition_compliance": 1, "identity_rigidity": 1},
+    "22.6": {"public_harmony_preference": 1, "conflict_dominance": -1},
+    "9.1": {"tradition_compliance": 1, "identity_rigidity": 1},
+
+    # --- Previously dead: parenting_alignment, caregiving_flexibility ---
+    "13.2": {"parenting_alignment": -1, "family_deference": 1},
+    "10.1": {"household_order_preference": 1},
+    "17.2": {"jealousy_threshold": -1},
+
+    # --- Strengthen thin coverage ---
+    "6.2": {"financial_mutuality": 1},
+    "19.12": {"guilt_susceptibility": 1},
+    "20.5": {"forgiveness_rate": 1},
+    "18.5": {"repair_skill": 1},
+    "18.10": {"repair_skill": 1},
 }
 
 class PersonaEngine:
@@ -141,25 +272,33 @@ class PersonaEngine:
         for q_id, val in answers.items():
             if q_id in MAPPING_TABLE:
                 mapping = MAPPING_TABLE[q_id]
-                
-                # Handle Scales via pre-defined logic or explicit dict
                 if isinstance(mapping, str):
                     self._handle_special_scales(q_id, val, mapping)
-                else:
-                    # Categorical Mapping
-                    if val in mapping:
-                        for dim, shift in mapping[val].items():
-                            self.enacted_traits[dim] = max(0.0, min(1.0, self.enacted_traits[dim] + shift))
+                elif val in mapping:
+                    for dim, shift in mapping[val].items():
+                        self.enacted_traits[dim] = max(0.0, min(1.0, self.enacted_traits[dim] + shift))
 
-    def _handle_special_scales(self, q_id, val, type):
+            if q_id in SCALE_MAPPINGS:
+                self._apply_scale_mapping(q_id, val)
+
+    def _apply_scale_mapping(self, q_id, val):
         try:
             score = float(val)
-            if type == "scale_egalitarianism_inverse":
-                # 1=Fair, 7=Traditional
-                shift = (score - 4) / 10.0 # 0.3 for 7, -0.3 for 1
+            for dim, direction in SCALE_MAPPINGS[q_id].items():
+                shift = (score - 4) / 10.0 * direction
+                self.enacted_traits[dim] = max(0.0, min(1.0, self.enacted_traits[dim] + shift))
+        except (ValueError, TypeError):
+            pass
+
+    def _handle_special_scales(self, q_id, val, scale_type):
+        try:
+            score = float(val)
+            if scale_type == "scale_egalitarianism_inverse":
+                shift = (score - 4) / 10.0
                 self.enacted_traits["egalitarianism"] -= shift
                 self.enacted_traits["tradition_compliance"] += shift
-        except: pass
+        except (ValueError, TypeError):
+            pass
 
     def _detect_contradictions(self):
         # Detect: Modern Ideal vs Traditional Enactment
@@ -207,10 +346,11 @@ class PersonaEngine:
         return f"This persona is a {clusters['power']} operator who values {clusters['emotion']} emotional dynamics and approaches the future as a {clusters['future']}."
 
     def _generate_prompt(self, clusters, summary):
+        rounded = {k: round(v, 4) for k, v in self.enacted_traits.items()}
         return f"""You are the 'Inner Parliament' for this persona.
 CONTEXT: {summary}
 CLUSTERS: {json.dumps(clusters)}
-TRAITS (ENACTED): {json.dumps(self.enacted_traits, indent=1)}
+TRAITS (ENACTED): {json.dumps(rounded, indent=1)}
 AMBIVALENCE: {json.dumps(self.ambivalence_map, indent=1)}
 
 SIMULATION INSTRUCTION:

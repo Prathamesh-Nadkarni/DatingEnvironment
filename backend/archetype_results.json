@@ -1,0 +1,798 @@
+{
+  "Twins (100% Mirror)": {
+    "overall_score": 87,
+    "trait_compatibility": {
+      "values": 1.0,
+      "conflict_style": 0.5,
+      "emotional": 0.375,
+      "practical": 0.8,
+      "trust": 0.8,
+      "autonomy": 0.76
+    },
+    "dimensional_scores": {
+      "family_dynamics": 95,
+      "financial": 95,
+      "autonomy_identity": 95,
+      "parenting": 95,
+      "crisis_resilience": 95,
+      "loyalty_trust": 95
+    },
+    "dimensional_details": {
+      "family_dynamics": [
+        {
+          "scenario_id": "unannounced_guests",
+          "scenario_title": "The Unannounced Indefinite Guests",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "pregnancy_pressure",
+          "scenario_title": "The 'Good News' Interrogation",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "relocation_ultimatum",
+          "scenario_title": "The Relocation Ultimatum",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        }
+      ],
+      "financial": [
+        {
+          "scenario_id": "house_father_name",
+          "scenario_title": "The 'House in Father' Name' Tradition",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "stridhan_confiscation",
+          "scenario_title": "The Stridhan (Bridal Wealth) Confiscation",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "disguised_dowry_gift",
+          "scenario_title": "The 'Gifts' vs. Dowry Ambiguity",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "autonomy_identity": [
+        {
+          "scenario_id": "stridhan_handover",
+          "scenario_title": "The 'Stridhan' (Wedding Gold) Handover",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "salary_to_mil",
+          "scenario_title": "Handing the Salary to the Mother-in-Law",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "ambition_sacrifice_demand",
+          "scenario_title": "The Career Downgrade Suggestion",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "parenting": [
+        {
+          "scenario_id": "unsolicited_career_downgrade",
+          "scenario_title": "The Unsolicited Career Downgrade",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "child_behavior_shaming",
+          "scenario_title": "The PTA Meeting Blame Game",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "child_custody_blackmail",
+          "scenario_title": "The Child Custody Blackmail",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "crisis_resilience": [
+        {
+          "scenario_id": "medical_emergency_uninsured",
+          "scenario_title": "The Uninsured Medical Catastrophe",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "monsoon_flood_rescue",
+          "scenario_title": "The Mumbai Monsoon Evacuation",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "sibling_legal_emergency",
+          "scenario_title": "The Sibling's Legal Bailout",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": false
+        }
+      ],
+      "loyalty_trust": [
+        {
+          "scenario_id": "pre_wedding_conversion",
+          "scenario_title": "The Pre-Wedding Conversion Demand",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "secret_matrimonial_profile",
+          "scenario_title": "The Secret Matrimonial Profile",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "maternity_financial_abuse",
+          "scenario_title": "Maternity Leave Financial Abuse",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ]
+    },
+    "dealbreakers": [],
+    "top_friction_axis": "family_dynamics",
+    "top_strength_axis": "family_dynamics",
+    "verdict": "Highly compatible (87/100) \u2014 strong alignment across traits (values=100%, trust=80%) with Family Dynamics as the clearest strength."
+  },
+  "Siblings (50% Shared)": {
+    "overall_score": 71,
+    "trait_compatibility": {
+      "values": 0.66,
+      "conflict_style": 0.522,
+      "emotional": 0.267,
+      "practical": 0.64,
+      "trust": 0.695,
+      "autonomy": 0.715
+    },
+    "dimensional_scores": {
+      "family_dynamics": 95,
+      "financial": 67,
+      "autonomy_identity": 75,
+      "parenting": 67,
+      "crisis_resilience": 95,
+      "loyalty_trust": 65
+    },
+    "dimensional_details": {
+      "family_dynamics": [
+        {
+          "scenario_id": "unannounced_guests",
+          "scenario_title": "The Unannounced Indefinite Guests",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "pregnancy_pressure",
+          "scenario_title": "The 'Good News' Interrogation",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "relocation_ultimatum",
+          "scenario_title": "The Relocation Ultimatum",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        }
+      ],
+      "financial": [
+        {
+          "scenario_id": "house_father_name",
+          "scenario_title": "The 'House in Father' Name' Tradition",
+          "harmony_score": 67,
+          "trajectory": "stable",
+          "inference": "Score 67/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "stridhan_confiscation",
+          "scenario_title": "The Stridhan (Bridal Wealth) Confiscation",
+          "harmony_score": 67,
+          "trajectory": "stable",
+          "inference": "Score 67/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "disguised_dowry_gift",
+          "scenario_title": "The 'Gifts' vs. Dowry Ambiguity",
+          "harmony_score": 67,
+          "trajectory": "stable",
+          "inference": "Score 67/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "autonomy_identity": [
+        {
+          "scenario_id": "stridhan_handover",
+          "scenario_title": "The 'Stridhan' (Wedding Gold) Handover",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "salary_to_mil",
+          "scenario_title": "Handing the Salary to the Mother-in-Law",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "ambition_sacrifice_demand",
+          "scenario_title": "The Career Downgrade Suggestion",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "parenting": [
+        {
+          "scenario_id": "unsolicited_career_downgrade",
+          "scenario_title": "The Unsolicited Career Downgrade",
+          "harmony_score": 67,
+          "trajectory": "stable",
+          "inference": "Score 67/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "child_behavior_shaming",
+          "scenario_title": "The PTA Meeting Blame Game",
+          "harmony_score": 67,
+          "trajectory": "stable",
+          "inference": "Score 67/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "child_custody_blackmail",
+          "scenario_title": "The Child Custody Blackmail",
+          "harmony_score": 67,
+          "trajectory": "stable",
+          "inference": "Score 67/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "crisis_resilience": [
+        {
+          "scenario_id": "medical_emergency_uninsured",
+          "scenario_title": "The Uninsured Medical Catastrophe",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "monsoon_flood_rescue",
+          "scenario_title": "The Mumbai Monsoon Evacuation",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "sibling_legal_emergency",
+          "scenario_title": "The Sibling's Legal Bailout",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 3,
+          "dealbreaker": false
+        }
+      ],
+      "loyalty_trust": [
+        {
+          "scenario_id": "pre_wedding_conversion",
+          "scenario_title": "The Pre-Wedding Conversion Demand",
+          "harmony_score": 65,
+          "trajectory": "stable",
+          "inference": "Score 65/100 [STABLE]: cultural stressor 'appeasement' contributed (2x, -10pts); no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "secret_matrimonial_profile",
+          "scenario_title": "The Secret Matrimonial Profile",
+          "harmony_score": 65,
+          "trajectory": "stable",
+          "inference": "Score 65/100 [STABLE]: cultural stressor 'appeasement' contributed (2x, -10pts); no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "maternity_financial_abuse",
+          "scenario_title": "Maternity Leave Financial Abuse",
+          "harmony_score": 65,
+          "trajectory": "stable",
+          "inference": "Score 65/100 [STABLE]: cultural stressor 'appeasement' contributed (2x, -10pts); no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ]
+    },
+    "dealbreakers": [],
+    "top_friction_axis": "loyalty_trust",
+    "top_strength_axis": "family_dynamics",
+    "verdict": "Compatible (71/100) \u2014 solid foundation with room to grow. Family Dynamics is a key strength; Loyalty & Trust (score 65) requires proactive communication."
+  },
+  "Strangers (25% Shared)": {
+    "overall_score": 70,
+    "trait_compatibility": {
+      "values": 0.74,
+      "conflict_style": 0.363,
+      "emotional": 0.371,
+      "practical": 0.495,
+      "trust": 0.815,
+      "autonomy": 0.585
+    },
+    "dimensional_scores": {
+      "family_dynamics": 95,
+      "financial": 79,
+      "autonomy_identity": 79,
+      "parenting": 79,
+      "crisis_resilience": 53,
+      "loyalty_trust": 79
+    },
+    "dimensional_details": {
+      "family_dynamics": [
+        {
+          "scenario_id": "unannounced_guests",
+          "scenario_title": "The Unannounced Indefinite Guests",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "pregnancy_pressure",
+          "scenario_title": "The 'Good News' Interrogation",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "relocation_ultimatum",
+          "scenario_title": "The Relocation Ultimatum",
+          "harmony_score": 95,
+          "trajectory": "harmonious",
+          "inference": "Score 95/100 [HARMONIOUS]: No conflict markers detected; 4 repair attempts (+12pts); 2 synergies detected (+8pts).",
+          "weight": 2,
+          "dealbreaker": false
+        }
+      ],
+      "financial": [
+        {
+          "scenario_id": "house_father_name",
+          "scenario_title": "The 'House in Father' Name' Tradition",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "stridhan_confiscation",
+          "scenario_title": "The Stridhan (Bridal Wealth) Confiscation",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "disguised_dowry_gift",
+          "scenario_title": "The 'Gifts' vs. Dowry Ambiguity",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "autonomy_identity": [
+        {
+          "scenario_id": "stridhan_handover",
+          "scenario_title": "The 'Stridhan' (Wedding Gold) Handover",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "salary_to_mil",
+          "scenario_title": "Handing the Salary to the Mother-in-Law",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "ambition_sacrifice_demand",
+          "scenario_title": "The Career Downgrade Suggestion",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "parenting": [
+        {
+          "scenario_id": "unsolicited_career_downgrade",
+          "scenario_title": "The Unsolicited Career Downgrade",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "child_behavior_shaming",
+          "scenario_title": "The PTA Meeting Blame Game",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "child_custody_blackmail",
+          "scenario_title": "The Child Custody Blackmail",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "crisis_resilience": [
+        {
+          "scenario_id": "medical_emergency_uninsured",
+          "scenario_title": "The Uninsured Medical Catastrophe",
+          "harmony_score": 53,
+          "trajectory": "at-risk",
+          "inference": "Score 53/100 [AT-RISK]: criticism was the dominant friction pattern (2x, -24pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts); 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "monsoon_flood_rescue",
+          "scenario_title": "The Mumbai Monsoon Evacuation",
+          "harmony_score": 53,
+          "trajectory": "at-risk",
+          "inference": "Score 53/100 [AT-RISK]: criticism was the dominant friction pattern (2x, -24pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts); 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "sibling_legal_emergency",
+          "scenario_title": "The Sibling's Legal Bailout",
+          "harmony_score": 53,
+          "trajectory": "at-risk",
+          "inference": "Score 53/100 [AT-RISK]: criticism was the dominant friction pattern (2x, -24pts); cultural stressor 'appeasement' contributed (1x, -5pts); 1 repair attempts (+3pts); 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": false
+        }
+      ],
+      "loyalty_trust": [
+        {
+          "scenario_id": "pre_wedding_conversion",
+          "scenario_title": "The Pre-Wedding Conversion Demand",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "secret_matrimonial_profile",
+          "scenario_title": "The Secret Matrimonial Profile",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "maternity_financial_abuse",
+          "scenario_title": "Maternity Leave Financial Abuse",
+          "harmony_score": 79,
+          "trajectory": "stable",
+          "inference": "Score 79/100 [STABLE]: No conflict markers detected; no repair attempts were made; 1 synergies detected (+4pts).",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ]
+    },
+    "dealbreakers": [],
+    "top_friction_axis": "crisis_resilience",
+    "top_strength_axis": "family_dynamics",
+    "verdict": "Compatible (70/100) \u2014 solid foundation with room to grow. Family Dynamics is a key strength; Crisis Resilience (score 53) requires proactive communication."
+  },
+  "Antipodes (0% Shared)": {
+    "overall_score": 66,
+    "trait_compatibility": {
+      "values": 0.46,
+      "conflict_style": 0.52,
+      "emotional": 0.339,
+      "practical": 0.415,
+      "trust": 0.585,
+      "autonomy": 0.545
+    },
+    "dimensional_scores": {
+      "family_dynamics": 72,
+      "financial": 75,
+      "autonomy_identity": 75,
+      "parenting": 75,
+      "crisis_resilience": 72,
+      "loyalty_trust": 75
+    },
+    "dimensional_details": {
+      "family_dynamics": [
+        {
+          "scenario_id": "unannounced_guests",
+          "scenario_title": "The Unannounced Indefinite Guests",
+          "harmony_score": 72,
+          "trajectory": "stable",
+          "inference": "Score 72/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); 1 repair attempts (+3pts).",
+          "weight": 2,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "pregnancy_pressure",
+          "scenario_title": "The 'Good News' Interrogation",
+          "harmony_score": 72,
+          "trajectory": "stable",
+          "inference": "Score 72/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); 1 repair attempts (+3pts).",
+          "weight": 2,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "relocation_ultimatum",
+          "scenario_title": "The Relocation Ultimatum",
+          "harmony_score": 72,
+          "trajectory": "stable",
+          "inference": "Score 72/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); 1 repair attempts (+3pts).",
+          "weight": 2,
+          "dealbreaker": false
+        }
+      ],
+      "financial": [
+        {
+          "scenario_id": "house_father_name",
+          "scenario_title": "The 'House in Father' Name' Tradition",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "stridhan_confiscation",
+          "scenario_title": "The Stridhan (Bridal Wealth) Confiscation",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "disguised_dowry_gift",
+          "scenario_title": "The 'Gifts' vs. Dowry Ambiguity",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "autonomy_identity": [
+        {
+          "scenario_id": "stridhan_handover",
+          "scenario_title": "The 'Stridhan' (Wedding Gold) Handover",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "salary_to_mil",
+          "scenario_title": "Handing the Salary to the Mother-in-Law",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "ambition_sacrifice_demand",
+          "scenario_title": "The Career Downgrade Suggestion",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "parenting": [
+        {
+          "scenario_id": "unsolicited_career_downgrade",
+          "scenario_title": "The Unsolicited Career Downgrade",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "child_behavior_shaming",
+          "scenario_title": "The PTA Meeting Blame Game",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "child_custody_blackmail",
+          "scenario_title": "The Child Custody Blackmail",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ],
+      "crisis_resilience": [
+        {
+          "scenario_id": "medical_emergency_uninsured",
+          "scenario_title": "The Uninsured Medical Catastrophe",
+          "harmony_score": 72,
+          "trajectory": "stable",
+          "inference": "Score 72/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "monsoon_flood_rescue",
+          "scenario_title": "The Mumbai Monsoon Evacuation",
+          "harmony_score": 72,
+          "trajectory": "stable",
+          "inference": "Score 72/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": false
+        },
+        {
+          "scenario_id": "sibling_legal_emergency",
+          "scenario_title": "The Sibling's Legal Bailout",
+          "harmony_score": 72,
+          "trajectory": "stable",
+          "inference": "Score 72/100 [STABLE]: criticism was the dominant friction pattern (1x, -6pts); 1 repair attempts (+3pts).",
+          "weight": 3,
+          "dealbreaker": false
+        }
+      ],
+      "loyalty_trust": [
+        {
+          "scenario_id": "pre_wedding_conversion",
+          "scenario_title": "The Pre-Wedding Conversion Demand",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "secret_matrimonial_profile",
+          "scenario_title": "The Secret Matrimonial Profile",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        },
+        {
+          "scenario_id": "maternity_financial_abuse",
+          "scenario_title": "Maternity Leave Financial Abuse",
+          "harmony_score": 75,
+          "trajectory": "stable",
+          "inference": "Score 75/100 [STABLE]: No conflict markers detected; no repair attempts were made.",
+          "weight": 3,
+          "dealbreaker": true
+        }
+      ]
+    },
+    "dealbreakers": [],
+    "top_friction_axis": "family_dynamics",
+    "top_strength_axis": "financial",
+    "verdict": "Compatible (66/100) \u2014 solid foundation with room to grow. Financial Alignment is a key strength; Family Dynamics (score 72) requires proactive communication."
+  }
+}
