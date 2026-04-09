@@ -12,7 +12,7 @@ class SimulationState(TypedDict):
     agent_a_prompt: str
     agent_b_prompt: str
     scenario_details: dict
-    dialogue_history: List[Dict[str, str]]
+    dialogue_history: List[Dict[str, Any]]
     turn_count: int
     max_turns: int
     current_speaker: str
@@ -20,6 +20,9 @@ class SimulationState(TypedDict):
     last_category_a: str
     last_category_b: str
     scenario_category: str
+    accumulated_stress: float
+    relationship_limit: float
+    happiness_factor: float
 
 
 def get_trait(prompt: str, trait: str) -> float:
@@ -508,6 +511,121 @@ def generate_mock_message(
 
 # ---------- LangGraph nodes ----------
 
+
+# ---------- Environmental Mechanics ----------
+
+EXTERNAL_AGENTS = {
+    "family_dynamics": ["Mother-in-Law", "Patriarch", "Nosy Aunt", "Extended Family"],
+    "financial": ["Bank Manager", "Siphoning Sibling", "Creditor"],
+    "autonomy_identity": ["Society Elders", "Traditional Neighbor"],
+    "parenting": ["School Principal", "Overbearing Grandparent"],
+    "crisis_resilience": ["Crisis Trigger", "Landlord", "Medical Staff"],
+    "loyalty_trust": ["Suspicious Relative", "Legal Counsel", "Anonymous Interferer"],
+}
+
+ENVIRONMENT_TEMPLATES = {
+    "escalate_reaction": [
+        "This is unacceptable! The family reputation is ruined.",
+        "You both are acting incredibly selfishly! I will not stand for this.",
+        "This is a disaster. What are people going to say?",
+    ],
+    "repair_reaction": [
+        "I'm glad you both are seeing reason.",
+        "That's a very mature way to handle it. Thank you.",
+        "Okay, we can work with that compromise. Finally some sense.",
+    ],
+    "neutral_reaction": [
+        "We are waiting for your final decision.",
+        "The situation remains tense. What will you do?",
+        "Time is running out, you need to act.",
+    ],
+    "limit_break": [
+        "THAT'S IT! The relationship is broken beyond repair.",
+        "This cannot be fixed. Everything is ruined. You've gone too far.",
+        "The damage is done. There is no coming back from this."
+    ]
+}
+
+def environmental_reaction_node(state: SimulationState):
+    scenario = state["scenario_details"]
+    category = state["scenario_category"]
+    weight = scenario.get("weight", 1)
+    dealbreaker = scenario.get("dealbreaker", False)
+
+    # Convert 1-3 weight logic to 1-5 severity scale
+    # Dealbreakers push the multiplier higher
+    severity = weight * (1.6 if dealbreaker else 1.0) 
+
+    last_a = state["last_category_a"]
+    last_b = state["last_category_b"]
+
+    agents = EXTERNAL_AGENTS.get(category, ["External Force"])
+    turn = state["turn_count"]
+    agent_name = agents[turn % len(agents)]
+
+    # Non-linear mathematics for algorithmic scaling
+    stress_delta = 0.0
+    happiness_delta = 0.0
+
+    if last_a in ["escalate", "withdraw"] or last_b in ["escalate", "withdraw"]:
+        reaction_type = "escalate_reaction"
+        # Tension escalates non-linearly based on severity
+        stress_delta = (severity ** 1.8) * 3.5  
+        
+        # High level factor affects happiness exponentially
+        if severity >= 4.0:
+            happiness_delta -= 20.0 * severity  # Can easily drain 80+ points
+        else:
+            happiness_delta -= 5.0 * severity
+            
+    elif last_a in ["repair", "compromise"] and last_b in ["repair", "compromise"]:
+        reaction_type = "repair_reaction"
+        stress_delta = -(severity ** 1.5) * 4.0
+        
+        # Highly rewarded if repairing a high-level factor
+        if severity >= 4.0:
+            happiness_delta += 20.0 * severity  # Outsized reward (e.g. 50+ points)
+        else:
+            happiness_delta += 10.0 * severity
+    else:
+        reaction_type = "neutral_reaction"
+        stress_delta = severity * 2.0
+        happiness_delta -= 2.0 * severity
+
+    # Apply Deltas
+    state["accumulated_stress"] += stress_delta
+    state["happiness_factor"] += happiness_delta
+    
+    # Bound tracking
+    state["happiness_factor"] = max(0.0, min(100.0, state["happiness_factor"]))
+    state["accumulated_stress"] = max(0.0, state["accumulated_stress"])
+
+    # Breakpoint Check (The "Relationship Limit")
+    if state["accumulated_stress"] >= state["relationship_limit"] or state["happiness_factor"] == 0:
+        reaction_type = "limit_break"
+        state["happiness_factor"] = 0.0 # Instant crash
+        state["tension_level"] = 1.0
+
+    templates = ENVIRONMENT_TEMPLATES.get(reaction_type)
+    message_text = templates[turn % len(templates)]
+    
+    msg_obj = {
+        "speaker": f"Environment [{agent_name}]",
+        "message": f"== EXTERNAL REACTION (Severity {severity:.1f}) ==\n{message_text}",
+        "_category": "environment",
+        "happiness_delta": happiness_delta,
+        "stress_delta": stress_delta
+    }
+    
+    state["dialogue_history"].append(msg_obj)
+    
+    logger.info(
+        "  [ENVIRONMENT] %s | Stress Δ: %+.2f (Total: %.2f) | Happiness Δ: %+.2f (Factor: %.2f)",
+        agent_name, stress_delta, state["accumulated_stress"], happiness_delta, state["happiness_factor"]
+    )
+
+    return state
+
 def scene_master(state: SimulationState):
     scenario = state["scenario_details"]
     category = scenario.get("category", "")
@@ -598,11 +716,17 @@ def agent_b_node(state: SimulationState):
     return state
 
 
-def controller_edge(state: SimulationState) -> str:
+def agent_b_controller(state: SimulationState) -> str:
+    # After Agent B, the environment reacts
+    return "environment"
+
+def environment_controller(state: SimulationState) -> str:
+    # If relationship limits are broken or max turns hit, end the simulation
+    if state["accumulated_stress"] >= state["relationship_limit"] or state["happiness_factor"] == 0.0:
+        return END
     if state["turn_count"] >= state["max_turns"]:
         return END
-    return "agent_a" if state["current_speaker"] == "Agent A" else "agent_b"
-
+    return "agent_a"
 
 # ---------- Build graph ----------
 
@@ -610,13 +734,19 @@ builder = StateGraph(SimulationState)
 builder.add_node("scene_master", scene_master)
 builder.add_node("agent_a", agent_a_node)
 builder.add_node("agent_b", agent_b_node)
+builder.add_node("environment", environmental_reaction_node)
+
 builder.add_edge(START, "scene_master")
 builder.add_edge("scene_master", "agent_a")
+builder.add_edge("agent_a", "agent_b")
+
+# Conditional rules via edge controllers
 builder.add_conditional_edges(
-    "agent_a", controller_edge, {"agent_b": "agent_b", END: END}
+    "agent_b", agent_b_controller, {"environment": "environment"}
 )
+
 builder.add_conditional_edges(
-    "agent_b", controller_edge, {"agent_a": "agent_a", END: END}
+    "environment", environment_controller, {"agent_a": "agent_a", END: END}
 )
 
 simulation_graph = builder.compile()
@@ -640,6 +770,9 @@ def run_simulation(
         "last_category_a": "",
         "last_category_b": "",
         "scenario_category": scenario.get("category", ""),
+        "accumulated_stress": 0.0,
+        "relationship_limit": 150.0,  # 150 stress is the breaking point
+        "happiness_factor": 50.0,     # Starts at neutral 50
     }
     result = simulation_graph.invoke(initial_state)
 

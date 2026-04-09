@@ -64,6 +64,7 @@ class EvaluationEngine:
             },
             "repair_attempts": 0,
             "synergies": [],
+            "environmental_impact": 0.0,
             "trajectory": "stable",
         }
 
@@ -87,6 +88,7 @@ class EvaluationEngine:
         """Primary scoring: sum category weights from _category tags."""
         raw = 0
         n = 0
+        env_impact = 0.0
         for turn in self.history:
             if turn["speaker"] == "Scene Master":
                 continue
@@ -94,7 +96,10 @@ class EvaluationEngine:
             if cat in CATEGORY_WEIGHTS:
                 raw += CATEGORY_WEIGHTS[cat]
                 n += 1
+            if cat == "environment":
+                env_impact += turn.get("happiness_delta", 0.0)
 
+        self.analysis["environmental_impact"] = env_impact
         if n == 0:
             # No tagged turns — fall back to neutral
             self._cat_raw = 0
@@ -234,8 +239,9 @@ class EvaluationEngine:
         )
         repair_bonus  = self.analysis["repair_attempts"] * 3
         synergy_bonus = len(self.analysis["synergies"]) * 4
+        env_impact = self.analysis["environmental_impact"]
 
-        final = cat_score - horse_penalty - cult_penalty + repair_bonus + synergy_bonus
+        final = cat_score - horse_penalty - cult_penalty + repair_bonus + synergy_bonus + env_impact
         self.analysis["harmony_score"] = max(0, min(100, int(final)))
 
         # Trajectory based on category raw signal
@@ -243,13 +249,18 @@ class EvaluationEngine:
         # Per-message average category contribution
         per_msg = self._cat_raw / n
 
-        if per_msg <= CATEGORY_WEIGHTS["escalate"] * 0.6:      # dominated by escalation
+        if env_impact <= -80:
+            self.analysis["trajectory"] = "downward-spiral"  # Relationship limit broken
+            self.analysis["harmony_score"] = 0               # Limit break causes instant 0
+        elif per_msg <= CATEGORY_WEIGHTS["escalate"] * 0.6:      # dominated by escalation
             self.analysis["trajectory"] = "downward-spiral"
         elif per_msg < 0:
             if horse_penalty > 15 and repair_bonus < 6:
                 self.analysis["trajectory"] = "at-risk"
             else:
                 self.analysis["trajectory"] = "unstable"
+        elif per_msg >= CATEGORY_WEIGHTS["repair"] * 0.6 and env_impact > 30:
+            self.analysis["trajectory"] = "harmonious" # Highly rewarded if env responded well
         elif per_msg >= CATEGORY_WEIGHTS["repair"] * 0.6:
             self.analysis["trajectory"] = "harmonious"
         elif per_msg >= CATEGORY_WEIGHTS["compromise"] * 0.6 and horse_penalty < 8:
@@ -263,15 +274,16 @@ class EvaluationEngine:
             "cultural_penalty": cult_penalty,
             "repair_bonus": repair_bonus,
             "synergy_bonus": synergy_bonus,
+            "env_impact": round(env_impact, 1),
         }
 
         self.analysis["inference"] = self._build_inference(
-            cat_score, horse_penalty, cult_penalty, repair_bonus, synergy_bonus,
+            cat_score, horse_penalty, cult_penalty, repair_bonus, synergy_bonus, env_impact
         )
 
     def _build_inference(
         self, cat_score: float, horse_penalty: int, cult_penalty: int,
-        repair_bonus: int, synergy_bonus: int,
+        repair_bonus: int, synergy_bonus: int, env_impact: float,
     ) -> str:
         score = self.analysis["harmony_score"]
         trajectory = self.analysis["trajectory"]
@@ -306,6 +318,8 @@ class EvaluationEngine:
             parts.append(f"{self.analysis['repair_attempts']} repair attempts (+{repair_bonus}pts)")
         if synergy_bonus > 0:
             parts.append(f"{len(self.analysis['synergies'])} synergies (+{synergy_bonus}pts)")
+        if env_impact != 0:
+            parts.append(f"environment response ({env_impact:+.1f}pts)")
 
         return f"Score {score}/100 [{trajectory.upper()}]: " + "; ".join(parts) + "."
 
@@ -313,9 +327,9 @@ class EvaluationEngine:
         b = self._score_breakdown
         logger.info("  EVALUATION SCORE BREAKDOWN:")
         logger.info(
-            "    cat_score=%.1f - horsemen=%d - cultural=%d + repair=%d + synergy=%d = %d",
+            "    cat_score=%.1f - horsemen=%d - cult=%d + repair=%d + synergy=%d + env=%.1f = %d",
             b["cat_score"], b["horsemen_penalty"], b["cultural_penalty"],
-            b["repair_bonus"], b["synergy_bonus"],
+            b["repair_bonus"], b["synergy_bonus"], b["env_impact"],
             self.analysis["harmony_score"],
         )
         if self.analysis["synergies"]:

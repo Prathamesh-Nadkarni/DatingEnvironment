@@ -51,19 +51,27 @@ RAW ANSWERS
 │  · Tension computation (per scenario)   │
 │  · 7-category dialogue generation       │
 │  · Resentment override logic            │
-│  × 18 scenarios (3 per category × 6)   │
+│  × 100 scenarios (3 per category × 6)   │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│  Stage 3.5: Environmental Mechanics     │
+│  · Smart Agent Interventions            │
+│  · (MIL, Patriarch, Sibling, Society)   │
+│  · Non-linear Happiness/Stress Alg      │
+│  · The Relationship "Limit Break"       │
 └────────────────────┬────────────────────┘
                      │
                      ▼
 ┌─────────────────────────────────────────┐
 │  Stage 4: The Arbitrator (Evaluation)   │
 │  Category-behaviour primary scoring     │
+│  + Environmental Happiness impact       │
 │  + Gottman Four Horsemen detection      │
 │  + Indian cultural stressor detection   │
 │  + Synergy detection                    │
 │  + 5-model static trait compatibility   │
-│  → Overall score · 6 dimensional scores │
-│  → Dealbreaker flags · Verdict          │
 └─────────────────────────────────────────┘
 ```
 
@@ -242,17 +250,44 @@ Execution flow per turn:
 generate_agent_a_message
         │
         ▼
-update_tension
-        │
-        ▼
 generate_agent_b_message
         │
         ▼
-check_turn_limit ──→ [END if max_turns reached]
+   ENVIRONMENT_REACTION (Smart Agent)
+        │
+        ▼
+NON-LINEAR MATH (Stress/Happiness check)
+        │
+        ▼
+check_turn_limit ──→ [END if max_turns or LIMIT_BREAK reached]
         │
         ▼
    [loop back]
 ```
+
+### Stage 3.5 — Environmental & Multi-Agent Mechanics
+
+The simulation is no longer a vacuum between two people. Relationship stability is often determined by how a couple handles **external pressure**.
+
+#### The Environment Node
+A dedicated LangGraph node executes after each exchange turn. It selects a "Smart Agent" from a category-specific pool to intervene in the dialogue:
+
+| Category | Potential External Agents |
+|---|---|
+| **Family Dynamics** | Mother-in-Law, Patriarch, Nosy Aunt, Extended Family |
+| **Financial** | Bank Manager, Siphoning Sibling, Creditor |
+| **Loyalty & Trust** | Suspicious Relative, Legal Counsel, Anonymous Interferer |
+| **Crisis Resilience** | Crisis Trigger, Landlord, Medical Staff |
+
+#### Non-Linear Algorithmic Scaling
+The engine calculates a **Happiness Factor (0-100)** and **Accumulated Stress (0-150)** using non-linear math to simulate the "breaking point" of real relationships:
+
+1.  **Exponential Happiness Depletion**: High-severity stressors (level 5+ dealbreakers) don't just subtract points; if the couple escalates, the happiness factor is drained exponentially (e.g., `-20.0 × severity`). A single bad exchange in a high-stakes scenario can wipe out 80% of the relationship's perceived happiness.
+2.  **Outsized Repair Rewards**: If the couple successfully de-escalates or repairs during a high-severity environmental crisis, they receive an outsized "stability bonus" (`+20.0 × severity`). This models how overcoming a major external challenge can significantly strengthen a bond.
+3.  **The Relationship Limit (Limit Break)**: The `accumulated_stress` counter represents the structural integrity of the relationship. Every external backlash adds stress. If stress crosses the **150-point limit**, the relationship hits a "Limit Break." The simulation instantaneously ends, the harmony score is hardcoded to 0, and the trajectory is collapsed into `DOWNWARD-SPIRAL`.
+
+#### Dynamic Contextual Templates
+External agents are not hardcoded strings. They select reactions (`ESCALATE`, `REPAIR`, `NEUTRAL`, `LIMIT_BREAK`) based on the couple's immediate dialogue history, ensuring the environment feels "smart" and reactive to the specific behavior of the two simulated personas.
 
 ### Behavioral Profiles
 
@@ -383,8 +418,10 @@ The most important innovation in the evaluation engine is that it does not score
 
 ```
 harmony_score = normalise(Σ category_weights) − horsemen_penalty − cultural_penalty
-                         + repair_bonus + synergy_bonus
+                 + repair_bonus + synergy_bonus + environmental_happiness_delta
 ```
+
+**Note on Environmental Impact**: If the environmental "Limit Break" is triggered (stress > 150), the harmony score is automatically forced to **0**, overriding all other positive signals. This models the "point of no return" where external damage becomes structural.
 
 This approach is more reliable than keyword matching because the category is the agent's actual behavioural decision — the spoken text is just the surface expression of it.
 
