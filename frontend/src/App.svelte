@@ -48,6 +48,9 @@
   $: totalQuestions = sections.reduce((acc, sec) => acc + sec.questions.length, 0);
   $: absoluteQuestionIndex = sections.slice(0, currentSectionIndex).reduce((acc, sec) => acc + sec.questions.length, 0) + currentQuestionIndex;
   $: progressPercent = totalQuestions > 0 ? Math.round((absoluteQuestionIndex / totalQuestions) * 100) : 0;
+  
+  $: hasAnsweredCurrent = answers[currentQuestion?.id] !== undefined && 
+                          (Array.isArray(answers[currentQuestion?.id]) ? answers[currentQuestion?.id].length > 0 : answers[currentQuestion?.id] !== '');
 
   let introSlide = true;
 
@@ -63,6 +66,22 @@
     } else {
         answers[qId] = value;
     }
+  }
+
+  async function handleBack() {
+    if ("vibrate" in navigator) navigator.vibrate(20);
+    isTransitioning = true;
+    setTimeout(() => {
+        if (currentQuestionIndex > 0) {
+          currentQuestionIndex--;
+        } else if (currentSectionIndex > 0) {
+          currentSectionIndex--;
+          currentQuestionIndex = sections[currentSectionIndex].questions.length - 1;
+        } else {
+          introSlide = true;
+        }
+        isTransitioning = false;
+    }, 500); 
   }
 
   async function handleNext() {
@@ -280,12 +299,18 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
           {/if}
         </div>
 
-        <footer>
-            <button class="action-btn-gold" on:click={handleNext} disabled={!answers[currentQuestion.id]}>
+        <footer class="nav-footer">
+            <button class="action-btn-ghost" on:click={handleBack}>
+              <span class="btn-text">Back</span>
+            </button>
+            <button class="action-btn-gold" on:click={handleNext} disabled={!hasAnsweredCurrent}>
               <span class="btn-text">
-                { (currentSectionIndex === sections.length - 1 && currentQuestionIndex === totalQuestionsInSection - 1) ? 'Synthesize My Persona' : 'Calmly Proceed' }
+                  {#if currentSectionIndex === sections.length - 1 && currentQuestionIndex === totalQuestionsInSection - 1}
+                      Complete Simulation
+                  {:else}
+                      Next Question
+                  {/if}
               </span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </button>
         </footer>
       </div>
@@ -533,8 +558,32 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
         padding: 1.25rem 1.5rem;
     }
 
+    .nav-footer {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .action-btn-ghost {
+        flex: 0.3;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 500;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+
     .action-btn-gold {
-        width: 100%;
+        flex: 1;
         background: #fbbf24;
         border: none;
         padding: 1.5rem;
