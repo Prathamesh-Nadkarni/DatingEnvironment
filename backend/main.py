@@ -21,11 +21,9 @@ app = FastAPI(title="MiroFish Agentic Matchmaking API")
 
 # Simple In-Memory DB for Demo
 db = {
-    "user_prompts": {
-        1: "You are the User (Agent A).",
-        2: "You are the Match (Agent B).",
-    },
-    "user_answers": {}
+    "sessions": {
+        # "session_id": { "user_a": {"prompt": "...", "answers": {}}, "user_b": {"prompt": "...", "answers": {}} }
+    }
 }
 
 app.add_middleware(
@@ -41,7 +39,8 @@ def health_check():
     return {"status": "ok"}
 
 class SurveySubmission(BaseModel):
-    user_id: int
+    session_id: str
+    role: str # "user_a" or "user_b"
     answers: Dict[str, Any]
 
 @app.get("/api/onboarding/questions")
@@ -50,25 +49,48 @@ def get_questions():
 
 @app.post("/api/onboarding/submit")
 def submit_onboarding(submission: SurveySubmission):
+    session_id = submission.session_id
+    role = submission.role
+
+    if session_id not in db["sessions"]:
+        db["sessions"][session_id] = {}
+        
+    if role not in db["sessions"][session_id]:
+        db["sessions"][session_id][role] = {}
+
     # 1. Store raw answers
-    db["user_answers"][submission.user_id] = submission.answers
+    db["sessions"][session_id][role]["answers"] = submission.answers
     
     # 2. Synthesize Persona through 9-step pipeline
     persona_prompt = analyze_answers(submission.answers)
     
     # 3. Store the prompt for simulation
-    db["user_prompts"][submission.user_id] = persona_prompt
+    db["sessions"][session_id][role]["prompt"] = persona_prompt
     
-    print(f"Persona Synthesized for User {submission.user_id}")
+    print(f"Persona Synthesized for Session {session_id} Role {role}")
     return {"status": "success", "message": "Persona synthesized."}
+
+@app.get("/api/session/status/{session_id}")
+def check_session_status(session_id: str):
+    if session_id not in db["sessions"]:
+        return {"ready": False}
+    
+    session = db["sessions"][session_id]
+    user_a_ready = "user_a" in session and "prompt" in session["user_a"]
+    user_b_ready = "user_b" in session and "prompt" in session["user_b"]
+    
+    return {
+        "ready": user_a_ready and user_b_ready,
+        "user_a_ready": user_a_ready,
+        "user_b_ready": user_b_ready
+    }
 
 @app.get("/api/scenarios")
 def get_scens():
     return {"scenarios": scenarios.get_scenarios()}
 
 class SimulationRequest(BaseModel):
-    user_a_id: int
-    user_b_id: int
+    session_id: str
     scenario_id: Optional[str] = None
     max_turns: int = 5
 
@@ -79,8 +101,9 @@ def start_simulation(req: SimulationRequest):
     scenario_data = all_scenarios.get(req.scenario_id or "unannounced_guests")
     
     # 2. Retrieve Prompts
-    prompt_a = db["user_prompts"].get(req.user_a_id, "You are a standard persona.")
-    prompt_b = db["user_prompts"].get(req.user_b_id, "You are a traditional match.")
+    session = db["sessions"].get(req.session_id, {})
+    prompt_a = session.get("user_a", {}).get("prompt", "You are a standard persona.")
+    prompt_b = session.get("user_b", {}).get("prompt", "You are a traditional match.")
     
     # 3. Execute LangGraph Simulation
     result = run_simulation(prompt_a, prompt_b, scenario_data, max_turns=req.max_turns)
@@ -100,21 +123,21 @@ def start_simulation(req: SimulationRequest):
     }
 
 class CompatibilityRequest(BaseModel):
-    user_a_id: int
-    user_b_id: int
+    session_id: str
     max_turns: int = 4
 
 @app.post("/api/compatibility/report")
 def get_compatibility_report(req: CompatibilityRequest):
-    prompt_a = db["user_prompts"].get(req.user_a_id, "You are a standard persona.")
-    prompt_b = db["user_prompts"].get(req.user_b_id, "You are a traditional match.")
+    session = db["sessions"].get(req.session_id, {})
+    
+    prompt_a = session.get("user_a", {}).get("prompt", "You are a standard persona.")
+    prompt_b = session.get("user_b", {}).get("prompt", "You are a traditional match.")
 
     report = run_full_compatibility_report(prompt_a, prompt_b, max_turns=req.max_turns)
 
     return {
         "status": "success",
-        "user_a_id": req.user_a_id,
-        "user_b_id": req.user_b_id,
+        "session_id": req.session_id,
         **report,
     }
 

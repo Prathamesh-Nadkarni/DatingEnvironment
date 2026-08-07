@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  export let userId: number;
+  export let sessionId: string = 'local_demo';
   
   let scenarios: any[] = [];
   let selectedScenarioId = '';
@@ -33,8 +33,7 @@
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          user_a_id: userId,
-          user_b_id: 2, 
+          session_id: sessionId,
           scenario_id: selectedScenarioId,
           max_turns: 6
         })

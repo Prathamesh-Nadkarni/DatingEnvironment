@@ -10,6 +10,12 @@
   let loading = true;
   let isTransitioning = false;
 
+  let modeSelectionSlide = false;
+  let shareLink = "";
+  let sessionId = "local_demo";
+  let role = "user_a";
+  let isWaitingForPartner = false;
+
   const CORE_DIMENSIONS = [
     "family_deference", "couple_first_orientation", "boundary_strength", "egalitarianism",
     "tradition_compliance", "public_harmony_preference", "partner_advocacy", "financial_mutuality",
@@ -27,6 +33,14 @@
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
   onMount(async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('session')) {
+        sessionId = urlParams.get('session') as string;
+        role = urlParams.get('role') || 'user_b';
+        introSlide = false;
+        modeSelectionSlide = false;
+    }
+
     try {
       const response = await fetch(`${API_URL}/api/onboarding/questions`);
       if (response.ok) {
@@ -84,12 +98,27 @@
     }, 500); 
   }
 
+  function selectGeneralMode() {
+      sessionId = "local_" + Math.random().toString(36).substring(7);
+      role = "user_a";
+      modeSelectionSlide = false;
+  }
+
+  function selectSpecificMode() {
+      sessionId = "session_" + Math.random().toString(36).substring(2, 8);
+      role = "user_a";
+      shareLink = `${window.location.origin}${window.location.pathname}?session=${sessionId}&role=user_b`;
+  }
+
   async function handleNext() {
     if ("vibrate" in navigator) navigator.vibrate(20);
     isTransitioning = true;
     setTimeout(async () => {
         if (introSlide) {
           introSlide = false;
+          if (!sessionId || sessionId === "local_demo") {
+              modeSelectionSlide = true;
+          }
         } else if (currentQuestionIndex < totalQuestionsInSection - 1) {
           currentQuestionIndex++;
         } else if (currentSectionIndex < sections.length - 1) {
@@ -108,13 +137,33 @@
       await fetch(`${API_URL}/api/onboarding/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: 1, answers })
+        body: JSON.stringify({ session_id: sessionId, role: role, answers })
       });
     } catch(e) {
        console.error(e);
     }
-    submitted = true;
+    
+    if (sessionId.startsWith("session_")) {
+        isWaitingForPartner = true;
+        pollSessionStatus();
+    } else {
+        submitted = true;
+    }
     loading = false;
+  }
+
+  async function pollSessionStatus() {
+      const interval = setInterval(async () => {
+          try {
+              const res = await fetch(`${API_URL}/api/session/status/${sessionId}`);
+              const data = await res.json();
+              if (data.ready) {
+                  clearInterval(interval);
+                  isWaitingForPartner = false;
+                  submitted = true;
+              }
+          } catch(e) {}
+      }, 3000);
   }
 
   function getScaleConfig(q: any) {
@@ -140,9 +189,15 @@
         <div class="luxury-spinner"></div>
         <p class="accent-text">Synthesizing {CORE_DIMENSIONS.length} Dimensions of You</p>
     </div>
+  {:else if isWaitingForPartner}
+    <div class="loader-overlay">
+        <div class="luxury-spinner"></div>
+        <p class="accent-text">Waiting for your partner to finish...</p>
+        <p class="dim" style="margin-top: 1rem; font-size: 0.9rem;">Keep this page open.</p>
+    </div>
   {:else if submitted}
     <div class="fade-in">
-        <Dashboard userId={1} />
+        <Dashboard {sessionId} />
     </div>
   {:else if introSlide}
     <div class="luxury-container intro-layout {isTransitioning ? 'transitioning' : ''}">
@@ -216,6 +271,26 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+  {:else if modeSelectionSlide}
+    <div class="luxury-container {isTransitioning ? 'transitioning' : ''}">
+        <div class="card glass">
+            <header>
+                <h1 class="accent-title" style="text-align: center;">Select Match Mode</h1>
+            </header>
+            {#if !shareLink}
+                <div class="mode-buttons" style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button class="action-btn-ghost" on:click={selectGeneralMode} style="flex: 1; padding: 1.5rem;">General Compatibility<br><small class="dim">Simulated Partner</small></button>
+                    <button class="action-btn-gold" on:click={selectSpecificMode} style="flex: 1; padding: 1.5rem;">With a Specific Person<br><small style="opacity: 0.8;">Share a Link</small></button>
+                </div>
+            {:else}
+                <div class="share-link-box" style="text-align: center; margin-top: 2rem;">
+                    <p style="margin-bottom: 1rem;">Share this link with your partner:</p>
+                    <input type="text" readonly value={shareLink} class="luxury-input" style="text-align: center; margin-bottom: 2rem;" on:focus={(e) => e.target.select()} />
+                    <button class="action-btn-gold" on:click={() => { modeSelectionSlide = false; }}>Proceed to Questionnaire</button>
+                </div>
+            {/if}
         </div>
     </div>
   {:else if currentQuestion}
