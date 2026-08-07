@@ -22,6 +22,13 @@ MiroFish was built to surface all of this before the first coffee.
 
 ---
 
+## Recent Updates (August 2026)
+
+- **Session Sharing (1-on-1 Compatibility):** You can now test your compatibility with a specific person. By selecting "With a Specific Person" at the start, the system generates a unique, shareable link. Both users enter the same session, complete their distinct questionnaires, and the LangGraph engine runs a custom simulation specifically between the two of you, evaluating your unique dynamics.
+- **Strict Questionnaire Navigation:** We've overhauled the questionnaire UX. Users can now use a "Back" button to revisit and change previous answers, and the system strictly enforces that a question must be answered before allowing progression to the next, ensuring high-fidelity data collection for the simulation.
+
+---
+
 ## How It Works — The Four-Stage Pipeline
 
 ```
