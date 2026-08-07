@@ -122,7 +122,7 @@
         <Dashboard userId={1} />
     </div>
   {:else if introSlide}
-    <div class="luxury-container {isTransitioning ? 'transitioning' : ''}">
+    <div class="luxury-container intro-layout {isTransitioning ? 'transitioning' : ''}">
         <div class="card glass intro-card">
             <header>
                 <span class="section-tag">Welcome to MiroFish</span>
@@ -138,6 +138,51 @@
                     <span class="btn-text">Begin The Mirroring</span>
                 </button>
             </footer>
+        </div>
+
+        <div class="preview-column fade-in delay-1">
+            <div class="terminal-preview glass">
+                <div class="mac-buttons">
+                    <span class="mac-btn red"></span><span class="mac-btn yellow"></span><span class="mac-btn green"></span>
+                    <span class="mac-title">test_persona_performance.py</span>
+                </div>
+                <pre class="terminal-text">
+<span class="dim">===================================================</span>
+<span class="gold">  CASE: Polar Opposites (0% Aligned)</span>
+<span class="dim">===================================================</span>
+
+OVERALL COMPATIBILITY  [------------------] <span class="red">0/100</span>
+
+<span class="red">DEALBREAKERS FLAGGED:</span> stridhan_confiscation, salary_to_mil, desire_mismatch...
+
+<span class="gold">-- Static trait compatibility --</span>
+  Values           [#########---------] 52%
+  Conflict style   [#########---------] 50%
+  Trust            [########----------] 49%
+
+<span class="gold">Verdict:</span>
+  Fundamental incompatibility detected in 13 
+  dealbreaker scenarios. Core values misalignment 
+  will compound over time.
+                </pre>
+            </div>
+            
+            <div class="dashboard-mock glass">
+                <div class="mock-score-card">
+                    <span class="mock-label">Simulated Harmony Index</span>
+                    <span class="mock-score red-glow">0%</span>
+                </div>
+                <div class="mock-stats">
+                    <div class="mock-stat">
+                        <span class="mock-label">TRAJECTORY</span>
+                        <span class="mock-val">AT-RISK</span>
+                    </div>
+                    <div class="mock-stat">
+                        <span class="mock-label">TOP FRICTION</span>
+                        <span class="mock-val">Family Dynamics</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
   {:else if currentQuestion}
@@ -260,6 +305,20 @@
         width: 100%;
         max-width: 720px;
         transition: transform 0.6s cubic-bezier(0.2, 1, 0.2, 1), opacity 0.5s ease;
+    }
+
+    .luxury-container.intro-layout {
+        max-width: 1200px;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+
+    @media (max-width: 900px) {
+        .luxury-container.intro-layout {
+            grid-template-columns: 1fr;
+        }
     }
 
     .luxury-container.transitioning {
@@ -522,9 +581,107 @@
     .fade-in {
         animation: fadeIn 1s ease forwards;
     }
+    
+    .delay-1 {
+        animation-delay: 0.3s;
+        opacity: 0;
+    }
 
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
+    }
+
+    .preview-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .terminal-preview {
+        padding: 1.5rem;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        font-size: 0.85rem;
+    }
+
+    .mac-buttons {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 1rem;
+        align-items: center;
+    }
+
+    .mac-btn {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    .mac-btn.red { background: #ff5f56; }
+    .mac-btn.yellow { background: #ffbd2e; }
+    .mac-btn.green { background: #27c93f; }
+    .mac-title {
+        margin-left: 10px;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.75rem;
+    }
+
+    .terminal-text {
+        color: #e2e8f0;
+        margin: 0;
+        line-height: 1.6;
+        overflow-x: hidden;
+    }
+
+    .terminal-text .dim { color: rgba(255, 255, 255, 0.3); }
+    .terminal-text .gold { color: #fbbf24; font-weight: bold; }
+    .terminal-text .red { color: #ef4444; font-weight: bold; }
+
+    .dashboard-mock {
+        padding: 1.5rem;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .mock-score-card {
+        text-align: center;
+    }
+
+    .mock-label {
+        display: block;
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 0.5rem;
+    }
+
+    .mock-score {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 3rem;
+        line-height: 1;
+    }
+    
+    .mock-score.red-glow {
+        color: #ef4444;
+        text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .mock-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        padding-left: 2rem;
+    }
+
+    .mock-val {
+        color: #f8fafc;
+        font-weight: 600;
+        font-size: 0.9rem;
     }
 </style>
