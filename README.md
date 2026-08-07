@@ -2,6 +2,8 @@
 
 > *"Don't ask who someone is. Watch what they do when the stakes are real."*
 
+**🌟 [Try the Live Demo Here!](https://Prathamesh-Nadkarni.github.io/DatingEnvironment/)**
+
 MiroFish is a relationship compatibility platform built on a fundamentally different premise than every dating app in existence. It does not ask you what you like or what you are looking for. It clones you into a behavioral AI agent and stress-tests that clone against a potential match across 18 high-stakes scenarios drawn from real Indian relational conflict patterns — before the first conversation ever happens.
 
 The result is not a star sign match or a percentage derived from survey answers. It is a behavioral simulation report: what you actually do when your mother-in-law demands your wife's gold, when your husband suggests you quit your job for the children's exams, or when a financial crisis hits and both of you want to blame someone.
