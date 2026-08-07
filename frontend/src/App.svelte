@@ -18,7 +18,10 @@
     "guilt_susceptibility", "autonomy_need", "caregiving_flexibility", "parenting_alignment",
     "jealousy_threshold", "privacy_need", "career_priority", "resentment_accumulation_rate",
     "forgiveness_rate", "moral_reasoning_style", "burnout_vulnerability", "identity_rigidity",
-    "household_order_preference", "social_image_sensitivity"
+    "household_order_preference", "social_image_sensitivity",
+    "hygiene_standard", "body_comfort", "sexual_openness", "libido_alignment",
+    "intimacy_communication", "ritual_rigidity", "sleep_schedule_compatibility",
+    "personal_space_need"
   ];
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';

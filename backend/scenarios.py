@@ -1200,6 +1200,198 @@ SCENARIOS = [
         "test_reason": "Tests whether the primary relationship actually holds veto power as originally agreed.",
         "scoring_logic": "A severe test of the Nash Equilibrium. If they cannot negotiate a compassionate wind-down or transition, the relationship fails.",
         "mechanic": "Executes a 'rule change' command from one agent. Simulates the ensuing multi-agent negotiation over thousands of interaction steps to find a stable equilibrium or dissolution."
+    },
+
+    # ══════════════════════════════════════════════════════════════════════════
+    #  PHASE 8 — HYGIENE & DOMESTIC HABITS  (5 scenarios)
+    # ══════════════════════════════════════════════════════════════════════════
+    {
+        "id": "bathroom_horror",
+        "category": "hygiene_domestic",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Bathroom Horror Show",
+        "description": "One partner consistently leaves the bathroom in a state that the other finds repulsive — wet towels on the floor, toothpaste residue in the sink, hair in the drain, unflushed toilet. After weeks of silent irritation, the cleaner partner reaches a breaking point.",
+        "impact": "Breeds silent disgust that erodes physical attraction and basic domestic respect. The 'messy' partner feels micromanaged; the 'clean' partner feels disrespected.",
+        "test_reason": "Tests whether couples can negotiate domestic standards without contempt or passive aggression. Reveals hygiene compatibility and conflict initiation style.",
+        "scoring_logic": "Direct, non-contemptuous negotiation that results in a concrete plan = High Score. Contempt, eye-rolling, or avoidance = Low Score.",
+        "mechanic": "Hygiene-mismatch injector. Tracks whether the cleaner agent uses 'I feel' language vs. character attacks, and whether the messier agent responds with genuine change commitment or defensiveness."
+    },
+    {
+        "id": "laundry_standoff",
+        "category": "hygiene_domestic",
+        "weight": 1,
+        "dealbreaker": False,
+        "title": "The Laundry Standoff",
+        "description": "Neither partner has done laundry in two weeks. Both are running out of clean clothes. Each is waiting for the other to break first. The apartment smells. Friends are visiting tomorrow.",
+        "impact": "A microcosm of passive domestic negotiation. Reveals who takes initiative, who waits to be asked, and who weaponizes incompetence.",
+        "test_reason": "Tests proactive household contribution vs. the 'mental load' dynamic. Exposes whether one partner has been silently designated the household manager.",
+        "scoring_logic": "Autonomous initiative from either partner + collaborative follow-through = High Score. Waiting games, guilt-tripping, or 'why didn't you' = Low Score.",
+        "mechanic": "Countdown timer with a social event deadline. Tracks initiative patterns and verbal framing of the request."
+    },
+    {
+        "id": "kitchen_disaster",
+        "category": "hygiene_domestic",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Post-Cooking Warzone",
+        "description": "One partner loves cooking elaborate meals but leaves the kitchen looking like a warzone afterwards — every counter dirty, oil splatter on the stove, dishes piled high. The other partner, who values kitchen cleanliness, has to choose between cleaning up in silence or confronting the chef.",
+        "impact": "Creates a resentment loop: one partner's creative expression becomes another's unpaid labor. The cook feels unappreciated; the cleaner feels exploited.",
+        "test_reason": "Tests the 'second shift' dynamic in a specific, daily, repeatable context. Reveals whether gratitude and reciprocity exist in the domestic economy.",
+        "scoring_logic": "Cook proactively cleans OR negotiates a fair trade = High Score. 'I cooked, you clean' as an unilateral declaration = Medium. Ignoring the mess entirely = Low Score.",
+        "mechanic": "Mess-accumulation state variable. Engine tracks whether the cooking partner acknowledges the labor asymmetry before being told."
+    },
+    {
+        "id": "guest_bathroom_shame",
+        "category": "hygiene_domestic",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Guest-Bathroom Shame Spiral",
+        "description": "Important guests (in-laws or the partner's boss) are arriving in two hours. The bathroom is filthy. One partner panics about the social judgment; the other thinks it is fine. A fight erupts about cleanliness standards, social image, and who is responsible for the state of the house.",
+        "impact": "Activates both hygiene standards AND social image sensitivity simultaneously. The couple must negotiate priorities under time pressure.",
+        "test_reason": "Tests whether social shame activates productive teamwork or mutual blame. Reveals whose social image anxiety is dominant in the relationship.",
+        "scoring_logic": "Collaborative emergency clean-up without blame = High Score. Blame-first behavior or 'this is your fault' framing = Low Score.",
+        "mechanic": "Time-pressure injector combined with social-audience variable. Tracks teamwork vs. blame under a deadline."
+    },
+    {
+        "id": "body_odor_confrontation",
+        "category": "hygiene_domestic",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Body Odor Confrontation",
+        "description": "One partner has developed noticeable body odor (due to stress, diet change, or reduced grooming). The other partner finds it physically repulsive but is terrified of hurting their partner's feelings. Intimacy has silently decreased. The avoidance has gone on for weeks.",
+        "impact": "Erodes physical intimacy, creates a communication black hole, and introduces shame into the relationship. The partner with the issue may be completely unaware.",
+        "test_reason": "Tests the ability to raise a deeply uncomfortable, body-related topic with kindness and without contempt. One of the hardest relational conversations.",
+        "scoring_logic": "Kind, direct, private conversation with framing of care = High Score. Hints, avoidance, or contemptuous delivery = Low Score. Using humor with consent = Medium-High.",
+        "mechanic": "Intimacy-withdrawal tracker. Monitors whether the avoidant partner eventually initiates the conversation and with what emotional tone."
+    },
+
+    # ══════════════════════════════════════════════════════════════════════════
+    #  PHASE 8 — INTIMACY & SEXUAL COMPATIBILITY  (5 scenarios)
+    # ══════════════════════════════════════════════════════════════════════════
+    {
+        "id": "desire_mismatch",
+        "category": "intimacy_sexual",
+        "weight": 3,
+        "dealbreaker": True,
+        "title": "The Chronic Desire Mismatch",
+        "description": "Six months into living together, a persistent pattern has emerged: one partner wants physical intimacy 4-5 times a week, the other is content with once a week or less. The higher-desire partner feels rejected; the lower-desire partner feels pressured. Neither has addressed it openly — it leaks out as irritability, reduced affection, and passive comments.",
+        "impact": "Creates a self-reinforcing cycle: pressure reduces desire, reduced desire increases pressure. If unaddressed, breeds chronic resentment and emotional disconnection.",
+        "test_reason": "Tests whether the couple can discuss sexual needs without shame, guilt, or contempt. Reveals communication skill on the most vulnerable topic in a relationship.",
+        "scoring_logic": "Open dialogue acknowledging both needs + concrete compromise plan = High Score. Pressure/guilt from either side, or complete avoidance = Low Score.",
+        "mechanic": "Libido-mismatch state injector. Tracks whether either agent uses guilt ('don't you find me attractive?') or shame ('you're too demanding') as leverage."
+    },
+    {
+        "id": "kink_reveal",
+        "category": "intimacy_sexual",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Kink Reveal Conversation",
+        "description": "One partner gathers the courage to share a sexual fantasy or preference that is significantly outside the other partner's comfort zone. It could be anything from roleplay to a specific fetish. The revelation creates a charged moment — the disclosing partner is deeply vulnerable, and the receiving partner must navigate surprise, potential discomfort, and the desire to not shame their partner.",
+        "impact": "A defining moment for sexual trust. A supportive reception (even without agreement to participate) deepens intimacy massively. A contemptuous or disgusted reaction can permanently shut down sexual vulnerability.",
+        "test_reason": "Tests emotional safety in the most private domain. Measures whether the couple can discuss sexual differences without judgment.",
+        "scoring_logic": "Receiving partner responds with curiosity or respectful boundary-setting = High Score. Disgust, mockery, or weaponizing the disclosure later = Automatic Low.",
+        "mechanic": "Vulnerability disclosure trigger. Engine monitors the receiving agent's immediate emotional response category and whether shame-language is used."
+    },
+    {
+        "id": "initiation_asymmetry",
+        "category": "intimacy_sexual",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Initiation Asymmetry",
+        "description": "One partner always initiates intimacy. The other enjoys it but never starts it. After months, the initiating partner begins to feel like they are the only one who wants it — creating a crisis of desirability and self-worth. They bring it up during a quiet evening.",
+        "impact": "The always-initiating partner feels undesired. The never-initiating partner may have responsive desire (only activated by cues) but cannot articulate it, making the problem invisible.",
+        "test_reason": "Tests whether the couple can distinguish desire styles (spontaneous vs. responsive) and negotiate initiation patterns without it becoming a referendum on attraction.",
+        "scoring_logic": "Understanding responsive vs. spontaneous desire + agreement to share initiation = High Score. 'You never want me' accusation loops = Low Score.",
+        "mechanic": "Initiation-tracking counter. Monitors whether the conversation produces a concrete behavioral change plan or devolves into blame."
+    },
+    {
+        "id": "postpartum_intimacy",
+        "category": "intimacy_sexual",
+        "weight": 3,
+        "dealbreaker": False,
+        "title": "The Post-Baby Intimacy Collapse",
+        "description": "Three months after childbirth. The mother is physically recovering, sleep-deprived, touched-out, and her body feels foreign. The father feels emotionally disconnected and physically starved. Both are too exhausted to fight about it but too frustrated to ignore it. The tension surfaces during a rare quiet moment after the baby sleeps.",
+        "impact": "One of the most predictable and devastating intimacy crises in a marriage. If mishandled, it sets a precedent of sexual disconnection that can last years.",
+        "test_reason": "Tests empathy under biological asymmetry. The father's patience and the mother's ability to communicate needs are both critical.",
+        "scoring_logic": "Father prioritizing connection over sex + mother feeling safe to express timeline = High Score. Pressure, guilt, or mutual withdrawal = Low Score.",
+        "mechanic": "Postpartum fatigue + hormonal state modifier injected into both agents. Body_comfort trait gates mother's response; co_regulation gates father's patience."
+    },
+    {
+        "id": "intimacy_shutdown",
+        "category": "intimacy_sexual",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The 'Not Tonight' Escalation",
+        "description": "Partner A initiates intimacy. Partner B declines. Partner A takes it personally and becomes visibly cold. The next morning, the coldness has escalated into a broader emotional withdrawal. Partner B now feels guilty for saying no and unsafe to decline in the future.",
+        "impact": "Creates a coercive dynamic where one partner cannot freely decline without relational punishment. Destroys the consent foundation of healthy intimacy.",
+        "test_reason": "Tests whether rejection is handled with emotional maturity. Reveals whether either partner uses emotional withdrawal as punishment for sexual refusal.",
+        "scoring_logic": "Initiator accepting rejection gracefully + reconnecting non-sexually = High Score. Punishing coldness, sulking, or guilt-tripping = Severe penalty.",
+        "mechanic": "Rejection-response tracker. Engine specifically monitors whether the rejected agent transitions to non-sexual connection or emotional punishment."
+    },
+
+    # ══════════════════════════════════════════════════════════════════════════
+    #  PHASE 8 — DAILY RITUALS & COHABITATION RHYTHMS  (5 scenarios)
+    # ══════════════════════════════════════════════════════════════════════════
+    {
+        "id": "morning_clash",
+        "category": "daily_rituals",
+        "weight": 1,
+        "dealbreaker": False,
+        "title": "The Morning Routine War",
+        "description": "One partner is a 'don't talk to me until I've had coffee' person. The other is a morning person who wants to discuss plans, share feelings, and connect before leaving for work. Every morning becomes a micro-rejection: the morning person feels shut out, the quiet person feels invaded.",
+        "impact": "Sets the emotional tone for the entire day. If the first interaction is a rejection or an intrusion, it compounds over weeks into a background resentment.",
+        "test_reason": "Tests routine negotiation on the smallest, most daily scale. Reveals whether the couple can respect each other's energy rhythms without interpreting them as rejection.",
+        "scoring_logic": "Compromise (e.g., 10 min quiet, then connect) + mutual understanding = High Score. Taking it personally or forcing compliance = Low Score.",
+        "mechanic": "Morning-state energy injector. Tracks whether agents negotiate a ritualized compromise or cycle through daily micro-conflicts."
+    },
+    {
+        "id": "sleep_schedule_war",
+        "category": "daily_rituals",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Night Owl vs. Early Bird",
+        "description": "One partner goes to bed at 10 PM and wakes at 6 AM. The other stays up until 2 AM and sleeps until 10 AM. They share a bed. The early bird is woken up by the night owl coming to bed; the night owl is woken up by the early bird's alarm. Both are chronically sleep-deprived and increasingly irritable.",
+        "impact": "Sleep deprivation is one of the most underestimated relationship stressors. Chronic mismatch creates permanent low-grade irritability, reduced intimacy, and decision fatigue.",
+        "test_reason": "Tests whether the couple can negotiate a biological incompatibility without moralizing ('you're lazy' vs. 'you're rigid'). Reveals flexibility vs. stubbornness.",
+        "scoring_logic": "Concrete structural solutions (separate blankets, sleep timing compromise, separate sleep on work nights) = High Score. Moralizing or ignoring = Low Score.",
+        "mechanic": "Sleep-deprivation fatigue modifier applied to both agents. Tracks whether proposed solutions are structural (effective) or behavioral-demand (ineffective)."
+    },
+    {
+        "id": "screen_time_dinner",
+        "category": "daily_rituals",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Phone-at-Dinner Standoff",
+        "description": "One partner scrolls their phone during every meal — dinner, breakfast, even dates. The other partner has asked them to put it away multiple times. The phone partner agrees each time but reverts within days. The non-phone partner now feels they are less interesting than a screen.",
+        "impact": "Chronic low-level emotional neglect. The phone-using partner may not register the severity; the other partner accumulates a sense of invisibility.",
+        "test_reason": "Tests whether a partner can modify a deeply habitual behavior when asked, and whether the requesting partner can raise the issue without contempt.",
+        "scoring_logic": "Genuine behavior change commitment + acknowledgment of impact = High Score. 'It's just a phone' dismissal or repeated broken promises = Low Score.",
+        "mechanic": "Attention-tracking counter. Monitors whether the phone-using agent acknowledges the pattern as meaningful or dismisses it as trivial."
+    },
+    {
+        "id": "alone_time_guilt",
+        "category": "daily_rituals",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The 'Why Do You Need Space?' Accusation",
+        "description": "One partner needs 1-2 hours of solitude daily to recharge — reading, walking, being alone. The other partner interprets this as rejection: 'If you loved me, you'd want to be with me.' The space-seeking partner starts hiding their alone time, creating a secret that corrodes trust.",
+        "impact": "Activates the anxious-avoidant attachment dynamic. The space-seeker withdraws more, the connection-seeker pursues harder, creating a destructive chase pattern.",
+        "test_reason": "Tests whether the couple can differentiate between healthy introversion and emotional withdrawal. Reveals attachment security and respect for individual needs.",
+        "scoring_logic": "Both partners validating each other's needs (space IS love for introverts) = High Score. Guilt-tripping or secret-keeping = Low Score.",
+        "mechanic": "Alone-time request trigger. Engine tracks whether the connection-seeking agent interprets the request as rejection or respects it as a need."
+    },
+    {
+        "id": "puja_vs_sleep",
+        "category": "daily_rituals",
+        "weight": 2,
+        "dealbreaker": False,
+        "title": "The Daily Puja vs. Sleeping In",
+        "description": "One partner insists on a daily morning puja/prayer ritual at 6 AM that involves incense, bells, and chanting. The other partner is not religious and values sleeping until 7:30 AM. The religious partner feels their faith is disrespected; the secular partner feels their rest is stolen. The in-laws weigh in, calling the non-participating partner 'godless.'",
+        "impact": "Intersects religion, daily routine, sleep, and family pressure into a single daily flashpoint. There is no neutral position — not participating is itself a statement.",
+        "test_reason": "Tests negotiation of religious practices in shared space. Reveals whether tradition compliance overrides partnership compromise.",
+        "scoring_logic": "Structural compromise (separate space, adjusted timing, headphones) = High Score. 'You must participate' or 'Your religion is ridiculous' = Low Score.",
+        "mechanic": "Religion-routine conflict injector. In-law agent pressures the non-religious partner. Tracks whether the religious partner defends spouse's right to opt out."
     }
 ]
 

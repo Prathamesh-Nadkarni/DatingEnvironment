@@ -9,7 +9,11 @@ CORE_DIMENSIONS = [
     "guilt_susceptibility", "autonomy_need", "caregiving_flexibility", "parenting_alignment",
     "jealousy_threshold", "privacy_need", "career_priority", "resentment_accumulation_rate",
     "forgiveness_rate", "moral_reasoning_style", "burnout_vulnerability", "identity_rigidity",
-    "household_order_preference", "social_image_sensitivity"
+    "household_order_preference", "social_image_sensitivity",
+    # Phase 8 — Hygiene, Sexual Compatibility & Daily Rituals
+    "hygiene_standard", "body_comfort", "sexual_openness", "libido_alignment",
+    "intimacy_communication", "ritual_rigidity", "sleep_schedule_compatibility",
+    "personal_space_need",
 ]
 
 # Diagnostic Mapping Table
@@ -166,6 +170,90 @@ MAPPING_TABLE = {
         "duty": {"tradition_compliance": 0.4, "guilt_susceptibility": 0.3},
         "wellbeing": {"autonomy_need": 0.4},
     },
+
+    # ---- HYGIENE & DOMESTIC STANDARDS (Section 24) ----
+    "24.2": {
+        "messy": {"hygiene_standard": 0.4, "household_order_preference": 0.3},
+        "sterile": {"hygiene_standard": -0.2, "body_comfort": 0.3},
+    },
+    "24.3": {
+        "direct": {"hygiene_standard": 0.4, "conflict_dominance": 0.2, "repair_skill": 0.2},
+        "hints": {"hygiene_standard": 0.2, "withdrawal_tendency": 0.2},
+        "adjust": {"hygiene_standard": -0.3, "public_harmony_preference": 0.3},
+        "letgo": {"hygiene_standard": -0.4, "body_comfort": 0.3},
+    },
+    "24.4": {
+        "Normal and comfortable": {"body_comfort": 0.5},
+        "Tolerable": {"body_comfort": 0.2},
+        "Should be private": {"body_comfort": -0.3, "hygiene_standard": 0.2},
+        "Deeply uncomfortable": {"body_comfort": -0.5, "hygiene_standard": 0.4},
+    },
+    "24.5": {
+        "Daily": {"hygiene_standard": 0.5, "household_order_preference": 0.4},
+        "2-3 times a week": {"hygiene_standard": 0.3, "household_order_preference": 0.2},
+        "Weekly": {"hygiene_standard": 0.1},
+        "When visibly dirty": {"hygiene_standard": -0.3},
+        "Outsource entirely": {"career_priority": 0.2},
+    },
+
+    # ---- SEXUAL COMPATIBILITY (Section 25) ----
+    "25.2": {
+        "Very adventurous/experimental": {"sexual_openness": 0.5, "libido_alignment": 0.3},
+        "Open to trying new things": {"sexual_openness": 0.3, "libido_alignment": 0.2},
+        "Moderate \u2014 some variety": {"sexual_openness": 0.1},
+        "Prefer familiar and comfortable": {"sexual_openness": -0.2},
+        "Very traditional/vanilla": {"sexual_openness": -0.4, "tradition_compliance": 0.2},
+    },
+    "25.4": {
+        "higher": {"libido_alignment": 0.3, "sexual_openness": 0.2},
+        "middle": {"intimacy_communication": 0.3, "repair_skill": 0.2},
+        "lower": {"libido_alignment": -0.2, "boundary_strength": 0.2},
+        "causes": {"intimacy_communication": 0.5, "co_regulation_capacity": 0.3},
+        "spontaneous": {"sexual_openness": 0.2, "ritual_rigidity": -0.2},
+    },
+    "25.5": {
+        "passion": {"sexual_openness": 0.3, "libido_alignment": 0.3},
+        "safety": {"intimacy_communication": 0.4, "co_regulation_capacity": 0.2},
+    },
+    "25.6": {
+        "Be mutual and equal": {"egalitarianism": 0.2, "intimacy_communication": 0.3},
+        "Usually come from one partner": {"sexual_openness": -0.2},
+        "Be spontaneous and unplanned": {"sexual_openness": 0.2, "ritual_rigidity": -0.2},
+        "Depend entirely on mood": {"libido_alignment": -0.2},
+        "Be discussed openly": {"intimacy_communication": 0.5},
+    },
+
+    # ---- DAILY RITUALS & ROUTINES (Section 26) ----
+    "26.2": {
+        "predictable": {"ritual_rigidity": 0.4, "household_order_preference": 0.3},
+        "flexible": {"ritual_rigidity": -0.4, "autonomy_need": 0.2},
+    },
+    "26.3": {
+        "Shared (breakfast together, etc.)": {"ritual_rigidity": 0.3, "personal_space_need": -0.3},
+        "Parallel (same space, own routine)": {"ritual_rigidity": 0.1, "personal_space_need": 0.1},
+        "Independent (no coordination needed)": {"personal_space_need": 0.4, "ritual_rigidity": -0.2},
+        "Family-centered (prayer/puja together)": {"ritual_rigidity": 0.4, "tradition_compliance": 0.3},
+    },
+    "26.5": {
+        "Early to bed, early to rise": {"sleep_schedule_compatibility": 0.4, "ritual_rigidity": 0.2},
+        "Night owl": {"sleep_schedule_compatibility": -0.3, "personal_space_need": 0.2},
+        "Flexible, no fixed pattern": {"sleep_schedule_compatibility": 0.1, "ritual_rigidity": -0.3},
+        "Depends on work demands": {"career_priority": 0.2},
+    },
+    "26.6": {
+        "adapt": {"sleep_schedule_compatibility": 0.3, "public_harmony_preference": 0.2},
+        "make_them": {"conflict_dominance": 0.3, "sleep_schedule_compatibility": -0.2},
+        "separate": {"personal_space_need": 0.4, "sleep_schedule_compatibility": -0.3},
+        "compromise": {"repair_skill": 0.3, "sleep_schedule_compatibility": 0.2},
+        "accept": {"personal_space_need": 0.3, "distress_tolerance": 0.2},
+    },
+    "26.7": {
+        "Almost none \u2014 I want togetherness": {"personal_space_need": -0.5},
+        "30 minutes to 1 hour": {"personal_space_need": -0.1},
+        "1-2 hours": {"personal_space_need": 0.2},
+        "2+ hours": {"personal_space_need": 0.4},
+        "I recharge heavily alone": {"personal_space_need": 0.5, "withdrawal_tendency": 0.2},
+    },
 }
 
 # Scale questions: map score (1-7) to trait shifts via direction (+1 = agree→high, -1 = agree→low)
@@ -217,6 +305,13 @@ SCALE_MAPPINGS = {
     "20.5": {"forgiveness_rate": 1},
     "18.5": {"repair_skill": 1},
     "18.10": {"repair_skill": 1},
+
+    # ---- Phase 8: Hygiene, Sexual Compat, Daily Rituals scales ----
+    "24.1": {"hygiene_standard": 1},
+    "25.1": {"sexual_openness": 1, "libido_alignment": 1},
+    "25.3": {"intimacy_communication": 1},
+    "26.1": {"ritual_rigidity": 1},
+    "26.4": {"ritual_rigidity": 1, "personal_space_need": -1},
 }
 
 class PersonaEngine:

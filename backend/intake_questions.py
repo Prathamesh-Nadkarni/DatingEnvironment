@@ -8,7 +8,11 @@ CORE_DIMENSIONS = [
     "guilt_susceptibility", "autonomy_need", "caregiving_flexibility", "parenting_alignment",
     "jealousy_threshold", "privacy_need", "career_priority", "resentment_accumulation_rate",
     "forgiveness_rate", "moral_reasoning_style", "burnout_vulnerability", "identity_rigidity",
-    "household_order_preference", "social_image_sensitivity"
+    "household_order_preference", "social_image_sensitivity",
+    # Phase 8 — Hygiene, Sexual Compatibility & Daily Rituals
+    "hygiene_standard", "body_comfort", "sexual_openness", "libido_alignment",
+    "intimacy_communication", "ritual_rigidity", "sleep_schedule_compatibility",
+    "personal_space_need",
 ]
 
 INTAKE_SECTIONS = [
@@ -324,6 +328,42 @@ INTAKE_SECTIONS = [
             {"id": "23.8", "text": "What kind of repeated behavior slowly makes you stop opening up?", "format": "short_answer"},
             {"id": "23.9", "text": "Describe a disagreement where you felt understood even though you did not get your way.", "format": "short_answer"},
             {"id": "23.10", "text": "What is one kind of pressure you can handle well, and one kind that gets under your skin fast?", "format": "short_answer"}
+        ]
+    },
+    {
+        "section": "Hygiene, Grooming & Domestic Standards",
+        "questions": [
+            {"id": "24.1", "text": "How important is daily personal grooming (shower, fresh clothes, etc.) in shared life?", "format": "scale_7", "min_label": "Not important", "max_label": "Extremely important"},
+            {"id": "24.2", "text": "Which bothers you more?", "format": "forced_choice", "options": [{"id": "messy", "text": "A messy, unclean bathroom"}, {"id": "sterile", "text": "An uncomfortably sterile, clinical home"}]},
+            {"id": "24.3", "text": "If your partner's hygiene standard is lower than yours, you would:", "format": "sjt", "options": [{"id": "direct", "text": "Address it directly and kindly"}, {"id": "hints", "text": "Drop hints over time"}, {"id": "adjust", "text": "Adjust your own standard downward"}, {"id": "letgo", "text": "Let it go entirely"}]},
+            {"id": "24.4", "text": "Bodily functions (burping, bathroom door open, etc.) in shared space are:", "format": "multiple_choice", "options": ["Normal and comfortable", "Tolerable", "Should be private", "Deeply uncomfortable"]},
+            {"id": "24.5", "text": "How often should shared spaces (kitchen, bathroom) be deep-cleaned?", "format": "multiple_choice", "options": ["Daily", "2-3 times a week", "Weekly", "When visibly dirty", "Outsource entirely"]},
+            {"id": "24.6", "text": "What small hygiene or grooming habit in a partner would create daily friction for you?", "format": "short_answer"}
+        ]
+    },
+    {
+        "section": "Sexual Compatibility & Intimacy Preferences",
+        "questions": [
+            {"id": "25.1", "text": "How important is sexual compatibility as a foundation for a lasting relationship?", "format": "scale_7", "min_label": "Not important", "max_label": "Extremely important"},
+            {"id": "25.2", "text": "In terms of intimacy style, where do you fall?", "format": "multiple_choice", "options": ["Very adventurous/experimental", "Open to trying new things", "Moderate — some variety", "Prefer familiar and comfortable", "Very traditional/vanilla"]},
+            {"id": "25.3", "text": "How comfortable are you discussing sexual needs and boundaries with a partner?", "format": "scale_7", "min_label": "Very uncomfortable", "max_label": "Completely comfortable"},
+            {"id": "25.4", "text": "Mismatched desire (one partner wants intimacy more frequently) should be handled by:", "format": "sjt", "options": [{"id": "higher", "text": "Prioritize higher-desire partner"}, {"id": "middle", "text": "Find a middle ground schedule"}, {"id": "lower", "text": "Lower-desire partner sets the pace"}, {"id": "causes", "text": "Address underlying causes together"}, {"id": "spontaneous", "text": "Avoid scheduling, stay spontaneous"}]},
+            {"id": "25.5", "text": "Which matters more for long-term intimacy?", "format": "forced_choice", "options": [{"id": "passion", "text": "Physical passion and desire"}, {"id": "safety", "text": "Emotional safety during intimacy"}]},
+            {"id": "25.6", "text": "Initiating intimacy should:", "format": "multiple_choice", "options": ["Be mutual and equal", "Usually come from one partner", "Be spontaneous and unplanned", "Depend entirely on mood", "Be discussed openly"]},
+            {"id": "25.7", "text": "What would make you feel rejected or unsafe in intimate contexts?", "format": "short_answer"}
+        ]
+    },
+    {
+        "section": "Daily Rituals, Routines & Cohabitation Rhythms",
+        "questions": [
+            {"id": "26.1", "text": "How attached are you to a fixed daily routine (same wake time, same meals, same wind-down)?", "format": "scale_7", "min_label": "Very flexible", "max_label": "Highly structured"},
+            {"id": "26.2", "text": "Which matters more in a shared home?", "format": "forced_choice", "options": [{"id": "predictable", "text": "Predictability and structure"}, {"id": "flexible", "text": "Flexibility and spontaneity"}]},
+            {"id": "26.3", "text": "Morning routines should be:", "format": "multiple_choice", "options": ["Shared (breakfast together, etc.)", "Parallel (same space, own routine)", "Independent (no coordination needed)", "Family-centered (prayer/puja together)"]},
+            {"id": "26.4", "text": "How important is it to eat dinner together most nights?", "format": "scale_7", "min_label": "Not important", "max_label": "Essential"},
+            {"id": "26.5", "text": "My ideal sleep schedule is:", "format": "multiple_choice", "options": ["Early to bed, early to rise", "Night owl", "Flexible, no fixed pattern", "Depends on work demands"]},
+            {"id": "26.6", "text": "If your partner's sleep schedule is very different from yours, you would:", "format": "sjt", "options": [{"id": "adapt", "text": "Adapt your own schedule"}, {"id": "make_them", "text": "Ask them to adapt"}, {"id": "separate", "text": "Sleep separately if needed"}, {"id": "compromise", "text": "Find a compromise in the middle"}, {"id": "accept", "text": "Accept the difference"}]},
+            {"id": "26.7", "text": "How much alone time do you need in a day, even while living together?", "format": "multiple_choice", "options": ["Almost none — I want togetherness", "30 minutes to 1 hour", "1-2 hours", "2+ hours", "I recharge heavily alone"]},
+            {"id": "26.8", "text": "What daily ritual or routine, if disrupted, would genuinely upset you?", "format": "short_answer"}
         ]
     }
 ]

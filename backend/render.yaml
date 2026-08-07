@@ -1,13 +1,17 @@
+# Render.com deployment config
+# After connecting this repo to Render:
+# 1. Go to Settings → Deploy Hook → copy the URL
+# 2. Add it as GitHub Secret: RENDER_DEPLOY_HOOK
+# 3. GitHub Actions will auto-trigger redeploys on push to main
+
 services:
   - type: web
     name: mirofish-api
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: "3.11"
       - key: ANTHROPIC_API_KEY
-        sync: false # You will need to add this manually in Render dashboard
-      - key: PORT
-        value: 10000
+        sync: false

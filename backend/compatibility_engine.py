@@ -92,6 +92,16 @@ TRAIT_MODEL: Dict[str, TraitSpec] = {
     "burnout_vulnerability":        ("joint_low",),
     "shame_sensitivity":            ("joint_low",),
     "guilt_susceptibility":         ("joint_low",),
+
+    # ── Phase 8: HYGIENE, SEXUAL COMPAT, DAILY RITUALS ─────────────────────
+    "hygiene_standard":               ("similarity",),   # shared cleanliness expectation
+    "body_comfort":                   ("similarity",),   # shared comfort with bodily naturalness
+    "sexual_openness":                ("similarity",),   # kink-to-vanilla alignment
+    "libido_alignment":               ("balance", 0.50), # desire frequency; gap = resentment
+    "intimacy_communication":         ("floor",),        # weakest partner limits sexual dialogue
+    "ritual_rigidity":                ("similarity",),   # routine attachment alignment
+    "sleep_schedule_compatibility":   ("similarity",),   # early bird vs. night owl
+    "personal_space_need":            ("balance", 0.50), # gap = anxious-avoidant activation
 }
 
 
@@ -158,6 +168,7 @@ EMOTIONAL_TRAITS = [
 PRACTICAL_TRAITS = [
     "financial_mutuality", "risk_tolerance", "security_need",
     "household_order_preference", "career_priority",
+    "hygiene_standard", "body_comfort",
 ]
 
 TRUST_TRAITS = [
@@ -168,6 +179,7 @@ TRUST_TRAITS = [
 AUTONOMY_TRAITS = [
     "autonomy_need", "egalitarianism", "career_priority",
     "identity_rigidity", "social_image_sensitivity",
+    "personal_space_need", "ritual_rigidity",
 ]
 
 DEALBREAKER_THRESHOLD = 25      # must be truly hostile (score <= 25) to flag
@@ -185,6 +197,10 @@ CATEGORY_LABELS = {
     "parenting":         "Parenting & Commitment",
     "crisis_resilience": "Crisis Resilience",
     "loyalty_trust":     "Loyalty & Trust",
+    # Phase 8
+    "hygiene_domestic":  "Hygiene & Domestic Habits",
+    "intimacy_sexual":   "Intimacy & Sexual Compatibility",
+    "daily_rituals":     "Daily Rituals & Cohabitation",
 }
 
 

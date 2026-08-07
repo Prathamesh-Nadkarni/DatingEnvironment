@@ -65,6 +65,10 @@ KEY_TRAITS = [
     "jealousy_threshold", "privacy_need", "financial_mutuality",
     "parenting_alignment", "caregiving_flexibility", "household_order_preference",
     "resentment_accumulation_rate", "social_image_sensitivity",
+    # Phase 8 — Hygiene, Sexual Compatibility & Daily Rituals
+    "hygiene_standard", "body_comfort", "sexual_openness", "libido_alignment",
+    "intimacy_communication", "ritual_rigidity", "sleep_schedule_compatibility",
+    "personal_space_need",
 ]
 
 
@@ -293,6 +297,10 @@ SCENARIO_TRAIT_FOCUS = {
     "parenting":         ["parenting_alignment", "caregiving_flexibility", "identity_rigidity"],
     "crisis_resilience": ["distress_tolerance", "co_regulation_capacity", "repair_skill", "resentment_accumulation_rate"],
     "loyalty_trust":     ["jealousy_threshold", "couple_first_orientation", "boundary_strength", "privacy_need"],
+    # Phase 8
+    "hygiene_domestic":  ["hygiene_standard", "body_comfort", "household_order_preference", "social_image_sensitivity"],
+    "intimacy_sexual":   ["sexual_openness", "libido_alignment", "intimacy_communication", "co_regulation_capacity"],
+    "daily_rituals":     ["ritual_rigidity", "sleep_schedule_compatibility", "personal_space_need", "autonomy_need"],
 }
 
 # Per-category score boosts for relevant response types
@@ -303,6 +311,10 @@ SCENARIO_CATEGORY_BIAS = {
     "parenting":         {"assert": 0.10, "repair": 0.08},
     "crisis_resilience": {"repair": 0.15, "escalate": 0.10},
     "loyalty_trust":     {"assert": 0.12, "withdraw": 0.08},
+    # Phase 8
+    "hygiene_domestic":  {"assert": 0.10, "compromise": 0.12},
+    "intimacy_sexual":   {"repair": 0.15, "withdraw": 0.10},
+    "daily_rituals":     {"compromise": 0.15, "defer": 0.08},
 }
 
 
@@ -521,6 +533,10 @@ EXTERNAL_AGENTS = {
     "parenting": ["School Principal", "Overbearing Grandparent"],
     "crisis_resilience": ["Crisis Trigger", "Landlord", "Medical Staff"],
     "loyalty_trust": ["Suspicious Relative", "Legal Counsel", "Anonymous Interferer"],
+    # Phase 8
+    "hygiene_domestic": ["Roommate", "Nosy Neighbor", "Visiting In-Law", "Hygiene-Conscious Friend"],
+    "intimacy_sexual": ["Intimacy Counselor", "Well-Meaning Friend", "Intrusive Relative"],
+    "daily_rituals": ["Nosy Neighbor", "Morning-Person Colleague", "Traditional Grandparent", "Sleep-Deprived Friend"],
 }
 
 ENVIRONMENT_TEMPLATES = {
