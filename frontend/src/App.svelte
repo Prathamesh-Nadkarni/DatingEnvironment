@@ -136,7 +136,7 @@
                 <h1 class="accent-title larger">Mirroring the Future of Your Relationships</h1>
             </header>
             <div class="intro-body">
-                <p>MiroFish is a <strong>High-Fidelity Behavioral Simulation Engine</strong>.</p>
+                <p>Compatibility Engine Co is a <strong>High-Fidelity Behavioral Simulation Engine</strong>.</p>
                 <p>We are about to build your digital twin—a persona generated from your deepest instincts, boundaries, and family conditioning.</p>
                 <p>Through advanced stress tests, we will simulate years of real-world friction in minutes to find your most resilient match.</p>
             </div>
@@ -149,6 +149,14 @@
         </div>
 
         <div class="preview-column fade-in delay-1">
+            <div class="avatars-container">
+                <img src="/DatingEnvironment/guy.png" class="avatar-img" alt="Guy Avatar" />
+                <div class="match-heart">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                </div>
+                <img src="/DatingEnvironment/girl.png" class="avatar-img" alt="Girl Avatar" />
+            </div>
+
             <div class="terminal-preview glass">
                 <div class="mac-buttons">
                     <span class="mac-btn red"></span><span class="mac-btn yellow"></span><span class="mac-btn green"></span>
@@ -156,38 +164,36 @@
                 </div>
                 <pre class="terminal-text">
 <span class="dim">===================================================</span>
-<span class="gold">  CASE: Polar Opposites (0% Aligned)</span>
+<span class="gold">  CASE: Solid Match (74% Aligned)</span>
 <span class="dim">===================================================</span>
 
-OVERALL COMPATIBILITY  [------------------] <span class="red">0/100</span>
-
-<span class="red">DEALBREAKERS FLAGGED:</span> stridhan_confiscation, salary_to_mil, desire_mismatch...
+OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
 
 <span class="gold">-- Static trait compatibility --</span>
-  Values           [#########---------] 52%
-  Conflict style   [#########---------] 50%
-  Trust            [########----------] 49%
+  Values           [###############---] 82%
+  Conflict style   [############------] 68%
+  Trust            [##############----] 76%
 
 <span class="gold">Verdict:</span>
-  Fundamental incompatibility detected in 13 
-  dealbreaker scenarios. Core values misalignment 
-  will compound over time.
+  Highly compatible. Disagreements detected in 
+  financial scenarios, but de-escalation logic
+  prevented dealbreakers. Long-term viable.
                 </pre>
             </div>
             
             <div class="dashboard-mock glass">
                 <div class="mock-score-card">
                     <span class="mock-label">Simulated Harmony Index</span>
-                    <span class="mock-score red-glow">0%</span>
+                    <span class="mock-score gold-glow">74%</span>
                 </div>
                 <div class="mock-stats">
                     <div class="mock-stat">
                         <span class="mock-label">TRAJECTORY</span>
-                        <span class="mock-val">AT-RISK</span>
+                        <span class="mock-val">STABLE</span>
                     </div>
                     <div class="mock-stat">
-                        <span class="mock-label">TOP FRICTION</span>
-                        <span class="mock-val">Family Dynamics</span>
+                        <span class="mock-label">TOP STRENGTH</span>
+                        <span class="mock-val">Emotional Support</span>
                     </div>
                 </div>
             </div>
@@ -739,9 +745,9 @@ OVERALL COMPATIBILITY  [------------------] <span class="red">0/100</span>
         line-height: 1;
     }
     
-    .mock-score.red-glow {
-        color: #ef4444;
-        text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    .mock-score.gold-glow {
+        color: #fbbf24;
+        text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
     }
 
     .mock-stats {
@@ -756,5 +762,47 @@ OVERALL COMPATIBILITY  [------------------] <span class="red">0/100</span>
         color: #f8fafc;
         font-weight: 600;
         font-size: 0.9rem;
+    }
+
+    .avatars-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: -1rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    .avatar-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .match-heart {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 50%;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+        animation: heartbeat 1.5s infinite;
+    }
+
+    @keyframes heartbeat {
+        0% { transform: scale(1); }
+        15% { transform: scale(1.15); }
+        30% { transform: scale(1); }
+        45% { transform: scale(1.15); }
+        60% { transform: scale(1); }
+        100% { transform: scale(1); }
     }
 </style>
