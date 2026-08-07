@@ -44,6 +44,10 @@
   $: currentSection = sections[currentSectionIndex];
   $: currentQuestion = currentSection?.questions[currentQuestionIndex];
   $: totalQuestionsInSection = currentSection?.questions.length || 0;
+  
+  $: totalQuestions = sections.reduce((acc, sec) => acc + sec.questions.length, 0);
+  $: absoluteQuestionIndex = sections.slice(0, currentSectionIndex).reduce((acc, sec) => acc + sec.questions.length, 0) + currentQuestionIndex;
+  $: progressPercent = totalQuestions > 0 ? Math.round((absoluteQuestionIndex / totalQuestions) * 100) : 0;
 
   let introSlide = true;
 
@@ -125,17 +129,21 @@
     <div class="luxury-container intro-layout {isTransitioning ? 'transitioning' : ''}">
         <div class="card glass intro-card">
             <header>
-                <span class="section-tag">Welcome to MiroFish</span>
+                <div class="brand-badge">
+                    <span class="pulse-dot"></span>
+                    <span>AI Engine Online</span>
+                </div>
                 <h1 class="accent-title larger">Mirroring the Future of Your Relationships</h1>
             </header>
             <div class="intro-body">
-                <p>MiroFish is not a matching algorithm. It is a <strong>High-Fidelity Behavioral Simulation Engine</strong>.</p>
-                <p>We are about to build your digital twin—a persona built from your instincts, boundaries, and family conditioning.</p>
-                <p>Through 30 clinical-grade stress tests, we will simulate years of real-world friction in minutes to find your most resilient match.</p>
+                <p>MiroFish is a <strong>High-Fidelity Behavioral Simulation Engine</strong>.</p>
+                <p>We are about to build your digital twin—a persona generated from your deepest instincts, boundaries, and family conditioning.</p>
+                <p>Through advanced stress tests, we will simulate years of real-world friction in minutes to find your most resilient match.</p>
             </div>
             <footer>
-                <button class="action-btn-gold" on:click={handleNext}>
-                    <span class="btn-text">Begin The Mirroring</span>
+                <button class="action-btn-gold get-started" on:click={handleNext}>
+                    <span class="btn-text">Get Started</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </button>
             </footer>
         </div>
@@ -186,8 +194,14 @@ OVERALL COMPATIBILITY  [------------------] <span class="red">0/100</span>
         </div>
     </div>
   {:else if currentQuestion}
-    <div class="progress-bar">
-        <div class="fill" style="width: {((currentSectionIndex * 10 + currentQuestionIndex) / (sections.length * 10)) * 100}%"></div>
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="fill" style="width: {progressPercent}%"></div>
+        </div>
+        <div class="progress-text">
+            <span>{progressPercent}% Completed</span>
+            <span class="dim">({absoluteQuestionIndex} / {totalQuestions})</span>
+        </div>
     </div>
 
     <div class="luxury-container {isTransitioning ? 'transitioning' : ''}">
@@ -331,6 +345,36 @@ OVERALL COMPATIBILITY  [------------------] <span class="red">0/100</span>
         display: flex;
         flex-direction: column;
         gap: 3rem;
+    }
+
+    .brand-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        padding: 6px 12px;
+        border-radius: 100px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #fbbf24;
+        margin-bottom: 1.5rem;
+    }
+
+    .pulse-dot {
+        width: 6px;
+        height: 6px;
+        background: #fbbf24;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #fbbf24;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.5); }
+        100% { opacity: 1; transform: scale(1); }
     }
 
     .section-tag {
@@ -513,10 +557,21 @@ OVERALL COMPATIBILITY  [------------------] <span class="red">0/100</span>
         cursor: not-allowed;
     }
 
-    .progress-bar {
+    .action-btn-gold.get-started {
+        font-size: 1rem;
+        padding: 1.75rem;
+        box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.3);
+    }
+
+    .progress-container {
         position: fixed;
         top: 0;
         left: 0;
+        width: 100%;
+        z-index: 50;
+    }
+
+    .progress-bar {
         width: 100%;
         height: 4px;
         background: rgba(255, 255, 255, 0.03);
@@ -527,6 +582,24 @@ OVERALL COMPATIBILITY  [------------------] <span class="red">0/100</span>
         background: #fbbf24;
         transition: width 0.8s cubic-bezier(0.65, 0, 0.35, 1);
         box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 12px;
+        right: 2rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #fbbf24;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        display: flex;
+        gap: 8px;
+    }
+
+    .progress-text .dim {
+        color: rgba(255,255,255,0.4);
+        font-weight: 400;
     }
 
     .loader-overlay {
