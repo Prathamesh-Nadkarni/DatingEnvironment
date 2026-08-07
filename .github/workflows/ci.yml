@@ -63,9 +63,9 @@ jobs:
       - name: Build with production API URL
         run: |
           cd frontend
-          VITE_API_URL=https://mirofish-api.onrender.com npm run build
+          VITE_API_URL=https://datingenvironment.onrender.com npm run build
         env:
-          VITE_API_URL: https://mirofish-api.onrender.com
+          VITE_API_URL: https://datingenvironment.onrender.com
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
