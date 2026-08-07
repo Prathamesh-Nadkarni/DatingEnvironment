@@ -1,0 +1,44 @@
+PROPRIETARY SOURCE-AVAILABLE LICENSE
+
+Copyright (C) 2026 [Your Name or Your Company Name]. All Rights Reserved.
+
+1. DEFINITIONS
+"Software" refers to the source code, binaries, documentation, and all other 
+files accompanied by this license.
+"Licensor" refers to the copyright owner, [Your Name or Your Company Name].
+
+2. PERMITTED USES
+Subject to the terms of this license, Licensor grants you a non-exclusive, 
+non-transferable, royalty-free, worldwide license to:
+- Download and view the source code of the Software.
+- Compile and run the Software locally for personal, educational, or 
+  demonstration purposes only.
+- Fork the repository on GitHub solely to propose modifications back to the 
+  original repository via Pull Requests.
+
+3. PROHIBITED USES
+You are strictly forbidden from doing any of the following without the 
+explicit, prior written permission of the Licensor:
+- Selling, renting, leasing, sub-licensing, or distributing the Software, 
+  either in its original or modified form, for a fee or monetary compensation.
+- Incorporating the Software, or any part of it, into a commercial product, 
+  service, or public cloud offering.
+- Hosting or deploying the Software as a public-facing service or web 
+  application.
+- Modifying the Software for any purpose other than personal evaluation or 
+  submitting contributions back to the original project.
+
+4. TERM AND TERMINATION
+This license is effective until terminated. Your rights under this license 
+will terminate automatically without notice if you fail to comply with any of 
+its terms. Upon termination, you must cease all use and destroy all copies of 
+the Software.
+
+5. DISCLAIMER OF WARRANTY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+THE SOFTWARE.
