@@ -16,6 +16,7 @@ from persona_synthesis import analyze_answers
 from simulation_engine import run_simulation
 from evaluation_engine import compute_harmony_index
 from compatibility_engine import run_full_compatibility_report
+from astrology import get_astro_fingerprint, get_astakoota_score
 
 app = FastAPI(title="MiroFish Agentic Matchmaking API")
 
@@ -42,6 +43,7 @@ class SurveySubmission(BaseModel):
     session_id: str
     role: str # "user_a" or "user_b"
     answers: Dict[str, Any]
+    demographics: Dict[str, str] = {}
 
 @app.get("/api/onboarding/questions")
 def get_questions():
@@ -61,10 +63,20 @@ def submit_onboarding(submission: SurveySubmission):
     # 1. Store raw answers
     db["sessions"][session_id][role]["answers"] = submission.answers
     
-    # 2. Synthesize Persona through 9-step pipeline
+    # 2. Extract demographics and compute Astro Fingerprint
+    if submission.demographics:
+        fingerprint = get_astro_fingerprint(
+            submission.demographics.get("fullName", ""),
+            submission.demographics.get("birthDate", ""),
+            submission.demographics.get("birthTime", ""),
+            submission.demographics.get("birthCity", "")
+        )
+        db["sessions"][session_id][role]["astro_fingerprint"] = fingerprint
+    
+    # 3. Synthesize Persona through 9-step pipeline
     persona_prompt = analyze_answers(submission.answers)
     
-    # 3. Store the prompt for simulation
+    # 4. Store the prompt for simulation
     db["sessions"][session_id][role]["prompt"] = persona_prompt
     
     print(f"Persona Synthesized for Session {session_id} Role {role}")
@@ -111,6 +123,16 @@ def start_simulation(req: SimulationRequest):
     # 4. Behavioral Analytics & Harmony Index
     analysis = compute_harmony_index(result["dialogue_history"])
     
+    # Compute Kundali score if both have astrological fingerprints
+    kundali_data = None
+    user_a = session.get("user_a", {})
+    user_b = session.get("user_b", {})
+    if "astro_fingerprint" in user_a and "astro_fingerprint" in user_b:
+        kundali_data = get_astakoota_score(
+            user_a["astro_fingerprint"]["moon_class"],
+            user_b["astro_fingerprint"]["moon_class"]
+        )
+    
     return {
         "status": "success", 
         "harmony_score": analysis["harmony_score"],
@@ -119,7 +141,8 @@ def start_simulation(req: SimulationRequest):
         "synergies": analysis["synergies"],
         "trajectory": analysis["trajectory"],
         "inference": analysis.get("inference", ""),
-        "dialogue_history": result["dialogue_history"]
+        "dialogue_history": result["dialogue_history"],
+        "kundali": kundali_data
     }
 
 class CompatibilityRequest(BaseModel):
@@ -130,14 +153,26 @@ class CompatibilityRequest(BaseModel):
 def get_compatibility_report(req: CompatibilityRequest):
     session = db["sessions"].get(req.session_id, {})
     
-    prompt_a = session.get("user_a", {}).get("prompt", "You are a standard persona.")
-    prompt_b = session.get("user_b", {}).get("prompt", "You are a traditional match.")
+    user_a = session.get("user_a", {})
+    user_b = session.get("user_b", {})
+    
+    prompt_a = user_a.get("prompt", "You are a standard persona.")
+    prompt_b = user_b.get("prompt", "You are a traditional match.")
 
     report = run_full_compatibility_report(prompt_a, prompt_b, max_turns=req.max_turns)
+    
+    # Compute Kundali score if both have astrological fingerprints
+    kundali_data = None
+    if "astro_fingerprint" in user_a and "astro_fingerprint" in user_b:
+        kundali_data = get_astakoota_score(
+            user_a["astro_fingerprint"]["moon_class"],
+            user_b["astro_fingerprint"]["moon_class"]
+        )
 
     return {
         "status": "success",
         "session_id": req.session_id,
+        "kundali": kundali_data,
         **report,
     }
 

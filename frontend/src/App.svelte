@@ -11,10 +11,18 @@
   let isTransitioning = false;
 
   let modeSelectionSlide = false;
+  let demographicsSlide = false;
   let shareLink = "";
   let sessionId = "local_demo";
   let role = "user_a";
   let isWaitingForPartner = false;
+  
+  let demographics = {
+      fullName: "",
+      birthDate: "",
+      birthTime: "",
+      birthCity: ""
+  };
 
   const CORE_DIMENSIONS = [
     "family_deference", "couple_first_orientation", "boundary_strength", "egalitarianism",
@@ -39,6 +47,7 @@
         role = urlParams.get('role') || 'user_b';
         introSlide = false;
         modeSelectionSlide = false;
+        demographicsSlide = true;
     }
 
     try {
@@ -105,16 +114,12 @@
       role = "user_a";
       shareLink = "";
       answers = {};
+      demographics = { fullName: "", birthDate: "", birthTime: "", birthCity: "" };
       currentSectionIndex = 0;
       currentQuestionIndex = 0;
       modeSelectionSlide = false;
+      demographicsSlide = false;
       introSlide = true;
-  }
-
-  function selectGeneralMode() {
-      sessionId = "local_" + Math.random().toString(36).substring(7);
-      role = "user_a";
-      modeSelectionSlide = false;
   }
 
   function selectSpecificMode() {
@@ -131,7 +136,11 @@
           introSlide = false;
           if (!sessionId || sessionId === "local_demo") {
               modeSelectionSlide = true;
+          } else {
+              demographicsSlide = true;
           }
+        } else if (demographicsSlide) {
+          demographicsSlide = false;
         } else if (currentQuestionIndex < totalQuestionsInSection - 1) {
           currentQuestionIndex++;
         } else if (currentSectionIndex < sections.length - 1) {
@@ -150,7 +159,7 @@
       await fetch(`${API_URL}/api/onboarding/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, role: role, answers })
+        body: JSON.stringify({ session_id: sessionId, role: role, answers, demographics })
       });
     } catch(e) {
        console.error(e);
@@ -290,12 +299,11 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     <div class="luxury-container {isTransitioning ? 'transitioning' : ''}">
         <div class="card glass">
             <header>
-                <h1 class="accent-title" style="text-align: center;">Select Match Mode</h1>
+                <h1 class="accent-title" style="text-align: center;">Session Link</h1>
             </header>
             {#if !shareLink}
                 <div class="mode-buttons" style="display: flex; gap: 1rem; margin-top: 2rem;">
-                    <button class="action-btn-ghost" on:click={selectGeneralMode} style="flex: 1; padding: 1.5rem;">General Compatibility<br><small class="dim">Simulated Partner</small></button>
-                    <button class="action-btn-gold" on:click={selectSpecificMode} style="flex: 1; padding: 1.5rem;">With a Specific Person<br><small style="opacity: 0.8;">Share a Link</small></button>
+                    <button class="action-btn-gold" on:click={selectSpecificMode} style="flex: 1; padding: 1.5rem;">Generate 1-on-1 Match Link<br><small style="opacity: 0.8;">Test compatibility with a specific person</small></button>
                 </div>
                 <div style="margin-top: 1rem; text-align: center;">
                     <button class="action-btn-ghost" style="padding: 0.5rem 2rem; border: none;" on:click={() => { introSlide = true; modeSelectionSlide = false; }}>Back to Intro</button>
@@ -306,10 +314,32 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
                     <input type="text" readonly value={shareLink} class="luxury-input" style="text-align: center; margin-bottom: 2rem;" on:focus={(e) => e.target.select()} />
                     <div style="display: flex; gap: 1rem;">
                         <button class="action-btn-ghost" style="flex: 0.5;" on:click={() => { shareLink = ""; }}>Back</button>
-                        <button class="action-btn-gold" style="flex: 1;" on:click={() => { modeSelectionSlide = false; }}>Proceed to Questionnaire</button>
+                        <button class="action-btn-gold" style="flex: 1;" on:click={() => { modeSelectionSlide = false; demographicsSlide = true; }}>Proceed to Questionnaire</button>
                     </div>
                 </div>
             {/if}
+        </div>
+    </div>
+  {:else if demographicsSlide}
+    <div class="luxury-container {isTransitioning ? 'transitioning' : ''}">
+        <div class="card glass">
+            <header>
+                <h1 class="accent-title" style="text-align: center;">Astrological Fingerprint</h1>
+                <p style="text-align: center; color: rgba(255,255,255,0.7); margin-top: 0.5rem;">Before we begin the behavioral simulation, we need your birth details to generate your Kundali (Ashtakoota) compatibility matrix.</p>
+            </header>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem;">
+                <input type="text" class="luxury-input single" placeholder="Full Name" bind:value={demographics.fullName} />
+                <input type="date" class="luxury-input single" placeholder="Date of Birth" bind:value={demographics.birthDate} />
+                <input type="time" class="luxury-input single" placeholder="Time of Birth" bind:value={demographics.birthTime} />
+                <input type="text" class="luxury-input single" placeholder="City of Birth" bind:value={demographics.birthCity} />
+            </div>
+
+            <footer class="nav-footer" style="margin-top: 2rem;">
+                <button class="action-btn-gold" on:click={handleNext} disabled={!demographics.fullName || !demographics.birthDate || !demographics.birthTime || !demographics.birthCity}>
+                  <span class="btn-text">Start Simulation</span>
+                </button>
+            </footer>
         </div>
     </div>
   {:else if currentQuestion}

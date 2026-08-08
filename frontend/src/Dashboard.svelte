@@ -86,11 +86,25 @@
 
   {#if result}
     <div class="results-container">
-      <div class="score-card">
-        <h3>Harmony Index</h3>
-        <div class="score" class:high={result.harmony_score > 75} class:med={result.harmony_score <= 75 && result.harmony_score > 50} class:low={result.harmony_score <= 50}>
-          {result.harmony_score}%
-        </div>
+      <div style="display: flex; gap: 1rem;">
+          <div class="score-card" style="flex: 1;">
+            <h3>AI Harmony Index</h3>
+            <div class="score" class:high={result.harmony_score > 75} class:med={result.harmony_score <= 75 && result.harmony_score > 50} class:low={result.harmony_score <= 50}>
+              {result.harmony_score}%
+            </div>
+          </div>
+
+          {#if result.kundali}
+          <div class="score-card" style="flex: 1;">
+            <h3>Ashtakoota (Kundali)</h3>
+            <div class="score" class:high={result.kundali.guna >= 26} class:med={result.kundali.guna < 26 && result.kundali.guna >= 18} class:low={result.kundali.guna < 18}>
+              {result.kundali.guna} <span style="font-size: 1.5rem; color: rgba(255,255,255,0.5);">/ 36</span>
+            </div>
+            <div style="text-align: center; font-size: 0.9rem; margin-top: 0.5rem; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px;">
+               {result.kundali.classification.replace('_', ' ')}
+            </div>
+          </div>
+          {/if}
       </div>
 
       <div class="tabs">
