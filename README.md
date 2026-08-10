@@ -476,7 +476,36 @@ Each synergy adds +4 to the final score.
 
 ---
 
-## Stage 4c — The Compatibility Engine
+## Stage 4c — Astrological Compatibility (Ashtakoota)
+
+While the behavioral simulation evaluates actual dynamics under stress, MiroFish also computes traditional Indian astrological compatibility (Ashtakoota) based on user demographics (Name, Date, Time, and City of Birth). This system deterministically maps birth details into 108 "Moon Classes" (27 Nakshatras × 4 Padas).
+
+The Ashtakoota system compares these Moon Classes to generate a Guna score out of 36, broken down across 8 historical parameters (kootas):
+1. **Varna (1 pt)**: Work & Ego compatibility
+2. **Vashya (2 pts)**: Mutual attraction & Control
+3. **Tara (3 pts)**: Destiny & Health compatibility
+4. **Yoni (4 pts)**: Physical & Sexual intimacy
+5. **Graha Maitri (5 pts)**: Psychological & Intellectual connection
+6. **Gana (6 pts)**: Temperament & Behavioral alignment
+7. **Bhakoot (7 pts)**: Family welfare, Love & Prosperity
+8. **Nadi (8 pts)**: Genetic & Core health compatibility
+
+### Astrological Warnings (Doshas)
+The engine detects classical Doshas (severe mismatches) which traditionally override standard scores:
+- **Nadi Dosha**: When both partners share the same Nadi (health/genetic warning). Penalises the base score and forces an `INAUSPICIOUS` verdict regardless of other matches.
+- **Bhakoot Dosha**: Severe misalignment in love/family harmony (prosperity warning). Heavily penalises the base score.
+
+### Scoring Tiers
+- **> 31**: Highly auspicious match (deep natural alignment)
+- **21 - 31**: Very Good (good foundation for marriage)
+- **18 - 20**: Middling (acceptable but requires mutual effort)
+- **< 18**: Inauspicious (core discordance detected)
+
+This Ashtakoota score is presented alongside the Behavioral Simulation Report in the Admin Dashboard, allowing for a side-by-side comparison of traditional astrological prediction vs. actual behavioral compatibility.
+
+---
+
+## Stage 4d — The Compatibility Engine
 
 ### Static Trait Compatibility: Five Scoring Models
 

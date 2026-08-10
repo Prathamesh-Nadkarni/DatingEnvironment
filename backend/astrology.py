@@ -86,20 +86,32 @@ def get_astakoota_score(moon_class_a: int, moon_class_b: int) -> dict:
         else:
             classification = "INAUSPICIOUS"
 
+    if classification == "EXCELLENT":
+        verdict_text = "Highly auspicious match. Stars indicate deep natural alignment, mutual prosperity, and excellent family harmony."
+    elif classification == "VERY_GOOD":
+        verdict_text = "Auspicious match. Good foundation for marriage with only minor astrological friction."
+    elif classification == "MIDDLING":
+        verdict_text = "Average match. Acceptable, but will require mutual effort, patience, and behavioral adjustments."
+    elif classification == "INAUSPICIOUS_NADI":
+        verdict_text = "Inauspicious. Nadi Dosha detected, which traditionally warns against genetic incompatibility or health issues."
+    else:
+        verdict_text = "Inauspicious match. Core astrological discordance detected; traditionally not recommended without strong mitigating factors."
+
     return {
         "guna": base_guna,
         "max_guna": 36,
         "nadi_dosha": nadi_dosha,
         "bhakoot_dosha": bhakoot_dosha,
         "classification": classification,
+        "verdict_text": verdict_text,
         "breakdown": {
-            "varna": varna,
-            "vashya": vashya,
-            "tara": tara,
-            "yoni": yoni,
-            "graha_maitri": maitri,
-            "gana": gana,
-            "bhakoot": bhakoot,
-            "nadi": nadi
+            "varna": {"score": varna, "max": 1, "desc": "Varna (1 pt) - Work & Ego compatibility"},
+            "vashya": {"score": vashya, "max": 2, "desc": "Vashya (2 pts) - Mutual attraction & Control"},
+            "tara": {"score": tara, "max": 3, "desc": "Tara (3 pts) - Destiny & Health compatibility"},
+            "yoni": {"score": yoni, "max": 4, "desc": "Yoni (4 pts) - Physical & Sexual intimacy"},
+            "graha_maitri": {"score": maitri, "max": 5, "desc": "Graha Maitri (5 pts) - Psychological & Intellectual connection"},
+            "gana": {"score": gana, "max": 6, "desc": "Gana (6 pts) - Temperament & Behavioral alignment"},
+            "bhakoot": {"score": bhakoot, "max": 7, "desc": "Bhakoot (7 pts) - Family welfare, Love & Prosperity"},
+            "nadi": {"score": nadi, "max": 8, "desc": "Nadi (8 pts) - Genetic & Core health compatibility"}
         }
     }
