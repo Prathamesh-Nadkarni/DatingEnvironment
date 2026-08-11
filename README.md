@@ -1,10 +1,10 @@
-# MiroFish — Behavioral Compatibility Engine
+# ManaMatch — Behavioral Compatibility Engine
 
 > *"Don't ask who someone is. Watch what they do when the stakes are real."*
 
 **🌟 [Try the Live Demo Here!](https://Prathamesh-Nadkarni.github.io/DatingEnvironment/)**
 
-MiroFish is a relationship compatibility platform built on a fundamentally different premise than every dating app in existence. It does not ask you what you like or what you are looking for. It clones you into a behavioral AI agent and stress-tests that clone against a potential match across 18 high-stakes scenarios drawn from real Indian relational conflict patterns — before the first conversation ever happens.
+ManaMatch is a relationship compatibility platform built on a fundamentally different premise than every dating app in existence. It does not ask you what you like or what you are looking for. It clones you into a behavioral AI agent and stress-tests that clone against a potential match across 18 high-stakes scenarios drawn from real Indian relational conflict patterns — before the first conversation ever happens.
 
 The result is not a star sign match or a percentage derived from survey answers. It is a behavioral simulation report: what you actually do when your mother-in-law demands your wife's gold, when your husband suggests you quit your job for the children's exams, or when a financial crisis hits and both of you want to blame someone.
 
@@ -20,7 +20,7 @@ Every matchmaking system — from shaadi.com to Hinge to even therapist-facilita
 
 **The Indian context adds a third layer of complexity** that western compatibility models ignore entirely. Indian marriages are not a union of two individuals. They are a negotiation between two family systems, two cultural scripts, two sets of gender expectations, and, increasingly, two professional identities competing for primacy. A couple can have perfect personal chemistry and be destroyed within eighteen months by in-law dynamics, stridhan disputes, or the husband's inability to advocate for his wife against his own mother.
 
-MiroFish was built to surface all of this before the first coffee.
+ManaMatch was built to surface all of this before the first coffee.
 
 ---
 
@@ -123,7 +123,7 @@ The intake is not a personality test. It is a **diagnostic portfolio** designed 
 
 ### Why the Questions Are Designed This Way
 
-Most personality instruments (MBTI, Big Five, etc.) are transparent — respondents can see what is being measured and optimise their answers. The MiroFish intake is **oblique**: the question does not signal what trait it is measuring. Question 17.1 (*"Which is worse: emotional or physical cheating?"*) is not asking about your tolerance for infidelity — it is measuring `jealousy_threshold`. Question 14.3 (*"If both sets of parents need support simultaneously, who has priority?"*) is not about eldercare logistics — it is measuring `family_deference` and latent patriarchal bias.
+Most personality instruments (MBTI, Big Five, etc.) are transparent — respondents can see what is being measured and optimise their answers. The ManaMatch intake is **oblique**: the question does not signal what trait it is measuring. Question 17.1 (*"Which is worse: emotional or physical cheating?"*) is not asking about your tolerance for infidelity — it is measuring `jealousy_threshold`. Question 14.3 (*"If both sets of parents need support simultaneously, who has priority?"*) is not about eldercare logistics — it is measuring `family_deference` and latent patriarchal bias.
 
 This oblique design makes the intake substantially harder to game. It also means that contradictions between answers on different sections are themselves informative — they are mapped to the `identity_rigidity` and ambivalence dimensions.
 
@@ -442,7 +442,7 @@ Contempt is weighted most heavily (−8) because Gottman's longitudinal research
 
 ### Indian Cultural Stressor Detection
 
-Standard western conflict frameworks miss a category of relational pathology that is endemic to Indian marriages: culturally scripted manipulation and social control mechanisms. MiroFish detects four of them:
+Standard western conflict frameworks miss a category of relational pathology that is endemic to Indian marriages: culturally scripted manipulation and social control mechanisms. ManaMatch detects four of them:
 
 | Pattern | What It Captures | Penalty per Hit |
 |---|---|---|
@@ -478,7 +478,7 @@ Each synergy adds +4 to the final score.
 
 ## Stage 4c — Astrological Compatibility (Ashtakoota)
 
-While the behavioral simulation evaluates actual dynamics under stress, MiroFish also computes traditional Indian astrological compatibility (Ashtakoota) based on user demographics (Name, Date, Time, and City of Birth). This system deterministically maps birth details into 108 "Moon Classes" (27 Nakshatras × 4 Padas).
+While the behavioral simulation evaluates actual dynamics under stress, ManaMatch also computes traditional Indian astrological compatibility (Ashtakoota) based on user demographics (Name, Date, Time, and City of Birth). This system deterministically maps birth details into 108 "Moon Classes" (27 Nakshatras × 4 Padas).
 
 The Ashtakoota system compares these Moon Classes to generate a Guna score out of 36, broken down across 8 historical parameters (kootas):
 1. **Varna (1 pt)**: Work & Ego compatibility
@@ -511,7 +511,7 @@ This Ashtakoota score is presented alongside the Behavioral Simulation Report in
 
 The compatibility engine computes a static trait score *before* running any simulation. This provides a baseline that represents trait-level structural compatibility — what the pair looks like on paper before situational pressure is applied.
 
-The critical design insight: **not all traits benefit from similarity**. Applying a single "how similar are you?" formula to all 30 dimensions produces psychologically incorrect results. MiroFish uses five distinct scoring models:
+The critical design insight: **not all traits benefit from similarity**. Applying a single "how similar are you?" formula to all 30 dimensions produces psychologically incorrect results. ManaMatch uses five distinct scoring models:
 
 ---
 
@@ -632,7 +632,7 @@ The mean of 46.2 with a standard deviation of 21.8 produces genuine differentiat
 
 ## The Indian Cultural Specificity
 
-MiroFish is not a generic compatibility engine with Indian scenario names inserted. The Indian cultural context is embedded at every layer of the architecture:
+ManaMatch is not a generic compatibility engine with Indian scenario names inserted. The Indian cultural context is embedded at every layer of the architecture:
 
 **At intake:** Questions are designed around documented Indian relational flashpoints — stridhan, joint family expectations, eldercare obligations, the *log kya kahenge* dynamic, caste/religion intersection with partner choice, the double standards applied to career ambition by gender.
 
@@ -640,7 +640,7 @@ MiroFish is not a generic compatibility engine with Indian scenario names insert
 
 **At simulation:** The `defer` response category exists specifically for the Indian pattern of compliance-as-love, where one partner (historically but not exclusively the wife) suppresses their needs in the framing of duty. The resentment override models the documented pattern where years of *defer* responses produce a sudden and disproportionate rupture.
 
-**At evaluation:** The four Indian cultural stressor patterns (appeasement, non-defence, guilt-tripping, exclusion) are not detectable by western compatibility frameworks at all. They are invisible as "conflict" because they do not look like argument — they look like deference, care, and silence. MiroFish names them.
+**At evaluation:** The four Indian cultural stressor patterns (appeasement, non-defence, guilt-tripping, exclusion) are not detectable by western compatibility frameworks at all. They are invisible as "conflict" because they do not look like argument — they look like deference, care, and silence. ManaMatch names them.
 
 **At the scenario catalog:** Every scenario in the catalog is drawn from real documented conflict categories in Indian matrimonial contexts. The Stridhan Confiscation, the Salary-to-Mother-in-Law, the 498A legal threat, the Pre-Wedding Conversion Demand — these are not hypothetical. They are the scenarios that appear repeatedly in Indian family courts, women's rights case files, and matrimonial therapy practice.
 
