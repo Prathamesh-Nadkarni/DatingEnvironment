@@ -1,14 +1,21 @@
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Response, status
 from pydantic import BaseModel
 import uvicorn
 from typing import List, Dict, Any, Optional
 from fastapi.middleware.cors import CORSMiddleware
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(name)s | %(message)s",
-)
+# Set up standard logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Set up observability logger
+obs_logger = logging.getLogger("observability")
+obs_logger.setLevel(logging.INFO)
+obs_handler = logging.FileHandler("observability.log")
+obs_handler.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s"))
+obs_logger.addHandler(obs_handler)
+obs_logger.propagate = False
 
 import scenarios
 from intake_questions import get_intake_data
@@ -39,6 +46,63 @@ app.add_middleware(
 def health_check():
     return {"status": "ok"}
 
+class TelemetryEvent(BaseModel):
+    session_id: Optional[str] = None
+    role: Optional[str] = None
+    event_type: str
+    element_id: Optional[str] = None
+    time_taken_ms: Optional[int] = None
+    details: Optional[Dict[str, Any]] = None
+
+@app.post("/api/telemetry")
+def record_telemetry(event: TelemetryEvent):
+    log_msg = f"Session: {event.session_id or 'anonymous'} | Role: {event.role or 'N/A'} | Event: {event.event_type}"
+    if event.element_id:
+        log_msg += f" | Element: {event.element_id}"
+    if event.time_taken_ms is not None:
+        log_msg += f" | Time(ms): {event.time_taken_ms}"
+    if event.details:
+        log_msg += f" | Details: {event.details}"
+    
+    obs_logger.info(log_msg)
+    return {"status": "recorded"}
+
+import os
+import re
+
+@app.get("/api/admin/sessions")
+def get_admin_sessions():
+    return {"sessions": db["sessions"]}
+
+@app.get("/api/admin/telemetry")
+def get_admin_telemetry():
+    if not os.path.exists("observability.log"):
+        return {"events": []}
+    
+    events = []
+    # Regex to match: [timestamp] [level] Session: ... | Role: ... | Event: ... | Element: ... | Time(ms): ... | Details: ...
+    # We can also just do simple string splitting since it's highly structured.
+    with open("observability.log", "r") as f:
+        for line in f:
+            if not line.strip(): continue
+            try:
+                # [2026-08-09 01:45:21,244] [INFO] Session: local_demo | Role: user_a | Event: button_click ...
+                parts = line.split("] [INFO] ")
+                if len(parts) != 2: continue
+                timestamp = parts[0].strip("[")
+                data_part = parts[1].strip()
+                
+                event_obj = {"timestamp": timestamp}
+                for pair in data_part.split(" | "):
+                    if ":" in pair:
+                        k, v = pair.split(":", 1)
+                        event_obj[k.strip().lower().replace("(ms)", "_ms")] = v.strip()
+                events.append(event_obj)
+            except Exception as e:
+                continue
+                
+    return {"events": events}
+
 class SurveySubmission(BaseModel):
     session_id: str
     role: str # "user_a" or "user_b"
@@ -49,8 +113,44 @@ class SurveySubmission(BaseModel):
 def get_questions():
     return {"sections": get_intake_data()}
 
+def generate_and_cache_report(session_id: str):
+    session = db["sessions"].get(session_id, {})
+    user_a = session.get("user_a", {})
+    user_b = session.get("user_b", {})
+    
+    prompt_a = user_a.get("prompt", "You are a standard persona.")
+    prompt_b = user_b.get("prompt", "You are a traditional match.")
+    
+    try:
+        report = run_full_compatibility_report(
+            prompt_a, 
+            prompt_b, 
+            answers_a=user_a.get("answers", {}), 
+            answers_b=user_b.get("answers", {}),
+            max_turns=4
+        )
+        
+        kundali_data = None
+        if "astro_fingerprint" in user_a and "astro_fingerprint" in user_b:
+            kundali_data = get_astakoota_score(
+                user_a["astro_fingerprint"]["moon_class"],
+                user_b["astro_fingerprint"]["moon_class"]
+            )
+        
+        session["cached_report"] = {
+            "status": "success",
+            "session_id": session_id,
+            "kundali": kundali_data,
+            **report,
+        }
+        session["report_status"] = "completed"
+    except Exception as e:
+        logger.error(f"Error generating report for {session_id}: {e}")
+        session["report_status"] = "error"
+
+
 @app.post("/api/onboarding/submit")
-def submit_onboarding(submission: SurveySubmission):
+def submit_onboarding(submission: SurveySubmission, background_tasks: BackgroundTasks):
     session_id = submission.session_id
     role = submission.role
 
@@ -80,6 +180,18 @@ def submit_onboarding(submission: SurveySubmission):
     db["sessions"][session_id][role]["prompt"] = persona_prompt
     
     print(f"Persona Synthesized for Session {session_id} Role {role}")
+    
+    # If both users have submitted, trigger the background report generation
+    session = db["sessions"][session_id]
+    if "user_a" in session and "prompt" in session["user_a"] and \
+       "user_b" in session and "prompt" in session["user_b"]:
+        
+        # Only start if not already generating/completed
+        if session.get("report_status") not in ["generating", "completed"]:
+            session["report_status"] = "generating"
+            background_tasks.add_task(generate_and_cache_report, session_id)
+            print(f"Started background report generation for {session_id}")
+
     return {"status": "success", "message": "Persona synthesized."}
 
 @app.get("/api/session/status/{session_id}")
@@ -150,31 +262,30 @@ class CompatibilityRequest(BaseModel):
     max_turns: int = 4
 
 @app.post("/api/compatibility/report")
-def get_compatibility_report(req: CompatibilityRequest):
+def get_compatibility_report(req: CompatibilityRequest, response: Response, background_tasks: BackgroundTasks):
     session = db["sessions"].get(req.session_id, {})
     
-    user_a = session.get("user_a", {})
-    user_b = session.get("user_b", {})
+    report_status = session.get("report_status", "pending")
     
-    prompt_a = user_a.get("prompt", "You are a standard persona.")
-    prompt_b = user_b.get("prompt", "You are a traditional match.")
-
-    report = run_full_compatibility_report(prompt_a, prompt_b, max_turns=req.max_turns)
-    
-    # Compute Kundali score if both have astrological fingerprints
-    kundali_data = None
-    if "astro_fingerprint" in user_a and "astro_fingerprint" in user_b:
-        kundali_data = get_astakoota_score(
-            user_a["astro_fingerprint"]["moon_class"],
-            user_b["astro_fingerprint"]["moon_class"]
-        )
-
-    return {
-        "status": "success",
-        "session_id": req.session_id,
-        "kundali": kundali_data,
-        **report,
-    }
+    if report_status == "completed" and "cached_report" in session:
+        return session["cached_report"]
+    elif report_status == "generating":
+        response.status_code = status.HTTP_202_ACCEPTED
+        return {"status": "generating", "message": "The LLM is currently synthesizing the behavioral report."}
+    elif report_status == "error":
+        raise HTTPException(status_code=500, detail="An error occurred during report generation.")
+    else:
+        # Fallback: if somehow it wasn't triggered, start it now
+        user_a_ready = "user_a" in session and "prompt" in session["user_a"]
+        user_b_ready = "user_b" in session and "prompt" in session["user_b"]
+        
+        if user_a_ready and user_b_ready:
+            session["report_status"] = "generating"
+            background_tasks.add_task(generate_and_cache_report, req.session_id)
+            response.status_code = status.HTTP_202_ACCEPTED
+            return {"status": "generating", "message": "Started background report generation."}
+        else:
+            raise HTTPException(status_code=400, detail="Both users must complete onboarding before report generation.")
 
 
 if __name__ == "__main__":

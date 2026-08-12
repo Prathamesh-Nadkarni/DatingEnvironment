@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import SimulationLoader from './SimulationLoader.svelte';
   import Chart from 'chart.js/auto';
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -112,30 +113,58 @@
       activeResults = null;
   }
 
+  let pollingInterval: any = null;
+
   async function viewResults(sessionId: string) {
+      if (pollingInterval) {
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+      }
       activeSessionId = sessionId;
       activeRole = null;
       activeResults = null;
       fetchingResults = true;
-      try {
-          const res = await fetch(`${API_URL}/api/compatibility/report`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ session_id: sessionId })
-          });
-          if (res.ok) {
-              const data = await res.json();
-              activeResults = {
-                  report: data,
-                  astro_score: data.kundali
-              };
-          } else {
-              activeResults = { error: "Results not ready or missing users." };
+      
+      const poll = async () => {
+          try {
+              const res = await fetch(`${API_URL}/api/compatibility/report`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ session_id: sessionId })
+              });
+              
+              if (res.status === 202) {
+                  // Still generating, wait and poll again
+                  return;
+              }
+              
+              if (res.ok) {
+                  const data = await res.json();
+                  activeResults = {
+                      report: data,
+                      astro_score: data.kundali
+                  };
+                  fetchingResults = false;
+                  clearInterval(pollingInterval);
+                  pollingInterval = null;
+              } else {
+                  activeResults = { error: "Results not ready or missing users." };
+                  fetchingResults = false;
+                  clearInterval(pollingInterval);
+                  pollingInterval = null;
+              }
+          } catch(e) {
+              activeResults = { error: "Failed to fetch results." };
+              fetchingResults = false;
+              clearInterval(pollingInterval);
+              pollingInterval = null;
           }
-      } catch(e) {
-          activeResults = { error: "Failed to fetch results." };
-      } finally {
-          fetchingResults = false;
+      };
+      
+      // Initial poll
+      await poll();
+      if (fetchingResults) {
+          pollingInterval = setInterval(poll, 3000);
       }
   }
 </script>
@@ -221,7 +250,7 @@
                     
                     <div class="answers-container">
                         {#if fetchingResults}
-                            <p>Loading results...</p>
+                            <SimulationLoader />
                         {:else if activeResults?.error}
                             <p style="color: #ff4444;">{activeResults.error}</p>
                         {:else if activeResults}

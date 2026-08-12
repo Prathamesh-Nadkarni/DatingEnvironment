@@ -5,6 +5,8 @@ from typing import Dict, List, Any, Tuple, Union
 from simulation_engine import get_trait, run_simulation
 from evaluation_engine import compute_harmony_index
 from scenarios import get_scenarios_by_category
+from llm_analysis import analyze_text_compatibility
+from intake_questions import INTAKE_SECTIONS
 
 logger = logging.getLogger("mirofish.compatibility")
 
@@ -261,6 +263,8 @@ def _pick_scenarios(category_scenarios: List[dict], n: int) -> List[dict]:
 def run_full_compatibility_report(
     prompt_a: str,
     prompt_b: str,
+    answers_a: dict = None,
+    answers_b: dict = None,
     max_turns: int = 4,
 ) -> Dict[str, Any]:
     logger.info("=" * 70)
@@ -306,6 +310,7 @@ def run_full_compatibility_report(
                 "harmony_score": score,
                 "trajectory": analysis["trajectory"],
                 "inference": analysis.get("inference", ""),
+                "dialogue_history": sim_result["dialogue_history"],
                 "weight": w,
                 "dealbreaker": scenario.get("dealbreaker", False),
             }
@@ -324,7 +329,30 @@ def run_full_compatibility_report(
 
     trait_avg = mean(trait_compat.values())
     sim_avg = mean(dimensional_scores.values()) if dimensional_scores else 50.0
-    raw_overall = TRAIT_WEIGHT * (trait_avg * 100) + SIMULATION_WEIGHT * sim_avg
+    
+    # Text Analysis Integration
+    text_score = 50
+    text_reasoning = ""
+    if answers_a and answers_b:
+        # Extract short answer question text to answer map
+        short_answers_a = {}
+        short_answers_b = {}
+        for sec in INTAKE_SECTIONS:
+            for q in sec["questions"]:
+                if q.get("format") == "short_answer":
+                    qid = q["id"]
+                    if qid in answers_a and qid in answers_b:
+                        short_answers_a[q["text"]] = answers_a[qid]
+                        short_answers_b[q["text"]] = answers_b[qid]
+        
+        if short_answers_a:
+            logger.info("  Running Llama 3.2 text analysis on %d short answers...", len(short_answers_a))
+            text_score, text_reasoning = analyze_text_compatibility(short_answers_a, short_answers_b)
+            logger.info("  Text Analysis Score: %d/100", text_score)
+            logger.info("  Text Analysis Reasoning: %s", text_reasoning)
+
+    # Weights: 30% Traits, 55% Simulation, 15% Text Style
+    raw_overall = (0.30 * trait_avg * 100) + (0.55 * sim_avg) + (0.15 * text_score)
 
     # Each dealbreaker scenario that hits the threshold costs 8 points,
     # but the total is capped so multiple dealbreakers in the same category
@@ -358,6 +386,8 @@ def run_full_compatibility_report(
         "dealbreakers": flagged_dealbreakers,
         "top_friction_axis": top_friction_axis,
         "top_strength_axis": top_strength_axis,
+        "text_analysis_score": text_score,
+        "text_analysis_reasoning": text_reasoning,
         "verdict": verdict,
     }
 

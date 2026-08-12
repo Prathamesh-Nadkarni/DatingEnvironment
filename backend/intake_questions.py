@@ -350,7 +350,9 @@ INTAKE_SECTIONS = [
             {"id": "25.4", "text": "Mismatched desire (one partner wants intimacy more frequently) should be handled by:", "format": "sjt", "options": [{"id": "higher", "text": "Prioritize higher-desire partner"}, {"id": "middle", "text": "Find a middle ground schedule"}, {"id": "lower", "text": "Lower-desire partner sets the pace"}, {"id": "causes", "text": "Address underlying causes together"}, {"id": "spontaneous", "text": "Avoid scheduling, stay spontaneous"}]},
             {"id": "25.5", "text": "Which matters more for long-term intimacy?", "format": "forced_choice", "options": [{"id": "passion", "text": "Physical passion and desire"}, {"id": "safety", "text": "Emotional safety during intimacy"}]},
             {"id": "25.6", "text": "Initiating intimacy should:", "format": "multiple_choice", "options": ["Be mutual and equal", "Usually come from one partner", "Be spontaneous and unplanned", "Depend entirely on mood", "Be discussed openly"]},
-            {"id": "25.7", "text": "What would make you feel rejected or unsafe in intimate contexts?", "format": "short_answer"}
+            {"id": "25.7", "text": "If a partner wants to introduce a new, non-traditional element to your sex life, you would:", "format": "sjt", "options": [{"id": "embrace", "text": "Embrace it enthusiastically"}, {"id": "curious", "text": "Be curious but cautious"}, {"id": "uncomfortable", "text": "Feel pressured/uncomfortable"}, {"id": "reject", "text": "Reject it immediately"}]},
+            {"id": "25.8", "text": "What does ideal physical affection look like to you outside of the bedroom?", "format": "short_answer"},
+            {"id": "25.9", "text": "What would make you feel rejected or unsafe in intimate contexts?", "format": "short_answer"}
         ]
     },
     {

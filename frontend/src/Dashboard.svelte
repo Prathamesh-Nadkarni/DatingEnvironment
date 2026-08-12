@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import SimulationLoader from './SimulationLoader.svelte';
   export let sessionId: string = 'local_demo';
   
   let scenarios: any[] = [];
@@ -79,9 +80,15 @@
       <h3>Potential Match: User 2</h3>
       <p>Vetted via: Agentic ReCAST Simulation</p>
     </div>
-    <button class="run-btn" on:click={runSimulation} disabled={loading}>
-      {loading ? 'Simulating...' : 'Run Simulation'}
-    </button>
+    {#if loading}
+      <div style="grid-column: 1 / -1; margin-top: 1rem;">
+        <SimulationLoader />
+      </div>
+    {:else}
+      <button class="run-btn" on:click={runSimulation}>
+        Run Simulation
+      </button>
+    {/if}
   </div>
 
   {#if result}

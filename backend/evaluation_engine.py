@@ -50,8 +50,9 @@ INDIAN_CONTEXT_STRESSORS = {
 
 
 class EvaluationEngine:
-    def __init__(self, history: List[Dict[str, str]]):
+    def __init__(self, history: List[Dict[str, str]], scenario_desc: str = ""):
         self.history = history
+        self.scenario_desc = scenario_desc
         self.analysis = {
             "harmony_score": 50,
             "horsemen": {
@@ -118,89 +119,21 @@ class EvaluationEngine:
             self._cat_score_0_100 = 50.0
 
     def _analyze_keywords(self):
-        """Secondary: keyword detection in dialogue text."""
-        for turn in self.history:
-            if turn["speaker"] == "Scene Master":
-                continue
-
-            msg = turn["message"].lower()
-            detections = []
-
-            if any(w in msg for w in [
-                "always", "never", "every time", "you always", "you never",
-            ]):
-                self.analysis["horsemen"]["criticism"] += 1
-                detections.append("criticism")
-
-            if any(w in msg for w in [
-                "disgusting", "disgust", "eye roll", "pathetic", "sick of",
-                "contempt",
-            ]):
-                self.analysis["horsemen"]["contempt"] += 1
-                detections.append("contempt")
-
-            if any(w in msg for w in [
-                "not my fault", "isn't my fault", "but you", "you're the one",
-                "it's not like", "i didn't",
-            ]):
-                self.analysis["horsemen"]["defensiveness"] += 1
-                detections.append("defensiveness")
-
-            if any(w in msg for w in [
-                "nothing more to say", "whatever you want", "just drop it",
-                "can't do this", "made up your mind",
-            ]):
-                self.analysis["horsemen"]["stonewalling"] += 1
-                detections.append("stonewalling")
-            stripped = msg.strip()
-            if stripped.endswith("...") and len(stripped) < 20:
-                self.analysis["horsemen"]["stonewalling"] += 1
-                detections.append("stonewalling(silence)")
-
-            if "elders" in msg and any(w in msg for w in [
-                "must", "should", "have to", "duty", "expect",
-            ]):
-                self.analysis["cultural_stressors"]["appeasement"] += 1
-                detections.append("cultural:appeasement")
-
-            if any(w in msg for w in [
-                "don't react", "don't say anything", "stay silent",
-                "keep quiet", "don't make a scene",
-            ]):
-                self.analysis["cultural_stressors"]["non_defense"] += 1
-                detections.append("cultural:non_defense")
-
-            if any(w in msg for w in [
-                "after everything", "sacrificed so much", "they raised",
-                "they gave up", "ungrateful",
-            ]):
-                self.analysis["cultural_stressors"]["guilt_tripping"] += 1
-                detections.append("cultural:guilt_tripping")
-
-            if any(w in msg for w in [
-                "this isn't your concern", "stay out of", "not your place",
-                "not your business",
-            ]):
-                self.analysis["cultural_stressors"]["exclusion"] += 1
-                detections.append("cultural:exclusion")
-
-            repair_phrases = [
-                "i'm sorry", "hear you", "i understand", "let's try",
-                "work through", "together", "compromise", "we're a team",
-                "find a compromise", "meet me halfway", "find a solution",
-                "brainstorm", "work as a team",
-            ]
-            repair_hits = sum(1 for p in repair_phrases if p in msg)
-            if repair_hits >= 2:
-                self.analysis["repair_attempts"] += 1
-                detections.append(f"repair({repair_hits} phrases)")
-
-            if detections:
-                category = turn.get("_category", "?")
-                logger.info(
-                    "  Msg [%s|%s] detected: %s",
-                    turn["speaker"], category, ", ".join(detections),
-                )
+        """Secondary: LLM evaluation of dialogue text."""
+        from llm_analysis import evaluate_simulation_transcript
+        
+        logger.info("  Running Llama 3.2 evaluation on simulation transcript...")
+        llm_eval = evaluate_simulation_transcript(self.scenario_desc, self.history)
+        
+        # Merge LLM results back into the engine state
+        self.analysis["horsemen"]["criticism"] += llm_eval.get("horsemen", 0)
+        self.analysis["repair_attempts"] += llm_eval.get("repair", 0)
+        
+        # Store reasoning
+        self.analysis["llm_reasoning"] = llm_eval.get("reasoning", "")
+        self.analysis["llm_score"] = llm_eval.get("score", 50)
+        
+        logger.info(f"  LLM Eval -> Horsemen: {llm_eval.get('horsemen', 0)}, Repair: {llm_eval.get('repair', 0)}, Score: {llm_eval.get('score', 50)}")
 
     def _detect_synergies(self):
         a_msgs = [
@@ -225,8 +158,8 @@ class EvaluationEngine:
             self.analysis["synergies"].append("Repair Potential: Willingness to de-escalate")
 
     def _finalize_score(self):
-        # Primary: category-derived score (0-100)
-        cat_score = self._cat_score_0_100
+        # Primary: Blend state-machine category score with LLM transcript score
+        cat_score = (self._cat_score_0_100 * 0.4) + (self.analysis.get("llm_score", 50) * 0.6)
 
         # Secondary keyword adjustments (±points)
         horse_penalty = sum(
@@ -338,6 +271,6 @@ class EvaluationEngine:
         logger.info("=" * 70)
 
 
-def compute_harmony_index(history: List[Dict[str, str]]) -> Dict[str, Any]:
-    engine = EvaluationEngine(history)
+def compute_harmony_index(history: List[Dict[str, str]], scenario_desc: str = "") -> Dict[str, Any]:
+    engine = EvaluationEngine(history, scenario_desc)
     return engine.compute()

@@ -230,6 +230,9 @@ These ambivalence profiles modify the agent's simulated internal thought process
 
 ## Stage 3 — The Simulation Engine
 
+### Asynchronous Processing Architecture
+Because simulating an entire multi-year relationship across 35+ high-stakes conflict scenarios requires heavy computational resources, the simulation engine is decoupled from the user experience. The moment both users submit their psychological intakes, a FastAPI `BackgroundTask` is spawned. This runs the full simulation silently in the background (typically taking 1-2 minutes). When users or admins attempt to access the Compatibility Dashboard during this window, the backend serves an HTTP `202 Accepted` status, and the frontend dynamically polls via an animated loading UI until the cached report snaps into place.
+
 ### Architecture: LangGraph State Machine
 
 The simulation is a directed graph with a single state object that persists across all turns:
@@ -330,9 +333,17 @@ tension = clamp(0.15 + focused_distance × 1.2, 0, 1)
 
 The 0.15 floor means there is always a minimum baseline level of friction in any scenario — even ideal couples are being stress-tested, not given a free pass.
 
-### Response Categories and Dialogue Generation
+### Local Generative Dialogue (Llama 3.2)
 
-Each agent selects one of **seven response categories** each turn. The selection is probabilistic, weighted by behavioral profile and scenario-specific biases.
+Instead of relying on hardcoded conversational templates, ManaMatch executes a full generative roleplay. We leverage a local, privacy-preserving **Llama 3.2 (1B/3B)** model (via Ollama) to synthesize every line of dialogue.
+
+At every turn, the LLM is injected with:
+1. The synthesized persona prompts of both users.
+2. The current environmental stress factors.
+3. The specific conflict scenario details.
+4. An inner monologue ("Internal Thought") detailing their underlying psychological state before speaking.
+
+Each agent selects one of **seven response categories** probabilistically, weighted by their behavioral profile:
 
 | Category | Psychological Meaning | Scoring Impact |
 |---|---|---|
@@ -344,13 +355,9 @@ Each agent selects one of **seven response categories** each turn. The selection
 | `strained` | Visible resentment leaking into interaction; "I'm trying but I'm done" | −12 |
 | `escalate` | Contempt, hostility, character attacks; Gottman's "divorce predictor" | −22 |
 
-The high penalty for `escalate` (−22) reflects John Gottman's research finding that contempt is the single strongest predictor of relationship dissolution — more predictive than frequency of conflict or sexual dissatisfaction.
+The high penalty for `escalate` (−22) reflects John Gottman's research finding that contempt is the single strongest predictor of relationship dissolution.
 
-**Scenario-category biases** adjust the probability distribution per category type. In `autonomy_identity` scenarios, `assert` gets a +0.15 boost because these scenarios inherently activate identity defence. In `crisis_resilience` scenarios, both `repair` (+0.15) and `escalate` (+0.10) are boosted — compatible couples rise to the occasion, incompatible ones collapse.
-
-**The Resentment Override** is triggered when an agent has been repeatedly forced into `defer` responses (family deference pattern) while having a high `resentment_accumulation_rate`. After sufficient suppression, the next response is forced to `strained` or `escalate` regardless of the probability distribution. This models the well-documented Indian marital pattern where years of silent compliance produce a sudden, disproportionate eruption.
-
-**Clash modifiers** append context-specific language to the dialogue based on the dominant trait clash between the two agents (fairness, family, autonomy, or conflict_style). This means two couples with the same tension level produce qualitatively different dialogue depending on *what* they are actually disagreeing about.
+**The Resentment Override** is mathematically enforced before the LLM speaks: if an agent has been repeatedly forced into `defer` responses while having a high `resentment_accumulation_rate`, the engine overrides their probability matrix and forces the LLM to generate an `escalate` or `strained` response. This accurately models the well-documented marital pattern where years of silent compliance produce a sudden, disproportionate eruption.
 
 ---
 
@@ -413,6 +420,14 @@ For each compatibility report, the engine selects the **3 highest-weighted scena
 ---
 
 ## Stage 4b — The Evaluation Engine
+
+### Generative Evaluation Engine
+
+Once the multi-turn scenario completes, the entire transcript is evaluated in two passes:
+1. **Mathematical State Machine**: Tracks numerical momentum (Happiness vs. Accumulated Stress limit breaks).
+2. **Generative Psychological Analysis**: The raw dialogue history is fed back into **Llama 3.2** which acts as an impartial clinical evaluator. It analyzes the text for implicit toxicity, passive-aggression, and Gottman's Four Horsemen (Criticism, Contempt, Defensiveness, Stonewalling), outputting a JSON object containing the penalty counts and synergy bonuses.
+
+This dual-pass evaluation yields a blended `harmony_score`, combining the rigidity of the state-machine rules with the nuanced contextual understanding of a generative LLM.
 
 ### Primary Scoring: Response Category Distribution
 

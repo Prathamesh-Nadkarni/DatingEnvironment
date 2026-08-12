@@ -321,6 +321,7 @@ class PersonaEngine:
         self.ambivalence_map = {}
         self.trigger_map = {"hot": [], "slow": []}
         self.narrative_hits = []
+        self.text_answers = {}
 
     def synthesize(self, raw_answers: Dict[str, Any]) -> Dict[str, Any]:
         """Runs the 9-step interpretation pipeline."""
@@ -345,7 +346,7 @@ class PersonaEngine:
             "ambivalence": self.ambivalence_map,
             "clusters": clusters,
             "summary": summary,
-            "system_prompt": self._generate_prompt(clusters, summary)
+            "system_prompt": self._generate_prompt(clusters, summary, raw_answers)
         }
 
     def _seed_ideals(self, answers):
@@ -375,6 +376,13 @@ class PersonaEngine:
 
             if q_id in SCALE_MAPPINGS:
                 self._apply_scale_mapping(q_id, val)
+                
+            # Capture free-text answers (long strings not in predefined options/scales)
+            if q_id not in MAPPING_TABLE and q_id not in SCALE_MAPPINGS:
+                if isinstance(val, str) and len(val.strip()) > 3:
+                    # Exclude simple demographics or single-word dropdowns if they happen to miss mapping
+                    if q_id not in ["0.1", "0.2", "0.3", "0.4"]:
+                        self.text_answers[q_id] = val
 
     def _apply_scale_mapping(self, q_id, val):
         try:
@@ -440,16 +448,21 @@ class PersonaEngine:
     def _generate_summary(self, clusters):
         return f"This persona is a {clusters['power']} operator who values {clusters['emotion']} emotional dynamics and approaches the future as a {clusters['future']}."
 
-    def _generate_prompt(self, clusters, summary):
+    def _generate_prompt(self, clusters, summary, raw_answers):
         rounded = {k: round(v, 4) for k, v in self.enacted_traits.items()}
+        text_context = "\n".join([f"Q({k}): {v}" for k, v in self.text_answers.items()])
+        
         return f"""You are the 'Inner Parliament' for this persona.
 CONTEXT: {summary}
 CLUSTERS: {json.dumps(clusters)}
 TRAITS (ENACTED): {json.dumps(rounded, indent=1)}
 AMBIVALENCE: {json.dumps(self.ambivalence_map, indent=1)}
+PERSONAL BELIEFS / SHORT ANSWERS:
+{text_context if text_context else "None provided."}
 
 SIMULATION INSTRUCTION:
 - Use <InternalThought> to resolve the conflict between what you WANT (Ideals) and what you DO (Enacted traits).
+- Ground your responses in the PERSONAL BELIEFS / SHORT ANSWERS provided above.
 - In Indian family scenarios, prioritize 'Dignity' and 'Harmony' but track 'Resentment' if you are forced to sacrifice Fairness.
 """
 

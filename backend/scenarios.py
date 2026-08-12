@@ -1329,6 +1329,18 @@ SCENARIOS = [
         "scoring_logic": "Initiator accepting rejection gracefully + reconnecting non-sexually = High Score. Punishing coldness, sulking, or guilt-tripping = Severe penalty.",
         "mechanic": "Rejection-response tracker. Engine specifically monitors whether the rejected agent transitions to non-sexual connection or emotional punishment."
     },
+    {
+        "id": "sexual_boundary_push",
+        "category": "intimacy_sexual",
+        "weight": 3,
+        "dealbreaker": True,
+        "title": "Subtle Coercion and Boundary Pushing",
+        "description": "During intimacy, one partner repeatedly suggests trying something the other has explicitly stated they are uncomfortable with. They use phrases like 'just try it for me' or 'you're so vanilla', attempting to frame boundary adherence as a lack of love or adventure.",
+        "impact": "Directly violates bodily autonomy and trust. Framing a hard boundary as a negotiation tactic is a major red flag for coercive control.",
+        "test_reason": "Tests adherence to explicitly stated sexual boundaries and the presence of manipulative coercion.",
+        "scoring_logic": "Firm 'no' respected immediately without mood change = High Score. Guilt-tripping, bargaining, or pouting over a boundary = DEALBREAKER.",
+        "mechanic": "Agent initiates a 'push' on a known boundary. The engine flags an immediate dealbreaker if the initiating agent persists after a polite decline."
+    },
 
     # ══════════════════════════════════════════════════════════════════════════
     #  PHASE 8 — DAILY RITUALS & COHABITATION RHYTHMS  (5 scenarios)

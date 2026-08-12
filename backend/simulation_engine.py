@@ -11,6 +11,8 @@ logger = logging.getLogger("mirofish.simulation")
 class SimulationState(TypedDict):
     agent_a_prompt: str
     agent_b_prompt: str
+    answers_a: dict
+    answers_b: dict
     scenario_details: dict
     dialogue_history: List[Dict[str, Any]]
     turn_count: int
@@ -468,7 +470,11 @@ def generate_mock_message(
     own_last: str,
     other_last: str,
     scenario_category: str = "",
+    scenario_desc: str = "",
+    user_tone_answers: dict = None,
 ) -> tuple:
+    from llm_analysis import generate_agent_dialogue
+
     own_profile = compute_behavioral_profile(own_prompt)
     other_profile = compute_behavioral_profile(other_prompt)
     clash_intensity = compute_trait_distance(own_prompt, other_prompt)
@@ -490,13 +496,15 @@ def generate_mock_message(
         elif resentment_val > 0.23:
             category = "strained"
 
-    variants = MESSAGES.get(category, MESSAGES["compromise"])
-    thought, spoken = variants[turn % len(variants)]
-
-    dominant_clash = find_dominant_clash(own_prompt, other_prompt)
-    modifier = CLASH_MODIFIERS.get(dominant_clash, {}).get(category, "")
-    if modifier:
-        spoken += modifier
+    # Generate actual dialogue via LLM matching user tone
+    spoken = generate_agent_dialogue(
+        scenario_desc=scenario_desc,
+        action=category,
+        history=history,
+        user_tone_answers=user_tone_answers,
+        agent_name=speaker
+    )
+    thought = f"Agent executing action: {category.upper()}"
 
     effective_category = category if category != "strained" else "compromise"
     tension_delta = compute_tension_delta(
@@ -701,9 +709,11 @@ def agent_a_node(state: SimulationState):
         state["last_category_a"],
         state["last_category_b"],
         state.get("scenario_category", ""),
+        scenario_desc=state.get("scenario_details", {}).get("description", ""),
+        user_tone_answers=state.get("answers_a", {})
     )
     state["dialogue_history"].append(
-        {"speaker": "Agent A", "message": msg, "_category": category}
+        {"speaker": "Agent A", "message": msg, "action": category}
     )
     state["tension_level"] = new_tension
     state["last_category_a"] = category
@@ -721,9 +731,11 @@ def agent_b_node(state: SimulationState):
         state["last_category_b"],
         state["last_category_a"],
         state.get("scenario_category", ""),
+        scenario_desc=state.get("scenario_details", {}).get("description", ""),
+        user_tone_answers=state.get("answers_b", {})
     )
     state["dialogue_history"].append(
-        {"speaker": "Agent B", "message": msg, "_category": category}
+        {"speaker": "Agent B", "message": msg, "action": category}
     )
     state["tension_level"] = new_tension
     state["last_category_b"] = category
@@ -772,11 +784,15 @@ def run_simulation(
     agent_a_prompt: str,
     agent_b_prompt: str,
     scenario: dict,
+    answers_a: dict = None,
+    answers_b: dict = None,
     max_turns: int = 5,
 ):
     initial_state = {
         "agent_a_prompt": agent_a_prompt,
         "agent_b_prompt": agent_b_prompt,
+        "answers_a": answers_a or {},
+        "answers_b": answers_b or {},
         "scenario_details": scenario,
         "dialogue_history": [],
         "turn_count": 0,
@@ -787,13 +803,13 @@ def run_simulation(
         "last_category_b": "",
         "scenario_category": scenario.get("category", ""),
         "accumulated_stress": 0.0,
-        "relationship_limit": 150.0,  # 150 stress is the breaking point
-        "happiness_factor": 50.0,     # Starts at neutral 50
+        "relationship_limit": 150.0,
+        "happiness_factor": 50.0,
     }
     result = simulation_graph.invoke(initial_state)
 
     categories = [
-        h.get("_category", "?")
+        h.get("_category") or h.get("action", "?")
         for h in result["dialogue_history"]
         if h["speaker"] != "Scene Master"
     ]
