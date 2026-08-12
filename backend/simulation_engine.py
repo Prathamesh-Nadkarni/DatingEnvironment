@@ -4,15 +4,20 @@ import logging
 from typing import List, Dict, Any, Optional
 from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START, END
+from state_models import MarriageState
 
 logger = logging.getLogger("mirofish.simulation")
 
 
 class SimulationState(TypedDict):
-    agent_a_prompt: str
-    agent_b_prompt: str
-    answers_a: dict
-    answers_b: dict
+    marriage_state: MarriageState
+    agent_a: dict
+    agent_b: dict
+    sampled_traits_a: dict
+    sampled_traits_b: dict
+    emotional_state_a: dict
+    emotional_state_b: dict
+    relationship_capital: float
     scenario_details: dict
     dialogue_history: List[Dict[str, Any]]
     turn_count: int
@@ -27,14 +32,11 @@ class SimulationState(TypedDict):
     happiness_factor: float
 
 
-def get_trait(prompt: str, trait: str) -> float:
+def get_trait(prompt_dict: dict, trait: str) -> float:
     try:
-        match = re.search(rf'"{trait}":\s*([0-9eE.+-]+)', prompt)
-        if match:
-            return float(match.group(1))
+        return prompt_dict["traits"].get(trait, {}).get("mean", 0.5)
     except Exception:
-        pass
-    return 0.5
+        return 0.5
 
 
 # ---------- Behavioral profile computation ----------
@@ -74,19 +76,19 @@ KEY_TRAITS = [
 ]
 
 
-def compute_behavioral_profile(prompt: str) -> Dict[str, float]:
+def compute_behavioral_profile(traits: dict) -> Dict[str, float]:
     return {
-        behavior: sum(get_trait(prompt, t) * w for t, w in components)
+        behavior: sum(traits.get(t, 0.5) * w for t, w in components)
         for behavior, components in BEHAVIORAL_COMPONENTS.items()
     }
 
 
-def compute_trait_distance(prompt_a: str, prompt_b: str) -> float:
+def compute_trait_distance(prompt_a: dict, prompt_b: dict) -> float:
     diffs = [abs(get_trait(prompt_a, t) - get_trait(prompt_b, t)) for t in KEY_TRAITS]
     return sum(diffs) / len(diffs)
 
 
-def find_dominant_clash(own_prompt: str, other_prompt: str) -> str:
+def find_dominant_clash(own_prompt: dict, other_prompt: dict) -> str:
     clashes = {
         "fairness": abs(
             get_trait(own_prompt, "egalitarianism")
@@ -98,11 +100,11 @@ def find_dominant_clash(own_prompt: str, other_prompt: str) -> str:
         ),
         "autonomy": abs(
             get_trait(own_prompt, "autonomy_need")
-            - get_trait(other_prompt, "tradition_compliance")
+            - get_trait(other_prompt, "autonomy_need")
         ),
         "conflict_style": abs(
             get_trait(own_prompt, "conflict_dominance")
-            - get_trait(other_prompt, "withdrawal_tendency")
+            - get_trait(other_prompt, "conflict_dominance")
         ),
     }
     return max(clashes, key=clashes.get)
@@ -350,7 +352,38 @@ def compute_focused_tension(prompt_a: str, prompt_b: str, category: str) -> floa
     return min(1.0, 0.15 + focused_distance * 1.2)
 
 
-# ---------- Response selection ----------
+# ---------- Stateful Emotion & Response Selection ----------
+
+import math
+
+def sigmoid(x: float) -> float:
+    return 1.0 / (1.0 + math.exp(-x))
+
+def update_emotional_state(state: dict, category: str, other_category: str) -> dict:
+    """Updates emotional state based on recent interaction."""
+    new_state = state.copy()
+    
+    if other_category == "escalate":
+        new_state["anger"] = min(1.0, new_state["anger"] + 0.2)
+        new_state["trust"] = max(0.0, new_state["trust"] - 0.15)
+        new_state["safety"] = max(0.0, new_state["safety"] - 0.2)
+    elif other_category == "withdraw":
+        new_state["hurt"] = min(1.0, new_state["hurt"] + 0.15)
+        new_state["safety"] = max(0.0, new_state["safety"] - 0.1)
+    elif other_category == "repair":
+        new_state["anger"] = max(0.0, new_state["anger"] - 0.15)
+        new_state["trust"] = min(1.0, new_state["trust"] + 0.1)
+        new_state["safety"] = min(1.0, new_state["safety"] + 0.15)
+    elif other_category == "defer":
+        # If I forced them to defer, my perceived power goes up, but their resentment might build (handled on their side)
+        pass
+        
+    # If I deferred, resentment builds
+    if category == "defer":
+        new_state["resentment"] = min(1.0, new_state["resentment"] + 0.1)
+        
+    return new_state
+
 
 def select_response_category(
     profile: Dict[str, float],
@@ -358,75 +391,73 @@ def select_response_category(
     turn: int,
     other_last: str,
     clash_intensity: float,
+    emotional_state: dict,
     scenario_category: str = "",
 ) -> str:
     scores: Dict[str, float] = {}
 
-    scores["compromise"] = (
-        0.3
-        + profile["repair"] * 0.25
-        + (1.0 - tension) * 0.25
-        + (1.0 - profile["assertiveness"]) * 0.1
-        + (1.0 - profile["avoidance"]) * 0.1
+    anger = emotional_state.get("anger", 0.0)
+    safety = emotional_state.get("safety", 0.5)
+    resentment = emotional_state.get("resentment", 0.0)
+    trust = emotional_state.get("trust", 0.5)
+
+    # Using Sigmoid with logits (raw combinations of trait and state)
+    scores["compromise"] = sigmoid(
+        -0.5
+        + profile["repair"] * 1.0
+        + safety * 1.5
+        - anger * 1.0
+        - resentment * 0.5
     )
 
-    scores["assert"] = (
-        profile["assertiveness"] * 0.35
-        + tension * 0.15
-        + (1.0 - profile["avoidance"]) * 0.15
-        + (1.0 - profile["deference"]) * 0.15
-        + 0.1
+    scores["assert"] = sigmoid(
+        -1.0
+        + profile["assertiveness"] * 2.0
+        + tension * 1.0
+        - safety * 0.5
     )
 
-    defer_boost = 0.1 if other_last in ("assert", "escalate") else 0.0
-    scores["defer"] = (
-        profile["deference"] * 0.35
-        + (1.0 - profile["assertiveness"]) * 0.15
-        + tension * 0.1
+    defer_boost = 1.0 if other_last in ("assert", "escalate") else 0.0
+    scores["defer"] = sigmoid(
+        -1.0
+        + profile["deference"] * 1.5
+        - profile["assertiveness"] * 1.0
         + defer_boost
-        + 0.1
     )
 
-    if turn >= 1 and tension > 0.3:
-        repair_boost = 0.1 if other_last in ("escalate", "withdraw") else 0.0
-        scores["repair"] = (
-            profile["repair"] * 0.35
-            + (1.0 - profile["avoidance"]) * 0.15
-            + min(tension, 0.7) * 0.15
-            + repair_boost
-            + 0.1
-        )
-    else:
-        scores["repair"] = 0.0
+    repair_boost = 1.0 if other_last in ("escalate", "withdraw") else 0.0
+    scores["repair"] = sigmoid(
+        -1.5
+        + profile["repair"] * 2.0
+        + trust * 1.5
+        + safety * 1.0
+        - anger * 1.5
+        - resentment * 2.0
+        + repair_boost
+    ) if turn >= 1 else 0.0
 
-    escalate_boost = 0.1 if other_last in ("defer", "withdraw") else 0.0
-    scores["withdraw"] = (
-        profile["avoidance"] * 0.2
-        + tension * 0.2
-        + (1.0 - profile["repair"]) * 0.1
-        + 0.04 * min(turn, 3)
+    escalate_boost = 1.0 if other_last in ("defer", "withdraw") else 0.0
+    scores["withdraw"] = sigmoid(
+        -1.0
+        + profile["avoidance"] * 2.0
+        - safety * 1.5
+        + resentment * 1.0
     )
-    scores["escalate"] = (
-        profile["assertiveness"] * 0.15
-        + tension * 0.2
-        + (1.0 - profile["repair"]) * 0.15
-        + (1.0 - profile["avoidance"]) * 0.05
+    
+    scores["escalate"] = sigmoid(
+        -2.0
+        + profile["assertiveness"] * 1.0
+        + anger * 2.0
+        + resentment * 1.5
+        - trust * 1.5
         + escalate_boost
-        + 0.04 * min(turn, 3)
     )
-
-    # Trait clash amplifies conflict responses, dampens cooperation
-    scores["assert"] += clash_intensity * 0.15
-    scores["escalate"] += clash_intensity * 0.2
-    scores["compromise"] -= clash_intensity * 0.15
-    if profile["avoidance"] > 0.5:
-        scores["withdraw"] += clash_intensity * 0.1
 
     # Apply scenario-category biases
     category_bias = SCENARIO_CATEGORY_BIAS.get(scenario_category, {})
     for cat, boost in category_bias.items():
         if cat in scores:
-            scores[cat] += boost
+            scores[cat] += (boost * 2.0)  # scale up for sigmoid bounds
 
     return max(scores, key=scores.get)
 
@@ -463,8 +494,9 @@ def compute_tension_delta(
 
 def generate_mock_message(
     speaker: str,
-    own_prompt: str,
-    other_prompt: str,
+    own_prompt: dict,
+    other_prompt: dict,
+    own_emotional_state: dict,
     history: list,
     tension: float,
     own_last: str,
@@ -475,25 +507,23 @@ def generate_mock_message(
 ) -> tuple:
     from llm_analysis import generate_agent_dialogue
 
-    own_profile = compute_behavioral_profile(own_prompt)
-    other_profile = compute_behavioral_profile(other_prompt)
+    own_profile = compute_behavioral_profile(own_prompt["sampled_traits"] if "sampled_traits" in own_prompt else own_prompt)
+    other_profile = compute_behavioral_profile(other_prompt["sampled_traits"] if "sampled_traits" in other_prompt else other_prompt)
     clash_intensity = compute_trait_distance(own_prompt, other_prompt)
 
     turn = sum(1 for h in history if h["speaker"] == speaker)
 
     category = select_response_category(
-        own_profile, tension, turn, other_last, clash_intensity, scenario_category
+        own_profile, tension, turn, other_last, clash_intensity, own_emotional_state, scenario_category
     )
 
-    # Resentment override: compromise/defer under high clash builds friction
+    # Resentment override is now organically handled by the high resentment multiplier in the sigmoid above,
+    # but we'll leave a hard override just in case.
     original_category = category
-    resentment_val = 0.0
-    if category in ("compromise", "defer") and clash_intensity > 0.15:
-        amplified_clash = clash_intensity ** 0.6
-        resentment_val = amplified_clash * (0.2 + tension * 0.25 + turn * 0.12)
-        if resentment_val > 0.42:
+    if category in ("compromise", "defer") and own_emotional_state.get("resentment", 0) > 0.6:
+        if own_emotional_state.get("anger", 0) > 0.5:
             category = "escalate"
-        elif resentment_val > 0.23:
+        else:
             category = "strained"
 
     # Generate actual dialogue via LLM matching user tone
@@ -616,19 +646,66 @@ def environmental_reaction_node(state: SimulationState):
         stress_delta = severity * 2.0
         happiness_delta -= 2.0 * severity
 
-    # Apply Deltas
-    state["accumulated_stress"] += stress_delta
-    state["happiness_factor"] += happiness_delta
+    # Apply Deltas to MarriageState (generic event impact)
+    m_state = state["marriage_state"]
+    # Update state logic
+    if reaction_type == "escalate_reaction":
+        m_state.relationship_capital = max(0.0, m_state.relationship_capital - severity * 2)
+        m_state.trust_a = max(0.0, m_state.trust_a - severity * 0.05)
+        m_state.trust_b = max(0.0, m_state.trust_b - severity * 0.05)
+        
+        # Adaptive Cascades (Phase 2)
+        if category == "financial":
+            m_state.financial_stability = max(0.0, m_state.financial_stability - severity * 0.1)
+            # Cascade: financial stress causes burnout
+            m_state.burnout_a += severity * 0.05
+            m_state.burnout_b += severity * 0.05
+        elif category == "intimacy":
+            m_state.intimacy_satisfaction_a = max(0.0, m_state.intimacy_satisfaction_a - severity * 0.1)
+            m_state.intimacy_satisfaction_b = max(0.0, m_state.intimacy_satisfaction_b - severity * 0.1)
+        elif category == "family_dynamics":
+            m_state.family_boundary_health = max(0.0, m_state.family_boundary_health - severity * 0.1)
+            # Cascade: family issues spike resentment
+            m_state.resentment_a += severity * 0.08
+            m_state.resentment_b += severity * 0.08
+            
+    elif reaction_type == "repair_reaction":
+        m_state.relationship_capital = min(100.0, m_state.relationship_capital + severity * 2)
+        m_state.trust_a = min(1.0, m_state.trust_a + severity * 0.05)
+        m_state.trust_b = min(1.0, m_state.trust_b + severity * 0.05)
+        m_state.successful_repairs += 1
+        
+        # Positive Cascades (Phase 2)
+        if category == "financial":
+            m_state.financial_stability = min(1.0, m_state.financial_stability + severity * 0.05)
+        elif category == "intimacy":
+            m_state.intimacy_satisfaction_a = min(1.0, m_state.intimacy_satisfaction_a + severity * 0.05)
+            m_state.intimacy_satisfaction_b = min(1.0, m_state.intimacy_satisfaction_b + severity * 0.05)
+        
+    m_state.update_happiness()
     
     # Bound tracking
-    state["happiness_factor"] = max(0.0, min(100.0, state["happiness_factor"]))
-    state["accumulated_stress"] = max(0.0, state["accumulated_stress"])
+    state["happiness_factor"] = (m_state.happiness_a + m_state.happiness_b) / 2.0 * 100.0
+    state["accumulated_stress"] = max(0.0, state["accumulated_stress"] + stress_delta)
 
-    # Breakpoint Check (The "Relationship Limit")
-    if state["accumulated_stress"] >= state["relationship_limit"] or state["happiness_factor"] == 0:
-        reaction_type = "limit_break"
-        state["happiness_factor"] = 0.0 # Instant crash
-        state["tension_level"] = 1.0
+    # Separation Mechanics (Phase 3)
+    import random
+    base_risk = 0.0
+    if m_state.relationship_capital < 20:
+        base_risk = (20 - m_state.relationship_capital) / 20.0
+        
+    if state["accumulated_stress"] >= state["relationship_limit"]:
+        base_risk += 0.5
+        
+    if base_risk > 0:
+        mitigation = ((m_state.commitment_a + m_state.commitment_b) / 2.0 * 0.5) + (m_state.exit_barriers * 0.5)
+        p_separation = max(0.0, base_risk - mitigation)
+        
+        if random.random() < p_separation:
+            reaction_type = "limit_break"
+            m_state.relationship_capital = 0.0 # Force breakdown
+            state["happiness_factor"] = 0.0
+            state["tension_level"] = 1.0
 
     templates = ENVIRONMENT_TEMPLATES.get(reaction_type)
     message_text = templates[turn % len(templates)]
@@ -660,13 +737,13 @@ def scene_master(state: SimulationState):
 
     state["scenario_category"] = category
     state["tension_level"] = compute_focused_tension(
-        state["agent_a_prompt"], state["agent_b_prompt"], category
+        state["agent_a"], state["agent_b"], category
     )
 
-    overall_distance = compute_trait_distance(state["agent_a_prompt"], state["agent_b_prompt"])
-    profile_a = compute_behavioral_profile(state["agent_a_prompt"])
-    profile_b = compute_behavioral_profile(state["agent_b_prompt"])
-    clash = find_dominant_clash(state["agent_a_prompt"], state["agent_b_prompt"])
+    overall_distance = compute_trait_distance(state["agent_a"], state["agent_b"])
+    profile_a = compute_behavioral_profile(state["sampled_traits_a"])
+    profile_b = compute_behavioral_profile(state["sampled_traits_b"])
+    clash = find_dominant_clash(state["agent_a"], state["agent_b"])
 
     logger.info("=" * 70)
     logger.info(
@@ -700,17 +777,24 @@ def scene_master(state: SimulationState):
 
 
 def agent_a_node(state: SimulationState):
+    # Update state from B's last action if there was one
+    if state["last_category_b"]:
+        state["emotional_state_a"] = update_emotional_state(
+            state["emotional_state_a"], state["last_category_a"], state["last_category_b"]
+        )
+
     msg, new_tension, category = generate_mock_message(
         "Agent A",
-        state["agent_a_prompt"],
-        state["agent_b_prompt"],
+        state["agent_a"],
+        state["agent_b"],
+        state["emotional_state_a"],
         state["dialogue_history"],
         state["tension_level"],
         state["last_category_a"],
         state["last_category_b"],
         state.get("scenario_category", ""),
         scenario_desc=state.get("scenario_details", {}).get("description", ""),
-        user_tone_answers=state.get("answers_a", {})
+        user_tone_answers=state.get("agent_a", {}).get("answers", {})
     )
     state["dialogue_history"].append(
         {"speaker": "Agent A", "message": msg, "action": category}
@@ -722,17 +806,23 @@ def agent_a_node(state: SimulationState):
 
 
 def agent_b_node(state: SimulationState):
+    if state["last_category_a"]:
+        state["emotional_state_b"] = update_emotional_state(
+            state["emotional_state_b"], state["last_category_b"], state["last_category_a"]
+        )
+        
     msg, new_tension, category = generate_mock_message(
         "Agent B",
-        state["agent_b_prompt"],
-        state["agent_a_prompt"],
+        state["agent_b"],
+        state["agent_a"],
+        state["emotional_state_b"],
         state["dialogue_history"],
         state["tension_level"],
         state["last_category_b"],
         state["last_category_a"],
         state.get("scenario_category", ""),
         scenario_desc=state.get("scenario_details", {}).get("description", ""),
-        user_tone_answers=state.get("answers_b", {})
+        user_tone_answers=state.get("agent_b", {}).get("answers", {})
     )
     state["dialogue_history"].append(
         {"speaker": "Agent B", "message": msg, "action": category}
@@ -781,18 +871,40 @@ simulation_graph = builder.compile()
 
 
 def run_simulation(
-    agent_a_prompt: str,
-    agent_b_prompt: str,
+    agent_a: dict,
+    agent_b: dict,
+    sampled_traits_a: dict,
+    sampled_traits_b: dict,
     scenario: dict,
-    answers_a: dict = None,
-    answers_b: dict = None,
+    marriage_state: MarriageState,
     max_turns: int = 5,
 ):
+    # Initialize transient emotional states from the persistent MarriageState
+    emotional_state_a = {
+        "anger": marriage_state.resentment_a,
+        "hurt": marriage_state.unresolved_hurt_a,
+        "trust": marriage_state.trust_a,
+        "safety": marriage_state.emotional_safety_a,
+        "resentment": marriage_state.resentment_a
+    }
+    
+    emotional_state_b = {
+        "anger": marriage_state.resentment_b,
+        "hurt": marriage_state.unresolved_hurt_b,
+        "trust": marriage_state.trust_b,
+        "safety": marriage_state.emotional_safety_b,
+        "resentment": marriage_state.resentment_b
+    }
+
     initial_state = {
-        "agent_a_prompt": agent_a_prompt,
-        "agent_b_prompt": agent_b_prompt,
-        "answers_a": answers_a or {},
-        "answers_b": answers_b or {},
+        "marriage_state": marriage_state,
+        "agent_a": agent_a,
+        "agent_b": agent_b,
+        "sampled_traits_a": sampled_traits_a,
+        "sampled_traits_b": sampled_traits_b,
+        "emotional_state_a": emotional_state_a,
+        "emotional_state_b": emotional_state_b,
+        "relationship_capital": marriage_state.relationship_capital,
         "scenario_details": scenario,
         "dialogue_history": [],
         "turn_count": 0,

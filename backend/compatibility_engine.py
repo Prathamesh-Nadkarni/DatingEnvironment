@@ -247,191 +247,177 @@ def compute_trait_compatibility(prompt_a: str, prompt_b: str) -> Dict[str, float
     }
 
 
-# ---------- Scenario selection ----------
+# ---------- Timeline Generation ----------
 
-def _pick_scenarios(category_scenarios: List[dict], n: int) -> List[dict]:
-    ranked = sorted(
-        category_scenarios,
-        key=lambda s: (s.get("weight", 1), s.get("dealbreaker", False)),
-        reverse=True,
-    )
-    return ranked[:n]
+def generate_timeline(all_scenarios: List[dict], years: int = 15) -> List[dict]:
+    """Generates an event timeline spanning `years`. Frequency determines probability of inclusion per year."""
+    import random
+    from state_models import MarriageState, LifePhase
+    timeline = []
+    
+    # Simple hazard function based on frequencies
+    freq_probs = {
+        "High": 0.8,
+        "Medium": 0.4,
+        "Low": 0.1,
+        "Very low": 0.05
+    }
+    
+    # Temporary mock state just to track time during timeline generation
+    mock_state = MarriageState()
+    
+    for month in range(1, years * 12 + 1):
+        mock_state.marriage_month = month
+        current_phase = mock_state.current_life_phase
+        
+        # Pick 1 scenario randomly, but weighted by frequency and life phase
+        candidate = random.choice(all_scenarios)
+        base_prob = freq_probs.get(candidate.get("frequency", "Medium"), 0.4)
+        
+        # Apply phase modifiers based on category
+        cat = candidate.get("category", "")
+        modifier = 1.0
+        
+        if current_phase == LifePhase.NEWLYWED:
+            if cat in ["family_dynamics", "financial"]: modifier = 1.2
+            elif cat == "parenting": modifier = 0.1
+        elif current_phase == LifePhase.CAREER_BUILDING:
+            if cat == "financial": modifier = 1.3
+        elif current_phase == LifePhase.CHILDCARE:
+            if cat == "parenting": modifier = 1.5
+            if cat == "intimacy": modifier = 1.2
+        elif current_phase == LifePhase.MIDLIFE:
+            if cat == "autonomy_identity": modifier = 1.4
+            
+        prob = base_prob * modifier
+        
+        if random.random() < prob:
+            # We add it to the timeline
+            event = candidate.copy()
+            event["month"] = month
+            timeline.append(event)
+            
+    return timeline
 
 
 # ---------- Multi-scenario compatibility report ----------
 
 def run_full_compatibility_report(
-    prompt_a: str,
-    prompt_b: str,
+    agent_a: dict,
+    agent_b: dict,
     answers_a: dict = None,
     answers_b: dict = None,
     max_turns: int = 4,
 ) -> Dict[str, Any]:
-    logger.info("=" * 70)
-    logger.info(
-        "COMPATIBILITY REPORT: up to %d scenarios per category (%d categories)",
-        SCENARIOS_PER_CATEGORY, len(CATEGORY_LABELS),
-    )
-    logger.info("=" * 70)
+    import random
+    import math
+    from state_models import MarriageState
+    MONTE_CARLO_N = 5
+    SIMULATION_YEARS = 15
 
-    trait_compat = compute_trait_compatibility(prompt_a, prompt_b)
+    def sample_traits(agent: dict) -> dict:
+        sampled = {}
+        for trait, dist in agent.get("traits", {}).items():
+            mean_val = dist.get("mean", 0.5)
+            variance = dist.get("variance", 0.01)
+            std_dev = math.sqrt(variance)
+            val = random.gauss(mean_val, std_dev)
+            sampled[trait] = max(0.0, min(1.0, val))
+        return sampled
 
-    by_category = get_scenarios_by_category()
-    dimensional_scores: Dict[str, int] = {}
-    dimensional_details: Dict[str, List[Dict[str, Any]]] = {}
-    flagged_dealbreakers: List[str] = []
-
-    for category in CATEGORY_LABELS:
-        cat_scenarios = by_category.get(category, [])
-        if not cat_scenarios:
-            continue
-
-        picked = _pick_scenarios(cat_scenarios, SCENARIOS_PER_CATEGORY)
-        scenario_results: List[Dict[str, Any]] = []
-        weighted_sum = 0.0
-        weight_total = 0.0
-
-        for scenario in picked:
-            w = scenario.get("weight", 1)
-            logger.info(
-                "  [%s] Running: '%s' (weight=%d, db=%s)",
-                category, scenario["title"], w, scenario.get("dealbreaker", False),
-            )
-            sim_result = run_simulation(prompt_a, prompt_b, scenario, max_turns=max_turns)
-            analysis = compute_harmony_index(sim_result["dialogue_history"])
-
-            score = analysis["harmony_score"]
-            weighted_sum += score * w
-            weight_total += w
-
-            detail = {
-                "scenario_id": scenario["id"],
-                "scenario_title": scenario["title"],
-                "harmony_score": score,
-                "trajectory": analysis["trajectory"],
-                "inference": analysis.get("inference", ""),
-                "dialogue_history": sim_result["dialogue_history"],
-                "weight": w,
-                "dealbreaker": scenario.get("dealbreaker", False),
-            }
-            scenario_results.append(detail)
-
-            if scenario.get("dealbreaker") and score <= DEALBREAKER_THRESHOLD:
-                flagged_dealbreakers.append(scenario["id"])
-                logger.info(
-                    "  *** DEALBREAKER FLAGGED: %s scored %d (threshold %d) ***",
-                    scenario["id"], score, DEALBREAKER_THRESHOLD,
-                )
-
-        cat_score = int(weighted_sum / weight_total) if weight_total > 0 else 50
-        dimensional_scores[category] = cat_score
-        dimensional_details[category] = scenario_results
-
-    trait_avg = mean(trait_compat.values())
-    sim_avg = mean(dimensional_scores.values()) if dimensional_scores else 50.0
+    all_scenarios = get_scenarios()
     
-    # Text Analysis Integration
-    text_score = 50
-    text_reasoning = ""
-    if answers_a and answers_b:
-        # Extract short answer question text to answer map
-        short_answers_a = {}
-        short_answers_b = {}
-        for sec in INTAKE_SECTIONS:
-            for q in sec["questions"]:
-                if q.get("format") == "short_answer":
-                    qid = q["id"]
-                    if qid in answers_a and qid in answers_b:
-                        short_answers_a[q["text"]] = answers_a[qid]
-                        short_answers_b[q["text"]] = answers_b[qid]
+    # Store results across N Monte Carlo lives
+    monte_carlo_results = []
+
+    # Run N full lives
+    for mc_idx in range(MONTE_CARLO_N):
+        logger.info(f"--- Monte Carlo Rollout {mc_idx + 1}/{MONTE_CARLO_N} ---")
         
-        if short_answers_a:
-            logger.info("  Running Llama 3.2 text analysis on %d short answers...", len(short_answers_a))
-            text_score, text_reasoning = analyze_text_compatibility(short_answers_a, short_answers_b)
-            logger.info("  Text Analysis Score: %d/100", text_score)
-            logger.info("  Text Analysis Reasoning: %s", text_reasoning)
+        timeline = generate_timeline(all_scenarios, years=SIMULATION_YEARS)
+        sampled_a = sample_traits(agent_a)
+        sampled_b = sample_traits(agent_b)
+        
+        m_state = MarriageState()
+        
+        life_log = []
+        for event in timeline:
+            m_state.marriage_month = event["month"]
+            
+            result = run_simulation(
+                agent_a, agent_b, 
+                sampled_a, sampled_b, 
+                event, m_state, 
+                max_turns=3
+            )
+            
+            # The run_simulation updates m_state in place
+            analysis = compute_harmony_index(result["dialogue_history"])
+            
+            life_log.append({
+                "month": event["month"],
+                "scenario": event["title"],
+                "happiness_a": m_state.happiness_a,
+                "happiness_b": m_state.happiness_b,
+                "capital": m_state.relationship_capital,
+                "harmony_score": analysis["harmony_score"],
+                "dialogue_history": result["dialogue_history"]
+            })
+            
+            if m_state.relationship_capital <= 0:
+                logger.warning(f"Marriage breakdown at month {event['month']}")
+                break
+                
+        monte_carlo_results.append({
+            "final_happiness_a": m_state.happiness_a,
+            "final_happiness_b": m_state.happiness_b,
+            "final_capital": m_state.relationship_capital,
+            "survived": m_state.relationship_capital > 0,
+            "duration_months": m_state.marriage_month,
+            "life_log": life_log
+        })
 
-    # Weights: 30% Traits, 55% Simulation, 15% Text Style
-    raw_overall = (0.30 * trait_avg * 100) + (0.55 * sim_avg) + (0.15 * text_score)
+    # Aggregate
+    survived_count = sum(1 for r in monte_carlo_results if r["survived"])
+    avg_happiness_a = sum(r["final_happiness_a"] for r in monte_carlo_results) / MONTE_CARLO_N
+    avg_happiness_b = sum(r["final_happiness_b"] for r in monte_carlo_results) / MONTE_CARLO_N
+    
+    # Find the median run (based on average happiness)
+    monte_carlo_results.sort(key=lambda x: (x["final_happiness_a"] + x["final_happiness_b"]) / 2)
+    median_run = monte_carlo_results[MONTE_CARLO_N // 2]
+    
+    overall_compatibility = int(((avg_happiness_a + avg_happiness_b) / 2) * 100)
 
-    # Each dealbreaker scenario that hits the threshold costs 8 points,
-    # but the total is capped so multiple dealbreakers in the same category
-    # don't multiply to an absurd penalty.
-    dealbreaker_penalty = min(MAX_DEALBREAKER_PENALTY, len(flagged_dealbreakers) * 8)
-    overall_score = max(0, min(100, int(raw_overall - dealbreaker_penalty)))
+    # Feature Attribution Logic (Phase 2 V4)
+    failure_causes = {}
+    for r in monte_carlo_results:
+        if not r["survived"] and r["life_log"]:
+            # Find the last 2 events before breakdown
+            for event in r["life_log"][-2:]:
+                scenario_title = event["scenario"]
+                failure_causes[scenario_title] = failure_causes.get(scenario_title, 0) + 1
+    
+    inference_text = f"Relationship survived {survived_count}/{MONTE_CARLO_N} Monte Carlo rollouts spanning 15 years. "
+    if survived_count < MONTE_CARLO_N and failure_causes:
+        top_cause = max(failure_causes, key=failure_causes.get)
+        inference_text += f"In failed timelines, cascading stress was most frequently triggered by events like '{top_cause}'."
+    elif survived_count == MONTE_CARLO_N:
+        inference_text += "High resilience was observed across all stress tests, indicating strong capital recovery mechanics."
 
-    top_friction_axis = min(dimensional_scores, key=dimensional_scores.get)
-    top_strength_axis = max(dimensional_scores, key=dimensional_scores.get)
-
-    verdict = _build_verdict(
-        overall_score, trait_compat, dimensional_scores,
-        flagged_dealbreakers, top_friction_axis, top_strength_axis,
-    )
-
-    logger.info("  OVERALL COMPATIBILITY: %d/100", overall_score)
-    logger.info(
-        "  Trait avg: %.2f | Sim avg: %.1f | Dealbreaker penalty: -%d",
-        trait_avg, sim_avg, dealbreaker_penalty,
-    )
-    logger.info("  Top friction: %s (%d)", top_friction_axis, dimensional_scores[top_friction_axis])
-    logger.info("  Top strength: %s (%d)", top_strength_axis, dimensional_scores[top_strength_axis])
-    logger.info("  VERDICT: %s", verdict)
-    logger.info("=" * 70)
-
+    # We return the median run's trajectory
     return {
-        "overall_score": overall_score,
-        "trait_compatibility": trait_compat,
-        "dimensional_scores": dimensional_scores,
-        "dimensional_details": dimensional_details,
-        "dealbreakers": flagged_dealbreakers,
-        "top_friction_axis": top_friction_axis,
-        "top_strength_axis": top_strength_axis,
-        "text_analysis_score": text_score,
-        "text_analysis_reasoning": text_reasoning,
-        "verdict": verdict,
+        "overall_compatibility_score": overall_compatibility,
+        "breakdown_probability": 1.0 - (survived_count / MONTE_CARLO_N),
+        "mean_happiness_a": avg_happiness_a,
+        "mean_happiness_b": avg_happiness_b,
+        "median_trajectory": median_run["life_log"],
+        "flagged_dealbreakers": [],
+        "dimensional_scores": {"longitudinal_survival": int((survived_count / MONTE_CARLO_N) * 100)},
+        "dimensional_details": {},
+        "harmony_score": overall_compatibility,
+        "horsemen": [],
+        "cultural_stressors": [],
+        "synergies": [],
+        "trajectory": median_run["life_log"],
+        "inference": inference_text
     }
-
-
-def _build_verdict(
-    overall: int,
-    trait_compat: Dict[str, float],
-    dimensional: Dict[str, int],
-    dealbreakers: List[str],
-    friction_axis: str,
-    strength_axis: str,
-) -> str:
-    friction_label = CATEGORY_LABELS.get(friction_axis, friction_axis)
-    strength_label = CATEGORY_LABELS.get(strength_axis, strength_axis)
-
-    if dealbreakers:
-        return (
-            f"Fundamental incompatibility detected in {len(dealbreakers)} dealbreaker scenario(s) "
-            f"({', '.join(dealbreakers)}). Core values misalignment will compound over time."
-        )
-
-    if overall >= 80:
-        return (
-            f"Highly compatible ({overall}/100) — strong alignment across traits "
-            f"(values={trait_compat['values']:.0%}, trust={trait_compat['trust']:.0%}) "
-            f"with {strength_label} as the clearest strength."
-        )
-    elif overall >= 65:
-        friction_score = dimensional[friction_axis]
-        return (
-            f"Compatible ({overall}/100) — solid foundation with room to grow. "
-            f"{strength_label} is a key strength; {friction_label} (score {friction_score}) "
-            f"requires proactive communication."
-        )
-    elif overall >= 50:
-        return (
-            f"Conditionally compatible ({overall}/100) — significant differences in "
-            f"{friction_label} will create recurring friction. "
-            f"Conflict style compatibility ({trait_compat['conflict_style']:.0%}) and "
-            f"trust alignment ({trait_compat['trust']:.0%}) determine if these can be navigated."
-        )
-    else:
-        return (
-            f"Low compatibility ({overall}/100) — deep misalignments in {friction_label} and "
-            f"values ({trait_compat['values']:.0%} alignment) make sustained harmony unlikely "
-            f"without major negotiation on core expectations."
-        )

@@ -255,10 +255,10 @@
                             <p style="color: #ff4444;">{activeResults.error}</p>
                         {:else if activeResults}
                             {#if activeResults.astro_score !== null}
-                                <div class="astro-card" style="border-color: #fbbf24; border: 1px solid #fbbf24; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                                <div class="astro-card" style="border-color: var(--accent); border: 1px solid var(--accent); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
                                     <h3>Astrological Compatibility (Ashtakoota)</h3>
                                     <div style="display: flex; align-items: baseline; gap: 1rem;">
-                                        <p style="font-size: 2.5rem; color: #fbbf24; margin: 0.5rem 0; font-weight: bold;">
+                                        <p style="font-size: 2.5rem; color: var(--accent); margin: 0.5rem 0; font-weight: bold;">
                                             {activeResults.astro_score.guna} <span style="font-size: 1.2rem; color: #94a3b8;">/ 36</span>
                                         </p>
                                         <span class="score-badge {activeResults.astro_score.guna >= 18 ? 'good' : 'bad'}">{activeResults.astro_score.classification.replace('_', ' ')}</span>
@@ -280,7 +280,7 @@
                                         {#each Object.entries(activeResults.astro_score.breakdown) as [koota, details]}
                                             <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px;">
                                                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                                    <strong style="text-transform: capitalize; color: #fbbf24;">{koota.replace('_', ' ')}</strong>
+                                                    <strong style="text-transform: capitalize; color: var(--accent);">{koota.replace('_', ' ')}</strong>
                                                     <span>{details.score} / {details.max}</span>
                                                 </div>
                                                 <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">{details.desc}</p>
@@ -290,13 +290,39 @@
                                 </div>
                             {/if}
 
-                            <h3>Behavioral Compatibility Report</h3>
+                            <h3>Behavioral Compatibility Report (V2 Longitudinal)</h3>
                             <div class="report-summary">
-                                <strong>Overall Score:</strong> <span style="color: #fbbf24; font-size: 1.5rem;">{activeResults.report.overall_score}/100</span><br/>
-                                <strong>Verdict:</strong> {activeResults.report.verdict}
+                                <strong>Overall Harmony:</strong> <span style="color: var(--accent); font-size: 1.5rem;">{activeResults.report.overall_compatibility_score || activeResults.report.overall_score}/100</span><br/>
+                                <strong>Breakdown Probability:</strong> <span style="color: #ff4444;">{(activeResults.report.breakdown_probability * 100).toFixed(0)}%</span><br/>
+                                <strong>Mean Happiness (A):</strong> {(activeResults.report.mean_happiness_a * 100).toFixed(0)}% | 
+                                <strong>Mean Happiness (B):</strong> {(activeResults.report.mean_happiness_b * 100).toFixed(0)}%<br/>
+                                <strong>Inference:</strong> {activeResults.report.inference || activeResults.report.verdict}
                             </div>
 
-                            {#if activeResults.report.dimensional_details}
+                            {#if activeResults.report.median_trajectory}
+                                <div class="category-block">
+                                    <h4 class="category-title">SIMULATED 15-YEAR TIMELINE (MEDIAN RUN)</h4>
+                                    {#each activeResults.report.median_trajectory as event}
+                                        <div class="scenario-card" style="border-left: 4px solid {event.capital > 0 ? '#4ade80' : '#ef4444'};">
+                                            <h5>Month {event.month}: {event.scenario} <span class="score-badge {event.harmony_score > 60 ? 'good' : 'bad'}">{event.harmony_score} Harmony</span></h5>
+                                            <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 0.25rem;">
+                                                Happiness A: {(event.happiness_a * 100).toFixed(0)}% | Happiness B: {(event.happiness_b * 100).toFixed(0)}% | Relationship Capital: {event.capital.toFixed(1)}
+                                            </p>
+                                            
+                                            {#if event.dialogue_history && event.dialogue_history.length > 0}
+                                                <div class="dialogue-box">
+                                                    <h6>Event Transcript</h6>
+                                                    {#each event.dialogue_history as msg}
+                                                        <div class="msg {msg.speaker === 'Scene Master' ? 'sys' : 'user'}">
+                                                            <strong>{msg.speaker}:</strong> {msg.message || msg.text}
+                                                        </div>
+                                                    {/each}
+                                                </div>
+                                            {/if}
+                                        </div>
+                                    {/each}
+                                </div>
+                            {:else if activeResults.report.dimensional_details}
                                 {#each Object.entries(activeResults.report.dimensional_details) as [category, scenarios]}
                                     <div class="category-block">
                                         <h4 class="category-title">{category.replace('_', ' ').toUpperCase()}</h4>

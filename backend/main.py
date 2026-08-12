@@ -118,13 +118,13 @@ def generate_and_cache_report(session_id: str):
     user_a = session.get("user_a", {})
     user_b = session.get("user_b", {})
     
-    prompt_a = user_a.get("prompt", "You are a standard persona.")
-    prompt_b = user_b.get("prompt", "You are a traditional match.")
+    agent_a = user_a.get("prompt", {})
+    agent_b = user_b.get("prompt", {})
     
     try:
         report = run_full_compatibility_report(
-            prompt_a, 
-            prompt_b, 
+            agent_a, 
+            agent_b, 
             answers_a=user_a.get("answers", {}), 
             answers_b=user_b.get("answers", {}),
             max_turns=4
@@ -226,11 +226,24 @@ def start_simulation(req: SimulationRequest):
     
     # 2. Retrieve Prompts
     session = db["sessions"].get(req.session_id, {})
-    prompt_a = session.get("user_a", {}).get("prompt", "You are a standard persona.")
-    prompt_b = session.get("user_b", {}).get("prompt", "You are a traditional match.")
+    agent_a = session.get("user_a", {}).get("prompt", {})
+    agent_b = session.get("user_b", {}).get("prompt", {})
+    
+    # Simple sampling for a 1-off simulation
+    def simple_sample(agent: dict) -> dict:
+        import random
+        import math
+        sampled = {}
+        for trait, dist in agent.get("traits", {}).items():
+            val = random.gauss(dist.get("mean", 0.5), math.sqrt(dist.get("variance", 0.01)))
+            sampled[trait] = max(0.0, min(1.0, val))
+        return sampled
+        
+    sampled_a = simple_sample(agent_a)
+    sampled_b = simple_sample(agent_b)
     
     # 3. Execute LangGraph Simulation
-    result = run_simulation(prompt_a, prompt_b, scenario_data, max_turns=req.max_turns)
+    result = run_simulation(agent_a, agent_b, sampled_a, sampled_b, scenario_data, max_turns=req.max_turns)
     
     # 4. Behavioral Analytics & Harmony Index
     analysis = compute_harmony_index(result["dialogue_history"])

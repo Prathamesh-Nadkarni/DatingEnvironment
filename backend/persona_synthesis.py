@@ -1,6 +1,58 @@
 from typing import Dict, Any, List, Optional
 import json
 
+from pydantic import BaseModel, Field
+
+# --- V2 Evidence Store Models ---
+class TraitEvidence(BaseModel):
+    trait: str
+    value: float
+    weight: float = 1.0
+    source_question: str
+    context: Dict[str, str] = Field(default_factory=dict) # e.g. {"actor": "parents", "stress": "public_conflict"}
+    evidence_type: str # "perception", "emotion", "impulse", "behavior", "reflection"
+
+class EvidenceStore:
+    def __init__(self):
+        self.evidence_log: List[TraitEvidence] = []
+        
+    def add_evidence(self, evidence: TraitEvidence):
+        self.evidence_log.append(evidence)
+        
+    def aggregate_traits(self) -> Dict[str, Any]:
+        """Deterministically aggregate baseline traits from the evidence."""
+        trait_groups = {}
+        for ev in self.evidence_log:
+            if ev.trait not in trait_groups:
+                trait_groups[ev.trait] = []
+            trait_groups[ev.trait].append(ev)
+            
+        results = {}
+        for trait, ev_list in trait_groups.items():
+            total_weight = sum(ev.weight for ev in ev_list)
+            if total_weight == 0:
+                continue
+                
+            mean_val = sum(ev.value * ev.weight for ev in ev_list) / total_weight
+            
+            # Simple confidence proxy: more evidence = higher confidence, capped at 0.95
+            evidence_count = len(ev_list)
+            confidence = min(0.95, 0.3 + (evidence_count * 0.1))
+            
+            # Contradiction proxy: variance in the values
+            variance = sum((ev.value - mean_val) ** 2 for ev in ev_list) / evidence_count if evidence_count > 1 else 0.0
+            contradiction_score = min(1.0, variance * 2.0)
+            
+            results[trait] = {
+                "mean": round(mean_val, 3),
+                "confidence": round(confidence, 3),
+                "evidence_count": evidence_count,
+                "contradiction_score": round(contradiction_score, 3),
+                "context_variance": round(variance, 3)
+            }
+            
+        return results
+
 CORE_DIMENSIONS = [
     "family_deference", "couple_first_orientation", "boundary_strength", "egalitarianism",
     "tradition_compliance", "public_harmony_preference", "partner_advocacy", "financial_mutuality",
@@ -316,12 +368,48 @@ SCALE_MAPPINGS = {
 
 class PersonaEngine:
     def __init__(self):
-        self.ideal_traits = {dim: 0.5 for dim in CORE_DIMENSIONS}
-        self.enacted_traits = {dim: 0.5 for dim in CORE_DIMENSIONS}
+        # We start with a baseline mean of 0.5 for all traits
+        self.ideal_traits = {dim: {"mean": 0.5, "evidence": []} for dim in CORE_DIMENSIONS}
+        self.enacted_traits = {dim: {"mean": 0.5, "evidence": []} for dim in CORE_DIMENSIONS}
         self.ambivalence_map = {}
-        self.trigger_map = {"hot": [], "slow": []}
-        self.narrative_hits = []
         self.text_answers = {}
+        
+    def _compile_distributions(self, traits_dict):
+        compiled = {}
+        for dim, data in traits_dict.items():
+            ev = data["evidence"]
+            ev_count = len(ev)
+            if ev_count == 0:
+                compiled[dim] = {
+                    "mean": data["mean"],
+                    "variance": 0.1, # Default high uncertainty if no evidence
+                    "confidence": 0.1,
+                    "evidence_count": 0,
+                    "contradiction_score": 0.0
+                }
+                continue
+                
+            # Compute contradiction (sum of magnitudes of opposite signs)
+            positives = sum([e for e in ev if e > 0])
+            negatives = abs(sum([e for e in ev if e < 0]))
+            
+            # Contradiction is high if both positive and negative evidence exist
+            contradiction_score = min(positives, negatives) / max(positives, negatives, 0.1)
+            
+            # Variance increases with contradiction and decreases with evidence count
+            variance = max(0.01, 0.1 - (ev_count * 0.01) + (contradiction_score * 0.05))
+            
+            # Confidence is high if lots of evidence and low contradiction
+            confidence = min(1.0, (ev_count * 0.15) * (1 - (contradiction_score * 0.5)))
+            
+            compiled[dim] = {
+                "mean": round(data["mean"], 3),
+                "variance": round(variance, 3),
+                "confidence": round(confidence, 3),
+                "evidence_count": ev_count,
+                "contradiction_score": round(contradiction_score, 3)
+            }
+        return compiled
 
     def synthesize(self, raw_answers: Dict[str, Any]) -> Dict[str, Any]:
         """Runs the 9-step interpretation pipeline."""
@@ -340,14 +428,7 @@ class PersonaEngine:
         # Step 5: Final Summary
         summary = self._generate_summary(clusters)
         
-        return {
-            "enacted_traits": self.enacted_traits,
-            "ideal_traits": self.ideal_traits,
-            "ambivalence": self.ambivalence_map,
-            "clusters": clusters,
-            "summary": summary,
-            "system_prompt": self._generate_prompt(clusters, summary, raw_answers)
-        }
+        return self._generate_prompt(clusters, summary, raw_answers)
 
     def _seed_ideals(self, answers):
         # S-prefixed questions represent stated ideals
@@ -356,40 +437,71 @@ class PersonaEngine:
             
             # Simplified ideal mapping
             if q_id == "S.2":
-                if val == "emotional": self.ideal_traits["co_regulation_capacity"] += 0.2
-                else: self.ideal_traits["security_need"] += 0.2
+                if val == "emotional": 
+                    self.ideal_traits["co_regulation_capacity"]["mean"] = min(1.0, self.ideal_traits["co_regulation_capacity"]["mean"] + 0.2)
+                    self.ideal_traits["co_regulation_capacity"]["evidence"].append(0.2)
+                else: 
+                    self.ideal_traits["security_need"]["mean"] = min(1.0, self.ideal_traits["security_need"]["mean"] + 0.2)
+                    self.ideal_traits["security_need"]["evidence"].append(0.2)
             if q_id == "S.5": # Marriage Importance
                 try: 
                     weight = (float(val) - 3) / 10.0
-                    self.ideal_traits["identity_rigidity"] += weight
+                    self.ideal_traits["identity_rigidity"]["mean"] = max(0.0, min(1.0, self.ideal_traits["identity_rigidity"]["mean"] + weight))
+                    self.ideal_traits["identity_rigidity"]["evidence"].append(weight)
                 except: pass
 
     def _process_enacted(self, answers):
+        if not hasattr(self, 'evidence_store'):
+            self.evidence_store = EvidenceStore()
+            
         for q_id, val in answers.items():
+            # Handle probe_group dictionaries
+            action_val = val.get("action") if isinstance(val, dict) else val
+            emotion_val = val.get("emotion") if isinstance(val, dict) else None
+            reflection_val = val.get("reflection") if isinstance(val, dict) else None
+
             if q_id in MAPPING_TABLE:
                 mapping = MAPPING_TABLE[q_id]
                 if isinstance(mapping, str):
-                    self._handle_special_scales(q_id, val, mapping)
-                elif val in mapping:
-                    for dim, shift in mapping[val].items():
-                        self.enacted_traits[dim] = max(0.0, min(1.0, self.enacted_traits[dim] + shift))
+                    self._handle_special_scales(q_id, action_val, mapping)
+                elif action_val in mapping:
+                    for dim, shift in mapping[action_val].items():
+                        self.enacted_traits[dim]["mean"] = max(0.0, min(1.0, self.enacted_traits[dim]["mean"] + shift))
+                        self.enacted_traits[dim]["evidence"].append(shift)
+                        
+                        # Add to EvidenceStore
+                        self.evidence_store.add_evidence(TraitEvidence(
+                            trait=dim,
+                            value=0.5 + shift,
+                            weight=abs(shift),
+                            source_question=q_id,
+                            evidence_type="behavior"
+                        ))
 
             if q_id in SCALE_MAPPINGS:
-                self._apply_scale_mapping(q_id, val)
+                self._apply_scale_mapping(q_id, action_val)
                 
             # Capture free-text answers (long strings not in predefined options/scales)
             if q_id not in MAPPING_TABLE and q_id not in SCALE_MAPPINGS:
-                if isinstance(val, str) and len(val.strip()) > 3:
-                    # Exclude simple demographics or single-word dropdowns if they happen to miss mapping
+                if isinstance(action_val, str) and len(action_val.strip()) > 3:
+                    # Exclude simple demographics
                     if q_id not in ["0.1", "0.2", "0.3", "0.4"]:
-                        self.text_answers[q_id] = val
+                        self.text_answers[q_id] = action_val
+                        
+            # Capture probe_group context
+            if isinstance(val, dict):
+                if emotion_val:
+                    self.text_answers[f"{q_id}_emotion"] = emotion_val
+                if reflection_val:
+                    self.text_answers[f"{q_id}_reflection"] = reflection_val
 
     def _apply_scale_mapping(self, q_id, val):
         try:
             score = float(val)
             for dim, direction in SCALE_MAPPINGS[q_id].items():
                 shift = (score - 4) / 10.0 * direction
-                self.enacted_traits[dim] = max(0.0, min(1.0, self.enacted_traits[dim] + shift))
+                self.enacted_traits[dim]["mean"] = max(0.0, min(1.0, self.enacted_traits[dim]["mean"] + shift))
+                self.enacted_traits[dim]["evidence"].append(shift)
         except (ValueError, TypeError):
             pass
 
@@ -398,22 +510,24 @@ class PersonaEngine:
             score = float(val)
             if scale_type == "scale_egalitarianism_inverse":
                 shift = (score - 4) / 10.0
-                self.enacted_traits["egalitarianism"] -= shift
-                self.enacted_traits["tradition_compliance"] += shift
+                self.enacted_traits["egalitarianism"]["mean"] = max(0.0, min(1.0, self.enacted_traits["egalitarianism"]["mean"] - shift))
+                self.enacted_traits["egalitarianism"]["evidence"].append(-shift)
+                self.enacted_traits["tradition_compliance"]["mean"] = max(0.0, min(1.0, self.enacted_traits["tradition_compliance"]["mean"] + shift))
+                self.enacted_traits["tradition_compliance"]["evidence"].append(shift)
         except (ValueError, TypeError):
             pass
 
     def _detect_contradictions(self):
         # Detect: Modern Ideal vs Traditional Enactment
-        ideal_egl = self.ideal_traits.get("egalitarianism", 0.5)
-        enacted_egl = self.enacted_traits.get("egalitarianism", 0.5)
+        ideal_egl = self.ideal_traits["egalitarianism"]["mean"]
+        enacted_egl = self.enacted_traits["egalitarianism"]["mean"]
         
         if ideal_egl > 0.7 and enacted_egl < 0.4:
             self.ambivalence_map["equality"] = "Intellectual Egalitarian / Behavioral Deference (Conflict likely)"
             
         # Detect: Harmony Idol vs Protective Instinct
-        harm = self.enacted_traits.get("public_harmony_preference", 0.5)
-        adv = self.enacted_traits.get("partner_advocacy", 0.5)
+        harm = self.enacted_traits["public_harmony_preference"]["mean"]
+        adv = self.enacted_traits["partner_advocacy"]["mean"]
         if harm > 0.7 and adv > 0.6:
             self.ambivalence_map["loyalty"] = "The Protector's Paradox (Wants to defend spouse but fears public rupture)"
 
@@ -426,22 +540,21 @@ class PersonaEngine:
         return clusters
 
     def _cluster_power(self):
-        def_v = self.enacted_traits["family_deference"]
-        bnd_v = self.enacted_traits["boundary_strength"]
+        def_v = self.enacted_traits["family_deference"]["mean"]
+        bnd_v = self.enacted_traits["boundary_strength"]["mean"]
         if def_v > 0.6 and bnd_v < 0.4: return "Deferential (Centered on parental approval)"
         if def_v < 0.4 and bnd_v > 0.6: return "Sovereign (Marriage as an independent unit)"
         return "Collaborative (Negotiates between unit and family)"
 
     def _cluster_emotion(self):
-        reg = self.enacted_traits["co_regulation_capacity"]
-        wth = self.enacted_traits["withdrawal_tendency"]
+        reg = self.enacted_traits["co_regulation_capacity"]["mean"]
+        wth = self.enacted_traits["withdrawal_tendency"]["mean"]
         if reg > 0.6 and wth < 0.4: return "Secure/Engaged"
         if wth > 0.6: return "Avoidant/Withdrawn"
         return "Anxious/Reassurance-Seeking"
 
     def _cluster_future(self):
-        mut = self.enacted_traits["financial_mutuality"]
-        risk = self.enacted_traits["risk_tolerance"]
+        mut = self.enacted_traits["financial_mutuality"]["mean"]
         if mut > 0.7: return "Communal Builder"
         return "Individualist/Separate"
 
@@ -449,24 +562,61 @@ class PersonaEngine:
         return f"This persona is a {clusters['power']} operator who values {clusters['emotion']} emotional dynamics and approaches the future as a {clusters['future']}."
 
     def _generate_prompt(self, clusters, summary, raw_answers):
-        rounded = {k: round(v, 4) for k, v in self.enacted_traits.items()}
+        # SPRINT 3: Evidence Aggregation
+        # Instead of compiling legacy distributions, we aggregate from our rich EvidenceStore.
+        distributions = self.evidence_store.aggregate_traits()
+        
+        # SPRINT 3: Reactive vs Deliberative Policy calculation
+        # We calculate an 'effective_policy' using a simplified stress activation model
+        # For this prototype, we'll assume higher burnout/shame increases the reactive_weight
+        burnout = self.enacted_traits["burnout_vulnerability"]["mean"]
+        shame = self.enacted_traits["shame_sensitivity"]["mean"]
+        stress_activation = min(1.0, (burnout + shame) / 2.0)
+        
+        # effective_policy = (reactive_policy * reactive_weight) + (deliberate_policy * (1 - reactive_weight))
+        # Here we just represent this concept as a text modifier for the LLM
+        policy_directive = f"STRESS ACTIVATION: {round(stress_activation, 2)}\n"
+        if stress_activation > 0.6:
+            policy_directive += "REACTIVE POLICY DOMINANT: Under stress, this persona defaults to instinctual, protective behaviors rather than deliberative ideals."
+        else:
+            policy_directive += "DELIBERATIVE POLICY DOMINANT: Under stress, this persona is able to self-regulate and act according to their ideals."
+            
         text_context = "\n".join([f"Q({k}): {v}" for k, v in self.text_answers.items()])
         
-        return f"""You are the 'Inner Parliament' for this persona.
+        formatted_dists = {}
+        for dim, data in distributions.items():
+            formatted_dists[dim] = f"Mean: {data['mean']} (Conf: {data['confidence']}, Contradiction: {data['contradiction_score']})"
+            
+        system_prompt = f"""You are the 'Inner Parliament' for this persona.
 CONTEXT: {summary}
 CLUSTERS: {json.dumps(clusters)}
-TRAITS (ENACTED): {json.dumps(rounded, indent=1)}
+TRAITS (ENACTED - DISTRIBUTIONS): {json.dumps(formatted_dists, indent=1)}
 AMBIVALENCE: {json.dumps(self.ambivalence_map, indent=1)}
-PERSONAL BELIEFS / SHORT ANSWERS:
+{policy_directive}
+
+PERSONAL BELIEFS / SHORT ANSWERS / EMOTIONAL PROBES:
 {text_context if text_context else "None provided."}
 
 SIMULATION INSTRUCTION:
 - Use <InternalThought> to resolve the conflict between what you WANT (Ideals) and what you DO (Enacted traits).
 - Ground your responses in the PERSONAL BELIEFS / SHORT ANSWERS provided above.
 - In Indian family scenarios, prioritize 'Dignity' and 'Harmony' but track 'Resentment' if you are forced to sacrifice Fairness.
+- Follow the Stress Activation policy modifier when deciding how to act.
 """
+        return {
+            "prompt": system_prompt,
+            "traits": distributions,
+            "clusters": clusters,
+            "ambivalence": self.ambivalence_map
+        }
 
-def analyze_answers(answers: Dict[str, Any]) -> str:
+def analyze_answers(answers: Dict[str, Any]) -> Dict[str, Any]:
     engine = PersonaEngine()
-    result = engine.synthesize(answers)
-    return result["system_prompt"]
+    engine._seed_ideals(answers)
+    engine._process_enacted(answers)
+    engine._detect_contradictions()
+    
+    clusters = engine._calculate_clusters()
+    summary = engine._generate_summary(clusters)
+    
+    return engine._generate_prompt(clusters, summary, answers)

@@ -107,7 +107,7 @@
             <div class="score" class:high={result.kundali.guna >= 26} class:med={result.kundali.guna < 26 && result.kundali.guna >= 18} class:low={result.kundali.guna < 18}>
               {result.kundali.guna} <span style="font-size: 1.5rem; color: rgba(255,255,255,0.5);">/ 36</span>
             </div>
-            <div style="text-align: center; font-size: 0.9rem; margin-top: 0.5rem; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px;">
+            <div style="text-align: center; font-size: 0.9rem; margin-top: 0.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;">
                {result.kundali.classification.replace('_', ' ')}
             </div>
           </div>
@@ -190,7 +190,7 @@
   h2 {
     font-family: 'Cormorant Garamond', serif;
     font-size: 2.2rem;
-    color: #fbbf24;
+    color: var(--accent);
     margin-top: 0;
     margin-bottom: 2rem;
     font-weight: 400;
@@ -228,10 +228,10 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    background: rgba(251, 191, 36, 0.03);
+    background: var(--accent-bg-raw, 0.03);
     padding: 2rem;
     border-radius: 20px;
-    border: 1px solid rgba(251, 191, 36, 0.1);
+    border: 1px solid var(--accent-bg);
     margin-bottom: 3rem;
   }
 
@@ -248,7 +248,7 @@
 
   .run-btn {
     margin-left: auto;
-    background: #fbbf24;
+    background: var(--accent);
     color: #1e1b4b;
     padding: 1rem 2rem;
     border-radius: 100px;
@@ -262,7 +262,7 @@
 
   .run-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 15px 30px -10px rgba(251, 191, 36, 0.4);
+    box-shadow: 0 15px 30px -10px var(--accent-border);
   }
 
   .score-card {
@@ -278,7 +278,7 @@
     font-size: 6rem;
     font-weight: 400;
     line-height: 1;
-    color: #fbbf24;
+    color: var(--accent);
   }
 
   .tabs {
@@ -301,8 +301,8 @@
   }
 
   .tabs button.active {
-    color: #fbbf24;
-    border-bottom: 2px solid #fbbf24;
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
   }
 
   .transcript-box {
@@ -328,16 +328,16 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1rem;
-    color: rgba(251, 191, 36, 0.6);
+    color: var(--accent-bg-raw, 0.6);
     margin-bottom: 0.75rem;
   }
 
   .message.mine {
-    background: rgba(251, 191, 36, 0.03);
-    border-color: rgba(251, 191, 36, 0.1);
+    background: var(--accent-bg-raw, 0.03);
+    border-color: var(--accent-bg);
   }
 
-  .message.mine strong { color: #fbbf24; }
+  .message.mine strong { color: var(--accent); }
 
   .tab-content {
     line-height: 1.8;
@@ -370,7 +370,7 @@
   .value.accent-gold {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.8rem;
-    color: #fbbf24;
+    color: var(--accent);
   }
 
   .synergy-list {
@@ -391,7 +391,7 @@
     content: '✧';
     position: absolute;
     left: 0;
-    color: #fbbf24;
+    color: var(--accent);
   }
 
   .horsemen-grid {
@@ -420,8 +420,8 @@
   }
 
   .horseman.cultural.active {
-    background: rgba(251, 191, 36, 0.1);
-    border: 1px solid rgba(251, 191, 36, 0.3);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-bg-raw, 0.3);
   }
 
   .h-name { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8;}

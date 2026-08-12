@@ -8,6 +8,14 @@ ManaMatch is a relationship compatibility platform built on a fundamentally diff
 
 The result is not a star sign match or a percentage derived from survey answers. It is a behavioral simulation report: what you actually do when your mother-in-law demands your wife's gold, when your husband suggests you quit your job for the children's exams, or when a financial crisis hits and both of you want to blame someone.
 
+## What's New (V4 Updates)
+
+- **True Glassmorphism UI & Indian Aesthetic Palette**: The frontend has been completely redesigned. Gone are the harsh blues and flat backgrounds. The UI now features a rich Plum / Saffron / Teal color scheme with dynamic background refractive blobs for stunning glassmorphism.
+- **Probe Bundle Intake System**: Situational Judgement Tests are now served as multi-part bundles: Action, Emotion, and Reflection. This guarantees deeper psychological evidence extraction.
+- **The EvidenceStore**: Answers are aggregated into probability distributions, calculating `mean`, `confidence`, and `contradiction_score` for every trait instead of assigning flat static values.
+- **Stress-Activated State Policies**: The LLM engine now enforces "Reactive" vs "Deliberative" policies on the agent. High stress/burnout limits the agent's ability to act on their ideals, forcing instinctual, protective behavior.
+- **Stateful Relationships Across Scenarios**: The engine introduces a persistent `MarriageState` object that tracks relationship capital, trust damage, accumulating resentment, and intimacy over time across scenarios.
+
 ---
 
 ## Why This Exists

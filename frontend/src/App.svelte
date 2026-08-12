@@ -107,7 +107,9 @@
   $: progressPercent = totalQuestions > 0 ? Math.round((absoluteQuestionIndex / totalQuestions) * 100) : 0;
   
   $: hasAnsweredCurrent = answers[currentQuestion?.id] !== undefined && 
-                          (Array.isArray(answers[currentQuestion?.id]) ? answers[currentQuestion?.id].length > 0 : answers[currentQuestion?.id] !== '');
+                          (currentQuestion?.format === 'probe_group' 
+                            ? (Object.keys(answers[currentQuestion.id] || {}).length === currentQuestion.probes.length && Object.values(answers[currentQuestion.id]).every(v => v !== ''))
+                            : (Array.isArray(answers[currentQuestion?.id]) ? answers[currentQuestion?.id].length > 0 : answers[currentQuestion?.id] !== ''));
 
   let introSlide = true;
 
@@ -251,6 +253,8 @@
 </svelte:head>
 
 <main class="app-root">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
   <div class="global-logo">
       <span class="logo-mana">Mana</span><span class="logo-match">Match</span>
   </div>
@@ -299,7 +303,7 @@
               <div class="avatars-container">
                   <img src="/DatingEnvironment/guy.png" class="avatar-img" alt="Guy Avatar" />
                   <div class="match-heart">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                   </div>
                   <img src="/DatingEnvironment/girl.png" class="avatar-img" alt="Girl Avatar" />
               </div>
@@ -415,7 +419,41 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
           </header>
           
           <div class="interaction-area">
-            {#if currentQuestion.format === 'multiple_choice' || currentQuestion.format === 'forced_choice' || currentQuestion.format === 'sjt'}
+            {#if currentQuestion.format === 'probe_group'}
+                <div class="probe-group-container" style="display: flex; flex-direction: column; gap: 2rem;">
+                    {#each currentQuestion.probes as probe}
+                        <div class="probe-item">
+                            <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent);">{probe.text}</h3>
+                            {#if probe.type === 'multiple_choice' || probe.type === 'sjt'}
+                                <div class="options-list">
+                                    {#each probe.options as opt}
+                                        <button 
+                                            class="luxury-btn {answers[currentQuestion.id] && answers[currentQuestion.id][probe.id] === (opt.id || opt) ? 'selected' : ''}"
+                                            on:click={() => {
+                                                if (!answers[currentQuestion.id]) answers[currentQuestion.id] = {};
+                                                answers[currentQuestion.id][probe.id] = opt.id || opt;
+                                                answers = answers; // trigger reactivity
+                                            }}>
+                                            <span class="btn-inner">{opt.text || opt}</span>
+                                        </button>
+                                    {/each}
+                                </div>
+                            {:else if probe.type === 'short_answer'}
+                                <textarea 
+                                    class="luxury-input"
+                                    placeholder="Your thoughts..."
+                                    value={answers[currentQuestion.id] ? answers[currentQuestion.id][probe.id] || '' : ''}
+                                    on:input={(e) => {
+                                        if (!answers[currentQuestion.id]) answers[currentQuestion.id] = {};
+                                        answers[currentQuestion.id][probe.id] = e.target.value;
+                                        answers = answers; // trigger reactivity
+                                    }}
+                                ></textarea>
+                            {/if}
+                        </div>
+                    {/each}
+                </div>
+            {:else if currentQuestion.format === 'multiple_choice' || currentQuestion.format === 'forced_choice' || currentQuestion.format === 'sjt'}
                 <div class="options-list">
                     {#each currentQuestion.options as opt}
                         <button 
@@ -500,8 +538,8 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
 <style>
     :global(body) {
         margin: 0;
-        background-color: #0f172a;
-        background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
+        background-color: var(--glass-bg);
+        background: radial-gradient(circle at center, var(--accent-tertiary) 0%, #0f172a 100%);
         color: #f8fafc;
         font-family: 'Plus Jakarta Sans', sans-serif;
         min-height: 100vh;
@@ -517,12 +555,44 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     }
 
     .glass {
-        background: rgba(30, 27, 75, 0.4);
-        backdrop-filter: blur(40px);
-        -webkit-backdrop-filter: blur(40px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.6);
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: var(--glass-border);
+        box-shadow: var(--shadow);
         border-radius: 32px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .blob {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: 1;
+        opacity: 0.6;
+        animation: float 20s infinite alternate ease-in-out;
+    }
+
+    .blob-1 {
+        top: -10%;
+        left: -10%;
+        width: 50vw;
+        height: 50vw;
+        background: var(--accent-tertiary);
+    }
+
+    .blob-2 {
+        bottom: -20%;
+        right: -10%;
+        width: 60vw;
+        height: 60vw;
+        background: var(--accent-quaternary);
+    }
+
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(5%, 10%) scale(1.1); }
     }
 
     .luxury-container {
@@ -561,23 +631,23 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: rgba(251, 191, 36, 0.1);
-        border: 1px solid rgba(251, 191, 36, 0.2);
+        background: var(--accent-bg);
+        border: var(--accent-border);
         padding: 6px 12px;
         border-radius: 100px;
         font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 0.15em;
-        color: #fbbf24;
+        color: var(--accent);
         margin-bottom: 1.5rem;
     }
 
     .pulse-dot {
         width: 6px;
         height: 6px;
-        background: #fbbf24;
+        background: var(--accent);
         border-radius: 50%;
-        box-shadow: 0 0 10px #fbbf24;
+        box-shadow: 0 0 10px var(--accent);
         animation: pulse 2s infinite;
     }
 
@@ -592,7 +662,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.2em;
-        color: rgba(251, 191, 36, 0.6);
+        color: var(--accent-bg-raw, 0.6);
         margin-bottom: 1rem;
         font-weight: 500;
     }
@@ -602,7 +672,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
         font-size: 2.75rem;
         line-height: 1.1;
         font-weight: 400;
-        color: #fbbf24;
+        color: var(--accent);
         margin: 0;
     }
 
@@ -622,7 +692,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     }
 
     .intro-body strong {
-        color: #fbbf24;
+        color: var(--accent);
         font-weight: 600;
     }
 
@@ -648,16 +718,16 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
 
     .luxury-btn:hover {
         background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(251, 191, 36, 0.3);
+        border-color: var(--accent-bg-raw, 0.3);
         transform: translateX(4px);
     }
 
     .luxury-btn.selected {
-        background: #fbbf24;
-        border-color: #fbbf24;
+        background: var(--accent);
+        border-color: var(--accent);
         color: #1e1b4b;
         font-weight: 600;
-        box-shadow: 0 10px 30px -5px rgba(251, 191, 36, 0.2);
+        box-shadow: 0 10px 30px -5px var(--accent-bg-raw, 0.2);
     }
 
     .scale-expert {
@@ -697,9 +767,9 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     }
 
     .scale-dot-btn.selected {
-        background: #fbbf24;
+        background: var(--accent);
         color: #1e1b4b;
-        border-color: #fbbf24;
+        border-color: var(--accent);
     }
 
     .dot-label {
@@ -729,7 +799,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
 
     .luxury-input:focus {
         outline: none;
-        border-color: #fbbf24;
+        border-color: var(--accent);
         background: rgba(255, 255, 255, 0.05);
     }
 
@@ -763,7 +833,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
 
     .action-btn-gold {
         flex: 1;
-        background: #fbbf24;
+        background: var(--accent);
         border: none;
         padding: 1.5rem;
         border-radius: 100px;
@@ -782,7 +852,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
 
     .action-btn-gold:hover:not(:disabled) {
         transform: translateY(-4px) scale(1.02);
-        box-shadow: 0 20px 40px -10px rgba(251, 191, 36, 0.4);
+        box-shadow: 0 20px 40px -10px var(--accent-border);
     }
 
     .action-btn-gold:disabled {
@@ -794,7 +864,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     .action-btn-gold.get-started {
         font-size: 1rem;
         padding: 1.75rem;
-        box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.3);
+        box-shadow: 0 10px 30px -10px var(--accent-bg-raw, 0.3);
     }
 
     .progress-container {
@@ -813,9 +883,9 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
 
     .fill {
         height: 100%;
-        background: #fbbf24;
+        background: var(--accent);
         transition: width 0.8s cubic-bezier(0.65, 0, 0.35, 1);
-        box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        box-shadow: 0 0 20px var(--accent-border);
     }
 
     .progress-text {
@@ -824,7 +894,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
         right: 2rem;
         font-size: 0.75rem;
         font-weight: 600;
-        color: #fbbf24;
+        color: var(--accent);
         letter-spacing: 0.1em;
         text-transform: uppercase;
         display: flex;
@@ -846,8 +916,8 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     .luxury-spinner {
         width: 60px;
         height: 60px;
-        border: 2px solid rgba(251, 191, 36, 0.1);
-        border-top-color: #fbbf24;
+        border: 2px solid var(--accent-bg);
+        border-top-color: var(--accent);
         border-radius: 50%;
         animation: spin 1.5s linear infinite;
     }
@@ -859,12 +929,12 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     .accent-text {
         font-family: 'Cormorant Garamond', serif;
         font-size: 1.5rem;
-        color: #fbbf24;
+        color: var(--accent);
         font-style: italic;
     }
 
     .rank-badge {
-        background: #fbbf24;
+        background: var(--accent);
         color: #1e1b4b;
         width: 24px;
         height: 24px;
@@ -943,7 +1013,7 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     }
 
     .terminal-text .dim { color: rgba(255, 255, 255, 0.3); }
-    .terminal-text .gold { color: #fbbf24; font-weight: bold; }
+    .terminal-text .gold { color: var(--accent); font-weight: bold; }
     .terminal-text .red { color: #ef4444; font-weight: bold; }
 
     .dashboard-mock {
@@ -974,8 +1044,8 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     }
     
     .mock-score.gold-glow {
-        color: #fbbf24;
-        text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        color: var(--accent);
+        text-shadow: 0 0 20px var(--accent-border);
     }
 
     .mock-stats {
@@ -1020,8 +1090,8 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
         height: 40px;
         background: rgba(0, 0, 0, 0.6);
         border-radius: 50%;
-        border: 1px solid rgba(251, 191, 36, 0.3);
-        box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+        border: 1px solid var(--accent-bg-raw, 0.3);
+        box-shadow: 0 0 15px var(--accent-bg-raw, 0.2);
         animation: heartbeat 1.5s infinite;
     }
 
@@ -1054,9 +1124,9 @@ OVERALL COMPATIBILITY  [################--] <span class="gold">74/100</span>
     }
 
     .logo-match {
-        color: #fbbf24;
+        color: var(--accent);
         font-style: italic;
-        text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+        text-shadow: 0 0 15px var(--accent-border);
         margin-left: 1px;
     }
 
