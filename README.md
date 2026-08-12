@@ -8,15 +8,7 @@ ManaMatch is a relationship compatibility platform built on a fundamentally diff
 
 The result is not a star sign match or a percentage derived from survey answers. It is a behavioral simulation report: what you actually do when your mother-in-law demands your wife's gold, when your husband suggests you quit your job for the children's exams, or when a financial crisis hits and both of you want to blame someone.
 
-## What's New (V4 Updates)
 
-- **True Glassmorphism UI & Indian Aesthetic Palette**: The frontend has been completely redesigned. Gone are the harsh blues and flat backgrounds. The UI now features a rich Plum / Saffron / Teal color scheme with dynamic background refractive blobs for stunning glassmorphism.
-- **Probe Bundle Intake System**: Situational Judgement Tests are now served as multi-part bundles: Action, Emotion, and Reflection. This guarantees deeper psychological evidence extraction.
-- **The EvidenceStore**: Answers are aggregated into probability distributions, calculating `mean`, `confidence`, and `contradiction_score` for every trait instead of assigning flat static values.
-- **Stress-Activated State Policies**: The LLM engine now enforces "Reactive" vs "Deliberative" policies on the agent. High stress/burnout limits the agent's ability to act on their ideals, forcing instinctual, protective behavior.
-- **Stateful Relationships Across Scenarios**: The engine introduces a persistent `MarriageState` object that tracks relationship capital, trust damage, accumulating resentment, and intimacy over time across scenarios.
-
----
 
 ## Why This Exists
 
@@ -47,17 +39,17 @@ RAW ANSWERS
                      ▼
 ┌─────────────────────────────────────────┐
 │  Stage 2: Persona Synthesis             │
-│  MAPPING_TABLE + SCALE_MAPPINGS         │
-│  → 30-dimensional trait vector          │
+│  EvidenceStore probability mapping      │
+│  → 30-dimensional Trait Distributions   │
 │  → Cluster assignment (3 axes)          │
-│  → LLM system prompt construction       │
+│  → Stress-Activated Policy injection    │
 └────────────────────┬────────────────────┘
                      │
                      ▼
 ┌─────────────────────────────────────────┐
 │  Stage 3: The Sandbox (Simulation)      │
-│  LangGraph state machine                │
-│  · Behavioral profiling                 │
+│  Stateful 15-Year Scenario Loop         │
+│  · MarriageState persistence            │
 │  · Tension computation (per scenario)   │
 │  · 7-category dialogue generation       │
 │  · Resentment override logic            │
@@ -93,13 +85,11 @@ RAW ANSWERS
 
 The intake is not a personality test. It is a **diagnostic portfolio** designed to extract behavioral predictions from four distinct question formats:
 
-- **Situational Judgement Tests (SJT):** Present a scenario with multiple realistic options. Forces the respondent to reveal their actual priority hierarchy, not their ideal self. Example: *"Your mother-in-law criticises your spouse in front of guests. You: [A] Defend them immediately, [B] Stay silent to avoid a scene, [C] Address it privately later, [D] Agree with the criticism to keep peace."* The option chosen reveals `partner_advocacy`, `boundary_strength`, `shame_sensitivity`, and `public_harmony_preference` simultaneously.
+- **Probe Bundles (SJT + Emotion + Reflection):** Situational Judgement Tests are served as multi-part bundles. Instead of just picking an action, respondents pick an **Action**, then identify the underlying **Emotion** driving it, and finally provide a free-text **Reflection**. This prevents the system from confusing "silence out of fear" with "silence out of patience". Example: *"Your mother-in-law criticises your spouse..."* The chosen action reveals `partner_advocacy`, while the follow-up probes detect `shame_sensitivity` or `public_harmony_preference`.
 
 - **Likert Scales (1–6):** Measure trait intensity without forcing binary positions. Used for traits like `egalitarianism` (Q5.4: *"A wife should adjust her career around her husband's"*), `autonomy_need`, `career_priority`. The scale also prevents neutral anchoring — there is no midpoint.
 
 - **Forced Choice:** Two options that are both defensible but reveal underlying values. Example: *"If your partner is embarrassed by your family vs. you failing to protect your spouse" — which is worse?* Forces a priority ranking that self-description never captures.
-
-- **Free Text / Narrative:** Used to detect ambivalence and contradiction. A respondent who writes "I prioritize individual autonomy" on Q0.1 but answers "Elders decide" on Q4.4 is flagged for `identity_rigidity` and assigned an ambivalence cluster.
 
 ### The 23 Intake Sections
 
@@ -198,23 +188,22 @@ Every answer is mapped to one or more of 30 numerical traits, each scored 0.0–
 | `caregiving_flexibility` | Adaptability in eldercare and care-giving roles | Willing to adjust; pragmatic | Rigid care expectations |
 | `parenting_alignment` | Clarity and firmness of parenting philosophy | Defined, consistent approach | Vague; adapts to whoever is loudest |
 
-### How Answers Become Traits — The Mapping System
+### How Answers Become Traits — The EvidenceStore
 
-The system uses two complementary mechanisms:
+The system maps categorical and likert answers into our proprietary **EvidenceStore**. Instead of assigning flat static values to traits, the EvidenceStore aggregates every mapped answer into **Trait Distributions**.
 
-**MAPPING_TABLE** handles categorical (multiple-choice) answers. Each answer maps to one or more traits with a signed weight (+/−0.1 to +/−0.5). For example:
+Each trait tracks:
+1. **Mean:** The center of gravity for the trait.
+2. **Confidence (Volume):** How many pieces of evidence support this trait.
+3. **Contradiction Score (Variance):** High variance indicates the user behaves inconsistently (e.g. egalitarian at work, but patriarchal at home).
 
-```
-Question 4.5 (family conflict scene):
-  "Defend spouse publicly"   → partner_advocacy +0.5, boundary_strength +0.4
-  "Stay silent"              → public_harmony_preference +0.4, shame_sensitivity +0.3,
-                               partner_advocacy −0.4
-  "Address privately"        → boundary_strength +0.2, conflict_dominance −0.2
-```
+All weights accumulate dynamically across the intake. The result is not a personality type but a continuous, high-resolution behavioural fingerprint with explicitly modelled uncertainty.
 
-**SCALE_MAPPINGS** handles Likert scale questions. A score of 1–6 is linearly normalised to 0.0–1.0, and then mapped to traits with a direction coefficient (positive = same direction as scale, negative = inverse). For example, Q5.4 ("A wife should adjust her career") is scale-mapped as `egalitarianism: −0.4` — a high score on that question *reduces* the egalitarianism trait.
+### Stress-Activated Policies
 
-All weights accumulate additively across the intake, then the final 30-dimension vector is normalised to [0.0, 1.0] per trait. The result is not a personality type but a continuous, high-resolution behavioural fingerprint.
+During Persona Synthesis, the engine computes a `stress_activation` metric for the persona (based on their `burnout_vulnerability` and `shame_sensitivity`). 
+- **Low Stress (Deliberative Policy):** The agent is capable of self-regulation and acts according to their stated ideals.
+- **High Stress (Reactive Policy):** The agent's cognitive load is maxed out. The system injects a Reactive Policy Dominant directive into the LLM, forcing the agent to abandon their ideals and act on protective, instinctual behaviors.
 
 ### The Three Cluster Axes
 
@@ -241,20 +230,25 @@ These ambivalence profiles modify the agent's simulated internal thought process
 ### Asynchronous Processing Architecture
 Because simulating an entire multi-year relationship across 35+ high-stakes conflict scenarios requires heavy computational resources, the simulation engine is decoupled from the user experience. The moment both users submit their psychological intakes, a FastAPI `BackgroundTask` is spawned. This runs the full simulation silently in the background (typically taking 1-2 minutes). When users or admins attempt to access the Compatibility Dashboard during this window, the backend serves an HTTP `202 Accepted` status, and the frontend dynamically polls via an animated loading UI until the cached report snaps into place.
 
-### Architecture: LangGraph State Machine
+### Architecture: Stateful Relationships
 
-The simulation is a directed graph with a single state object that persists across all turns:
+The simulation is not a series of isolated events. It operates as a continuous state machine simulating up to 15 years of marriage, managed by the `MarriageState` object that persists across all turns.
 
 ```
-SimulationState:
-  · agent_a_prompt       — full system prompt with traits
-  · agent_b_prompt       — full system prompt with traits
+MarriageState:
+  · relationship_capital — structural integrity (0-100)
+  · trust_a / trust_b    — distinct trust levels per partner
+  · resentment_a / b     — accumulating unresolved hurt
+  · intimacy & fairness  — structural satisfaction markers
+  · injuries             — list of unresolved RelationshipInjuries
+
+Simulation Loop:
+  · agent_a_prompt       — full system prompt with Stress Policies
+  · agent_b_prompt       — full system prompt with Stress Policies
   · scenario_details     — title, description, category, weight, dealbreaker flag
   · dialogue_history     — list of {speaker, message, _category, _thought}
   · turn_count           — current turn
   · tension_level        — float 0.0–1.0, updates each turn
-  · last_category_a/b    — previous response category (feeds momentum)
-  · scenario_category    — drives trait focus and category bias
 ```
 
 Execution flow per turn:
