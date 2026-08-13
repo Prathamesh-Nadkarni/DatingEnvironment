@@ -316,9 +316,15 @@
                     {#each syntheticReports as report}
                         <div class="session-card">
                             <div>
-                                <h3>Test: {report.run_id} ({report.mode})</h3>
-                                <p style="font-size: 0.8rem; color: #aaa; margin: 0; margin-top: 0.25rem;">Pair: {report.person_a.id} &amp; {report.person_b.id}</p>
-                                <p style="font-size: 0.8rem; color: #aaa; margin: 0;">Status: <span style="color: {report.status === 'PASS' ? 'lightgreen' : 'coral'}">{report.status}</span></p>
+                                {#if report.person_a}
+                                    <h3>Test: {report.run_id} ({report.mode})</h3>
+                                    <p style="font-size: 0.8rem; color: #aaa; margin: 0; margin-top: 0.25rem;">Pair: {report.person_a.id} &amp; {report.person_b.id}</p>
+                                    <p style="font-size: 0.8rem; color: #aaa; margin: 0;">Status: <span style="color: {report.status === 'PASS' ? 'lightgreen' : 'coral'}">{report.status}</span></p>
+                                {:else}
+                                    <h3>Adaptive Intake Test</h3>
+                                    <p style="font-size: 0.8rem; color: #aaa; margin: 0; margin-top: 0.25rem;">Persona: {report.persona_id}</p>
+                                    <p style="font-size: 0.8rem; color: #aaa; margin: 0;">Model: {report.model} | Questions: {report.transcript?.length || 0}</p>
+                                {/if}
                             </div>
                             <div class="roles">
                                 <button class="action-btn-ghost" on:click={() => {
@@ -335,19 +341,20 @@
 
             <!-- Synthetic Results Panel -->
             {#if activeSyntheticReport}
-                {@const compat = activeSyntheticReport.relationship_behavior.compatibility}
-                {@const sim = activeSyntheticReport.relationship_behavior.simulation}
-                {@const astro = activeSyntheticReport.relationship_behavior.astro_score}
-                <div class="card glass full-width" id="synthetic-results">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                        <div>
-                            <h2 style="margin:0;">Synthetic Test Report</h2>
-                            <p style="color:#aaa; font-size:0.85rem; margin:0.25rem 0 0;">
-                                {activeSyntheticReport.person_a.id} &amp; {activeSyntheticReport.person_b.id}
-                                &nbsp;·&nbsp; Run ID: {activeSyntheticReport.run_id}
-                                &nbsp;·&nbsp; Seed: {activeSyntheticReport.seed}
-                            </p>
-                        </div>
+                {#if activeSyntheticReport.person_a}
+                    {@const compat = activeSyntheticReport.relationship_behavior.compatibility}
+                    {@const sim = activeSyntheticReport.relationship_behavior.simulation}
+                    {@const astro = activeSyntheticReport.relationship_behavior.astro_score}
+                    <div class="card glass full-width" id="synthetic-results">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <div>
+                                <h2 style="margin:0;">Synthetic Test Report</h2>
+                                <p style="color:#aaa; font-size:0.85rem; margin:0.25rem 0 0;">
+                                    {activeSyntheticReport.person_a.id} &amp; {activeSyntheticReport.person_b.id}
+                                    &nbsp;·&nbsp; Run ID: {activeSyntheticReport.run_id}
+                                    &nbsp;·&nbsp; Seed: {activeSyntheticReport.seed}
+                                </p>
+                            </div>
                         <button class="action-btn-ghost" on:click={() => activeSyntheticReport = null}>Close</button>
                     </div>
 
@@ -540,6 +547,25 @@
                         </div>
                     {/if}
                 </div>
+                {:else}
+                    <div class="card glass full-width" id="synthetic-results">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <div>
+                                <h2 style="margin:0;">Adaptive Intake Report</h2>
+                                <p style="color:#aaa; font-size:0.85rem; margin:0.25rem 0 0;">
+                                    Persona: {activeSyntheticReport.persona_id}
+                                    &nbsp;·&nbsp; Model: {activeSyntheticReport.model}
+                                    &nbsp;·&nbsp; Seed: {activeSyntheticReport.seed}
+                                </p>
+                            </div>
+                            <button class="action-btn-ghost" on:click={() => activeSyntheticReport = null}>Close</button>
+                        </div>
+                        <div class="answers-container">
+                            <h3>Transcript ({activeSyntheticReport.transcript?.length || 0} questions)</h3>
+                            <pre class="json-viewer">{JSON.stringify(activeSyntheticReport.transcript || [], null, 2)}</pre>
+                        </div>
+                    </div>
+                {/if}
             {/if}
 
 
