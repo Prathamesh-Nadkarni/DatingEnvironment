@@ -121,12 +121,9 @@
       if (synthRes && synthRes.ok) {
         synthData = await synthRes.json();
       } else {
-        console.warn("Backend API for synthetic reports failed. Attempting to load static sample-report.json...");
-        const fallbackRes = await fetch('/DatingEnvironment/sample-report.json').catch(() => fetch('/sample-report.json'));
-        if (fallbackRes && fallbackRes.ok) {
-          const fallbackData = await fallbackRes.json();
-          synthData = { reports: [fallbackData] };
-        }
+        // Synthetic reports are intentionally backend-only. Never fall back to
+        // a bundled JSON file, which would expose saved reports on GitHub Pages.
+        console.warn("Backend API for synthetic reports is unavailable.");
       }
       
       sessions = sessData.sessions || {};

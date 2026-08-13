@@ -25,6 +25,23 @@ ManaMatch was built to surface all of this before the first coffee.
 
 ---
 
+## Deployment and Admin Reports
+
+GitHub Actions runs the **MiroFish CI/CD** workflow for pull requests and
+pushes to `main`. It can also be started manually from **Actions → MiroFish
+CI/CD → Run workflow** on `main`; a manual run executes the backend checks,
+deploys the frontend, and triggers the Render deploy hook when that repository
+secret is configured.
+
+The admin dashboard is built with `VITE_API_URL=https://datingenvironment.onrender.com`.
+Saved synthetic-report JSON files remain on the backend under
+`backend/synthetic_testing/reports/` and are served only by
+`GET /api/admin/synthetic-reports`. They are deliberately not copied into the
+GitHub Pages frontend artifact. Ensure the Render service has the report files
+and permits the GitHub Pages origin via CORS before using the admin dashboard.
+
+---
+
 ## How It Works — The Four-Stage Pipeline
 
 ```
