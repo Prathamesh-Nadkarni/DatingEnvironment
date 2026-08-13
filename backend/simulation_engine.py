@@ -623,36 +623,54 @@ def environmental_reaction_node(state: SimulationState):
     # Update state logic
     if reaction_type == "escalate_reaction":
         m_state.relationship_capital = max(0.0, m_state.relationship_capital - severity * 2)
-        m_state.trust_a = max(0.0, m_state.trust_a - severity * 0.05)
-        m_state.trust_b = max(0.0, m_state.trust_b - severity * 0.05)
+        
+        # Asymmetric trust impact: the one who escalated hurts the other's trust more
+        if last_a == "escalate":
+            m_state.trust_b = max(0.0, m_state.trust_b - severity * 0.08)
+        else:
+            m_state.trust_b = max(0.0, m_state.trust_b - severity * 0.02)
+            
+        if last_b == "escalate":
+            m_state.trust_a = max(0.0, m_state.trust_a - severity * 0.08)
+        else:
+            m_state.trust_a = max(0.0, m_state.trust_a - severity * 0.02)
         
         # Adaptive Cascades (Phase 2)
         if category == "financial":
             m_state.financial_stability = max(0.0, m_state.financial_stability - severity * 0.1)
-            # Cascade: financial stress causes burnout
-            m_state.burnout_a += severity * 0.05
-            m_state.burnout_b += severity * 0.05
+            # Cascade: financial stress causes burnout, higher for those who escalate or withdraw
+            m_state.burnout_a += severity * (0.07 if last_a in ["escalate", "withdraw"] else 0.03)
+            m_state.burnout_b += severity * (0.07 if last_b in ["escalate", "withdraw"] else 0.03)
         elif category == "intimacy":
-            m_state.intimacy_satisfaction_a = max(0.0, m_state.intimacy_satisfaction_a - severity * 0.1)
-            m_state.intimacy_satisfaction_b = max(0.0, m_state.intimacy_satisfaction_b - severity * 0.1)
+            m_state.intimacy_satisfaction_a = max(0.0, m_state.intimacy_satisfaction_a - severity * (0.12 if last_a in ["withdraw"] else 0.08))
+            m_state.intimacy_satisfaction_b = max(0.0, m_state.intimacy_satisfaction_b - severity * (0.12 if last_b in ["withdraw"] else 0.08))
         elif category == "family_dynamics":
             m_state.family_boundary_health = max(0.0, m_state.family_boundary_health - severity * 0.1)
             # Cascade: family issues spike resentment
-            m_state.resentment_a += severity * 0.08
-            m_state.resentment_b += severity * 0.08
+            m_state.resentment_a += severity * (0.1 if last_b in ["escalate"] else 0.05)
+            m_state.resentment_b += severity * (0.1 if last_a in ["escalate"] else 0.05)
             
     elif reaction_type == "repair_reaction":
         m_state.relationship_capital = min(100.0, m_state.relationship_capital + severity * 2)
-        m_state.trust_a = min(1.0, m_state.trust_a + severity * 0.05)
-        m_state.trust_b = min(1.0, m_state.trust_b + severity * 0.05)
+        
+        if last_b == "repair":
+            m_state.trust_a = min(1.0, m_state.trust_a + severity * 0.06)
+        else:
+            m_state.trust_a = min(1.0, m_state.trust_a + severity * 0.02)
+            
+        if last_a == "repair":
+            m_state.trust_b = min(1.0, m_state.trust_b + severity * 0.06)
+        else:
+            m_state.trust_b = min(1.0, m_state.trust_b + severity * 0.02)
+            
         m_state.successful_repairs += 1
         
         # Positive Cascades (Phase 2)
         if category == "financial":
             m_state.financial_stability = min(1.0, m_state.financial_stability + severity * 0.05)
         elif category == "intimacy":
-            m_state.intimacy_satisfaction_a = min(1.0, m_state.intimacy_satisfaction_a + severity * 0.05)
-            m_state.intimacy_satisfaction_b = min(1.0, m_state.intimacy_satisfaction_b + severity * 0.05)
+            m_state.intimacy_satisfaction_a = min(1.0, m_state.intimacy_satisfaction_a + severity * (0.07 if last_a == "repair" else 0.03))
+            m_state.intimacy_satisfaction_b = min(1.0, m_state.intimacy_satisfaction_b + severity * (0.07 if last_b == "repair" else 0.03))
         
     m_state.update_happiness()
     
