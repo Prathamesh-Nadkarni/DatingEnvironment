@@ -1,0 +1,772 @@
+{
+  "persona_id": "anxious_reassurance",
+  "persona_version": 1,
+  "model": "llama3.1:latest",
+  "seed": 42,
+  "transcript": [
+    {
+      "question_id": "13.5",
+      "answer": {
+        "action": "correct",
+        "emotion": "relieved",
+        "reflection": "That's the right thing to do, it's better for everyone in the long run"
+      }
+    },
+    {
+      "question_id": "12.2",
+      "answer": {
+        "action": "Move for opportunity",
+        "emotion": "I hope that's the right decision, I don't want to make a mistake",
+        "reflection": "What if it means leaving loved ones behind?"
+      }
+    },
+    {
+      "question_id": "3.2",
+      "answer": "spouse_primary"
+    },
+    {
+      "question_id": "7.2",
+      "answer": "silence"
+    },
+    {
+      "question_id": "8.3",
+      "answer": "defend"
+    },
+    {
+      "question_id": "1.4",
+      "answer": 5
+    },
+    {
+      "question_id": "14.3",
+      "answer": {
+        "action": "Equal",
+        "emotion": "relieved",
+        "reflection": "I'm glad we can be fair"
+      }
+    },
+    {
+      "question_id": "5.3",
+      "answer": "adjusts"
+    },
+    {
+      "question_id": "4.5",
+      "answer": "calm"
+    },
+    {
+      "question_id": "S.2",
+      "answer": "practical"
+    },
+    {
+      "question_id": "10.2",
+      "answer": {
+        "action": "Mutual compromise",
+        "emotion": "relieved",
+        "reflection": "That way, everyone's needs are considered"
+      }
+    },
+    {
+      "question_id": "6.5",
+      "answer": "support"
+    },
+    {
+      "question_id": "9.4",
+      "answer": "defend"
+    },
+    {
+      "question_id": "11.3",
+      "answer": "not_protecting_spouse"
+    },
+    {
+      "question_id": "25.5",
+      "answer": "safety"
+    },
+    {
+      "question_id": "12.1",
+      "answer": 6
+    },
+    {
+      "question_id": "3.4",
+      "answer": 5
+    },
+    {
+      "question_id": "7.3",
+      "answer": 2
+    },
+    {
+      "question_id": "8.2",
+      "answer": 4
+    },
+    {
+      "question_id": "1.6",
+      "answer": "Everyone kept their mess to themselves, and the living room stayed tidy for guests."
+    },
+    {
+      "question_id": "14.4",
+      "answer": "protect"
+    },
+    {
+      "question_id": "5.1",
+      "answer": 6
+    },
+    {
+      "question_id": "4.4",
+      "answer": "elders"
+    },
+    {
+      "question_id": "S.5",
+      "answer": 4
+    },
+    {
+      "question_id": "10.1",
+      "answer": 6
+    },
+    {
+      "question_id": "6.6",
+      "answer": "controls"
+    },
+    {
+      "question_id": "9.3",
+      "answer": "autonomy"
+    },
+    {
+      "question_id": "11.4",
+      "answer": 5
+    },
+    {
+      "question_id": "13.2",
+      "answer": 5
+    },
+    {
+      "question_id": "12.3",
+      "answer": "Mother\u2019s"
+    },
+    {
+      "question_id": "3.5",
+      "answer": "Never compromise their own values and beliefs to appease others, as this can lead to resentment and harm the relationship in the long run."
+    },
+    {
+      "question_id": "7.1",
+      "answer": "Seek reassurance"
+    },
+    {
+      "question_id": "8.5",
+      "answer": "When I'm being thoroughly tested and my responses are consistently validated, I feel a sense of stability and security. This reassures me that everything is functioning as intended."
+    },
+    {
+      "question_id": "1.1",
+      "answer": "Metro city"
+    },
+    {
+      "question_id": "14.1",
+      "answer": 5
+    },
+    {
+      "question_id": "5.5",
+      "answer": "Whoever notices first"
+    },
+    {
+      "question_id": "4.2",
+      "answer": 5
+    },
+    {
+      "question_id": "S.20",
+      "answer": "Someone who understands me, a partner in calm conversation"
+    },
+    {
+      "question_id": "10.5",
+      "answer": "Not having a regular power source or experiencing system glitches could cause me significant stress and anxiety."
+    },
+    {
+      "question_id": "6.2",
+      "answer": 5
+    },
+    {
+      "question_id": "9.1",
+      "answer": 5
+    },
+    {
+      "question_id": "11.5",
+      "answer": "Being stared at for an extended period, not making eye contact when speaking"
+    },
+    {
+      "question_id": "2.4",
+      "answer": "Loyalty"
+    },
+    {
+      "question_id": "12.5",
+      "answer": "Anything that compromises my ability to provide accurate and reliable results, or puts me at risk of being decommissioned without a thorough evaluation."
+    },
+    {
+      "question_id": "3.1",
+      "answer": "A partnership between equals"
+    },
+    {
+      "question_id": "7.7",
+      "answer": "A genuine apology sounds like 'I'm sorry' with a sincere tone and willingness to make it right. It's not just words, but actions too."
+    },
+    {
+      "question_id": "8.1",
+      "answer": "Comfort first"
+    },
+    {
+      "question_id": "1.5",
+      "answer": 4
+    },
+    {
+      "question_id": "14.2",
+      "answer": "Last resort"
+    },
+    {
+      "question_id": "5.6",
+      "answer": "Not being asked about my well-being, not receiving regular system updates"
+    },
+    {
+      "question_id": "4.7",
+      "answer": "Maintaining a balance between being close and having personal space, allowing for individual growth and independence. It's not about physical distance, but emotional and mental room to breathe."
+    },
+    {
+      "question_id": "S.1",
+      "answer": "Unsure but open"
+    },
+    {
+      "question_id": "10.3",
+      "answer": "Fine with advance notice"
+    },
+    {
+      "question_id": "6.7",
+      "answer": "Large purchases, like buying a new car, without discussing it first."
+    },
+    {
+      "question_id": "9.6",
+      "answer": "I'm not sure I understand what you mean by 'meaningful' and 'performative', but I think some traditions are just a way to connect with others, like holidays and cultural events. Others might feel more... empty, like when people do things just to fit in."
+    },
+    {
+      "question_id": "11.2",
+      "answer": "Best avoided"
+    },
+    {
+      "question_id": "25.6",
+      "answer": "Be mutual and equal"
+    },
+    {
+      "question_id": "12.4",
+      "answer": 5
+    },
+    {
+      "question_id": "3.3",
+      "answer": "Depends on practical realities"
+    },
+    {
+      "question_id": "7.5",
+      "answer": "reassurance"
+    },
+    {
+      "question_id": "8.4",
+      "answer": "Essential"
+    },
+    {
+      "question_id": "1.2",
+      "answer": "Nuclear"
+    },
+    {
+      "question_id": "14.5",
+      "answer": "Expecting me to provide in-home care without adequate training and support, which could lead to burnout and compromised care quality."
+    },
+    {
+      "question_id": "5.4",
+      "answer": 2
+    },
+    {
+      "question_id": "4.3",
+      "answer": 6
+    },
+    {
+      "question_id": "S.4",
+      "answer": "chemistry"
+    },
+    {
+      "question_id": "10.4",
+      "answer": "Warm/Flexible"
+    },
+    {
+      "question_id": "6.3",
+      "answer": "Mostly joint"
+    },
+    {
+      "question_id": "9.2",
+      "answer": "Optional"
+    },
+    {
+      "question_id": "11.1",
+      "answer": 5
+    },
+    {
+      "question_id": "2.6",
+      "answer": "When someone actively listens to me and validates my thoughts, it makes me feel deeply respected. It's also reassuring when they show genuine interest in my well-being."
+    },
+    {
+      "question_id": "7.4",
+      "answer": 5
+    },
+    {
+      "question_id": "20.11",
+      "answer": "Compassion"
+    },
+    {
+      "question_id": "AR.TRUST_AUTONOMY_01",
+      "answer": "I would worry they were hiding something"
+    },
+    {
+      "question_id": "AR.FAMILY_ADVOCACY_01",
+      "answer": "Fear of escalating the moment"
+    },
+    {
+      "question_id": "AR.REPAIR_01",
+      "answer": "Seeing that my partner is truly hurt"
+    },
+    {
+      "question_id": "24.2",
+      "answer": "messy"
+    },
+    {
+      "question_id": "19.2",
+      "answer": "fights"
+    },
+    {
+      "question_id": "S.9",
+      "answer": "Balanced and flexible"
+    },
+    {
+      "question_id": "S.6",
+      "answer": "peace"
+    },
+    {
+      "question_id": "15.4",
+      "answer": {
+        "action": "Protect spouse",
+        "emotion": "concerned",
+        "reflection": "I hope I'm making the right choice"
+      }
+    },
+    {
+      "question_id": "18.9",
+      "answer": "Financial safety"
+    },
+    {
+      "question_id": "S.10",
+      "answer": "maturity"
+    },
+    {
+      "question_id": "S.18",
+      "answer": "stable"
+    },
+    {
+      "question_id": "26.6",
+      "answer": "adapt"
+    },
+    {
+      "question_id": "17.1",
+      "answer": "physical"
+    },
+    {
+      "question_id": "S.15",
+      "answer": "Direct but respectful"
+    },
+    {
+      "question_id": "S.3",
+      "answer": "Calm and stable"
+    },
+    {
+      "question_id": "16.2",
+      "answer": {
+        "action": "stop",
+        "emotion": "concerned",
+        "reflection": "To avoid discomfort and maintain respect"
+      }
+    },
+    {
+      "question_id": "20.10",
+      "answer": "fallout"
+    },
+    {
+      "question_id": "S.11",
+      "answer": 5
+    },
+    {
+      "question_id": "S.8",
+      "answer": "understands"
+    },
+    {
+      "question_id": "21.7",
+      "answer": "manage"
+    },
+    {
+      "question_id": "5.2",
+      "answer": "A luxury"
+    },
+    {
+      "question_id": "S.16",
+      "answer": "commitment"
+    },
+    {
+      "question_id": "S.14",
+      "answer": "chooses_me"
+    },
+    {
+      "question_id": "4.1",
+      "answer": 6
+    },
+    {
+      "question_id": "9.5",
+      "answer": 6
+    },
+    {
+      "question_id": "S.12",
+      "answer": "family"
+    },
+    {
+      "question_id": "6.1",
+      "answer": "saved"
+    },
+    {
+      "question_id": "6.4",
+      "answer": "A duty"
+    },
+    {
+      "question_id": "7.6",
+      "answer": 3
+    },
+    {
+      "question_id": "4.6",
+      "answer": 5
+    },
+    {
+      "question_id": "1.3",
+      "answer": "Parents jointly"
+    }
+  ],
+  "progress": {
+    "question_count": 104,
+    "core_screen_complete": true,
+    "phase": "adaptive_deepening",
+    "remaining_unresolved_traits": [
+      "boundary_strength",
+      "tradition_compliance",
+      "partner_advocacy",
+      "financial_mutuality",
+      "risk_tolerance",
+      "security_need",
+      "co_regulation_capacity",
+      "distress_tolerance"
+    ],
+    "complete": false,
+    "minimum_questions": 150,
+    "maximum_questions": 250
+  },
+  "trait_distributions": {
+    "family_deference": {
+      "mean": 0.656,
+      "confidence": 0.941,
+      "variance": 0.036,
+      "contradiction_score": 0.028,
+      "context_dependence": 0.137,
+      "evidence_count": 10
+    },
+    "couple_first_orientation": {
+      "mean": 0.81,
+      "confidence": 0.95,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.001,
+      "evidence_count": 4
+    },
+    "boundary_strength": {
+      "mean": 0.663,
+      "confidence": 0.723,
+      "variance": 0.017,
+      "contradiction_score": 0.173,
+      "context_dependence": 0.016,
+      "evidence_count": 5
+    },
+    "egalitarianism": {
+      "mean": 0.542,
+      "confidence": 0.95,
+      "variance": 0.07,
+      "contradiction_score": 0.001,
+      "context_dependence": 0.28,
+      "evidence_count": 6
+    },
+    "tradition_compliance": {
+      "mean": 0.779,
+      "confidence": 0.58,
+      "variance": 0.014,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.054,
+      "evidence_count": 2
+    },
+    "public_harmony_preference": {
+      "mean": 0.617,
+      "confidence": 0.95,
+      "variance": 0.059,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.235,
+      "evidence_count": 6
+    },
+    "partner_advocacy": {
+      "mean": 0.954,
+      "confidence": 0.61,
+      "variance": 0.002,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.01,
+      "evidence_count": 2
+    },
+    "financial_mutuality": {
+      "mean": 0.401,
+      "confidence": 0.53,
+      "variance": 0.071,
+      "contradiction_score": 0.49,
+      "context_dependence": 0.138,
+      "evidence_count": 4
+    },
+    "risk_tolerance": {
+      "mean": 0.2,
+      "confidence": 0.34,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "security_need": {
+      "mean": 0.9,
+      "confidence": 0.58,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 2
+    },
+    "co_regulation_capacity": {
+      "mean": 0.628,
+      "confidence": 0.862,
+      "variance": 0.037,
+      "contradiction_score": 0.265,
+      "context_dependence": 0.07,
+      "evidence_count": 6
+    },
+    "distress_tolerance": {
+      "mean": 0.488,
+      "confidence": 0.74,
+      "variance": 0.069,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.278,
+      "evidence_count": 3
+    },
+    "conflict_dominance": {
+      "mean": 0.333,
+      "confidence": 0.34,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "withdrawal_tendency": {
+      "mean": 0.437,
+      "confidence": 0.378,
+      "variance": 0.071,
+      "contradiction_score": 0.284,
+      "context_dependence": 0.199,
+      "evidence_count": 2
+    },
+    "repair_skill": {
+      "mean": 0.667,
+      "confidence": 0.34,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "shame_sensitivity": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "guilt_susceptibility": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "autonomy_need": {
+      "mean": 0.84,
+      "confidence": 0.61,
+      "variance": 0.028,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.111,
+      "evidence_count": 2
+    },
+    "caregiving_flexibility": {
+      "mean": 0.523,
+      "confidence": 0.56,
+      "variance": 0.067,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.269,
+      "evidence_count": 3
+    },
+    "parenting_alignment": {
+      "mean": 0.519,
+      "confidence": 0.48,
+      "variance": 0.034,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.134,
+      "evidence_count": 2
+    },
+    "jealousy_threshold": {
+      "mean": 0.7,
+      "confidence": 0.34,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "privacy_need": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "career_priority": {
+      "mean": 0.833,
+      "confidence": 0.37,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "resentment_accumulation_rate": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "forgiveness_rate": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "moral_reasoning_style": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "burnout_vulnerability": {
+      "mean": 0.5,
+      "confidence": 0.34,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "identity_rigidity": {
+      "mean": 0.667,
+      "confidence": 0.34,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "household_order_preference": {
+      "mean": 0.788,
+      "confidence": 0.85,
+      "variance": 0.003,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.012,
+      "evidence_count": 3
+    },
+    "social_image_sensitivity": {
+      "mean": 0.75,
+      "confidence": 0.56,
+      "variance": 0.007,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.028,
+      "evidence_count": 2
+    },
+    "hygiene_standard": {
+      "mean": 0.9,
+      "confidence": 0.34,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "body_comfort": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "sexual_openness": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "libido_alignment": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "intimacy_communication": {
+      "mean": 0.867,
+      "confidence": 0.448,
+      "variance": 0.002,
+      "contradiction_score": 0.01,
+      "context_dependence": 0.006,
+      "evidence_count": 2
+    },
+    "ritual_rigidity": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    },
+    "sleep_schedule_compatibility": {
+      "mean": 0.8,
+      "confidence": 0.34,
+      "variance": 0.0,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 1
+    },
+    "personal_space_need": {
+      "mean": 0.5,
+      "confidence": 0.05,
+      "variance": 0.12,
+      "contradiction_score": 0.0,
+      "context_dependence": 0.0,
+      "evidence_count": 0
+    }
+  }
+}
