@@ -2,8 +2,8 @@
 
 > *"Don't ask who someone is. Watch what they do when the stakes are real."*
 
-**🌟 [Try the Live Demo Here!](https://Prathamesh-Nadkarni.github.io/DatingEnvironment/)**
-**📊 [View Sample Simulation Output](https://Prathamesh-Nadkarni.github.io/DatingEnvironment/#/admin)**
+**🌟 [Try the Live Demo Here!](https://prathamesh-nadkarni.github.io/DatingEnvironment/)**
+**📊 [View Sample Simulation Output](https://prathamesh-nadkarni.github.io/DatingEnvironment/#/admin)**
 
 ManaMatch is a relationship compatibility platform built on a fundamentally different premise than every dating app in existence. It does not ask you what you like or what you are looking for. It clones you into a behavioral AI agent and stress-tests that clone against a potential match across 18 high-stakes scenarios drawn from real Indian relational conflict patterns — before the first conversation ever happens.
 
