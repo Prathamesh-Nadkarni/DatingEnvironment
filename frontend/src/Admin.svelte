@@ -112,11 +112,22 @@
       const [sessRes, telRes, synthRes] = await Promise.all([
         fetch(`${API_URL}/api/admin/sessions`),
         fetch(`${API_URL}/api/admin/telemetry`),
-        fetch(`${API_URL}/api/admin/synthetic-reports`)
+        fetch(`${API_URL}/api/admin/synthetic-reports`).catch(() => null)
       ]);
       const sessData = await sessRes.json();
       const telData = await telRes.json();
-      const synthData = await synthRes.json();
+      
+      let synthData = { reports: [] };
+      if (synthRes && synthRes.ok) {
+        synthData = await synthRes.json();
+      } else {
+        console.warn("Backend API for synthetic reports failed. Attempting to load static sample-report.json...");
+        const fallbackRes = await fetch('/DatingEnvironment/sample-report.json').catch(() => fetch('/sample-report.json'));
+        if (fallbackRes && fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          synthData = { reports: [fallbackData] };
+        }
+      }
       
       sessions = sessData.sessions || {};
       telemetryEvents = telData.events || [];
