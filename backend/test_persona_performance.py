@@ -123,7 +123,7 @@ def compute_report_breakdown(report: Dict[str, Any]) -> Dict[str, Any]:
         "dealbreaker_penalty": penalty,
         "formula_line": (
             f"raw = {TRAIT_WEIGHT:.0%}x({trait_avg:.3f}x100) + {SIMULATION_WEIGHT:.0%}x({sim_avg:.1f}) "
-            f"= {raw:.1f}  |  -{penalty} dealbreaker -> {report['overall_score']}/100"
+            f"= {raw:.1f}  |  -{penalty} dealbreaker -> {report['overall_compatibility_score']}/100"
         ),
     }
 
@@ -157,11 +157,13 @@ def print_report(name: str, ratio: float, report: Dict[str, Any]) -> None:
     print(f"  CASE: {name}  |  Answer overlap vs base: ~{int(ratio * 100)}%")
     print(f"{'=' * 78}")
 
-    print(f"\n  OVERALL COMPATIBILITY  {bar(report['overall_score'])}")
+    print(f"\n  OVERALL COMPATIBILITY  {bar(report.get('overall_compatibility_score', report.get('overall_score', 0)))}")
     print(f"  {br['formula_line']}")
 
-    if report["dealbreakers"]:
-        print(f"\n  DEALBREAKERS FLAGGED: {', '.join(report['dealbreakers'])}")
+    if report.get("flagged_dealbreakers", []):
+        print("\n  DEALBREAKER TRIGGERED:")
+        for db in report.get("flagged_dealbreakers", []):
+            print(f"    ! {db}")
 
     print("\n  -- Static trait compatibility (no simulation) --")
     tc = report["trait_compatibility"]
@@ -197,9 +199,9 @@ def print_report(name: str, ratio: float, report: Dict[str, Any]) -> None:
                 print(f"         inference: {inf}")
 
     print(f"\n  -- Summary axes --")
-    print(f"    Top friction: {CATEGORY_LABELS.get(report['top_friction_axis'], report['top_friction_axis'])}")
-    print(f"    Top strength: {CATEGORY_LABELS.get(report['top_strength_axis'], report['top_strength_axis'])}")
-    print(f"\n  Verdict:\n    {report['verdict']}")
+    print(f"    Top friction: {CATEGORY_LABELS.get(report.get('top_friction_axis', 'None'), report.get('top_friction_axis', 'None'))}")
+    print(f"    Top strength: {CATEGORY_LABELS.get(report.get('top_strength_axis', 'None'), report.get('top_strength_axis', 'None'))}")
+    print(f"\n  Verdict:\n    {report.get('verdict', report.get('inference', 'No verdict generated'))}")
     print()
 
 
@@ -228,8 +230,8 @@ def run_diagnostic(max_turns: int = DEFAULT_MAX_TURNS) -> Dict[str, Any]:
         persona_b = engine_b.synthesize(user_b_answers)
 
         report = run_full_compatibility_report(
-            persona_a["system_prompt"],
-            persona_b["system_prompt"],
+            persona_a,
+            persona_b,
             max_turns=max_turns,
         )
         all_reports[name] = report
@@ -238,10 +240,10 @@ def run_diagnostic(max_turns: int = DEFAULT_MAX_TURNS) -> Dict[str, Any]:
     print("\n" + "=" * 78)
     print("  BASELINE SANITY CHECKS (expected with seed=42; middle tiers may cross)")
     print("=" * 78)
-    soulmates = all_reports["Soulmates (100% Aligned)"]["overall_score"]
-    goodmatch = all_reports["Good Match (50% Aligned)"]["overall_score"]
-    unlikely = all_reports["Unlikely Pair (25% Aligned)"]["overall_score"]
-    polar = all_reports["Polar Opposites (0% Aligned)"]["overall_score"]
+    soulmates = all_reports["Soulmates (100% Aligned)"].get("overall_compatibility_score", all_reports["Soulmates (100% Aligned)"].get("overall_score", 0))
+    goodmatch = all_reports["Good Match (50% Aligned)"].get("overall_compatibility_score", all_reports["Good Match (50% Aligned)"].get("overall_score", 0))
+    unlikely = all_reports["Unlikely Pair (25% Aligned)"].get("overall_compatibility_score", all_reports["Unlikely Pair (25% Aligned)"].get("overall_score", 0))
+    polar = all_reports["Polar Opposites (0% Aligned)"].get("overall_compatibility_score", all_reports["Polar Opposites (0% Aligned)"].get("overall_score", 0))
 
     print(f"  Scores: Soulmates={soulmates}  GoodMatch={goodmatch}  UnlikelyPair={unlikely}  PolarOpposites={polar}")
     checks = [
