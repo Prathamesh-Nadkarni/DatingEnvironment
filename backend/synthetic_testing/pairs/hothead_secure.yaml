@@ -1,0 +1,11 @@
+id: hothead_secure
+version: 1
+person_a: high_repair_hothead
+person_b: secure_collaborator
+tags:
+- generated_pair
+expected_dynamics:
+  should_show: []
+  should_not_show: []
+directional_expectations: {}
+trajectory_expectations: {}

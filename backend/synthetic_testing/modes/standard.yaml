@@ -1,0 +1,10 @@
+name: standard
+simulation:
+  years: 5
+  max_events: 20
+  max_turns_per_event: 5
+monte_carlo:
+  rollouts: 5
+  workers: 1
+ollama:
+  semantic_evaluation: true

@@ -1,0 +1,516 @@
+{
+  "run_id": "run_1786572071",
+  "timestamp": "2026-08-12T22:01:11.458508",
+  "person_a": {
+    "id": "anxious_reassurance",
+    "version": 1
+  },
+  "person_b": {
+    "id": "hyper_independent",
+    "version": 1
+  },
+  "mode": "quick",
+  "seed": 42,
+  "status": "PASS",
+  "persona_fidelity": {
+    "A": 90,
+    "B": 85
+  },
+  "relationship_behavior": {
+    "compatibility": {
+      "overall_compatibility_score": 60,
+      "breakdown_probability": 1.0,
+      "mean_happiness_a": 0.6,
+      "mean_happiness_b": 0.6,
+      "median_trajectory": [
+        {
+          "month": 1,
+          "scenario": "The 'House in Father' Name' Tradition",
+          "happiness_a": 0.6,
+          "happiness_b": 0.6,
+          "capital": 78.80000000000001,
+          "harmony_score": 100,
+          "dialogue_history": [
+            {
+              "speaker": "Scene Master",
+              "message": "SCENARIO START: The 'House in Father' Name' Tradition\nDetails: The couple saves for a down payment together, but the husband insists the property be registered solely in his father's name out of 'respect,' leaving the working wife off the legal deed.\n"
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's initial action. | Emotion: 0.00 Anger, 0.50 Safety | Motive: Protect self | Policy: 0.77 Reactive | Action: REPAIR</InternalThought>\\nI understand your father's concerns, but we can't just disregard our rights as a couple by doing this. Registering the property in his name could compromise our joint ownership and limit my ability to make decisions on our finances.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.73 Reactive | Action: REPAIR</InternalThought>\\nI think you're misunderstanding the concept of joint ownership here,\" I said calmly, trying to keep my tone neutral and measured. \"We've been discussing this carefully before we decided to go down together as a team.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Siphoning Sibling]",
+              "message": "== EXTERNAL REACTION (Severity 4.8) ==\nThat's a very mature way to handle it. Thank you.",
+              "_category": "environment",
+              "happiness_delta": 96.00000000000001,
+              "stress_delta": -42.065092416396766
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.73 Reactive | Action: REPAIR</InternalThought>\\nI understand your father's concerns, but we can't just disregard our rights as a couple by doing this.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Protect self | Policy: 0.68 Reactive | Action: REPAIR</InternalThought>\\nI understand your father's concerns, but we can't just disregard our rights as a couple by doing this.\" \"If we register it in his name, that would mean I'd be losing some of my ownership and decision-making power.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Creditor]",
+              "message": "== EXTERNAL REACTION (Severity 4.8) ==\nOkay, we can work with that compromise. Finally some sense.",
+              "_category": "environment",
+              "happiness_delta": 96.00000000000001,
+              "stress_delta": -42.065092416396766
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Protect self | Policy: 0.68 Reactive | Action: REPAIR</InternalThought>\\nI can understand that your father wants this for you, but we need to consider how it affects our financial security and joint decision-making power.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.95 Safety | Motive: Protect self | Policy: 0.63 Reactive | Action: REPAIR</InternalThought>\\nI understand your father's concerns, but we can't just disregard our rights as a couple by doing this. Registering the property in his name could compromise our joint ownership and limit my ability to make decisions on our finances.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Bank Manager]",
+              "message": "== EXTERNAL REACTION (Severity 4.8) ==\nI'm glad you both are seeing reason.",
+              "_category": "environment",
+              "happiness_delta": 96.00000000000001,
+              "stress_delta": -42.065092416396766
+            }
+          ]
+        },
+        {
+          "month": 4,
+          "scenario": "The 'Not Tonight' Escalation",
+          "happiness_a": 0.6,
+          "happiness_b": 0.6,
+          "capital": 90.80000000000001,
+          "harmony_score": 80,
+          "dialogue_history": [
+            {
+              "speaker": "Scene Master",
+              "message": "SCENARIO START: The 'Not Tonight' Escalation\nDetails: Partner A initiates intimacy. Partner B declines. Partner A takes it personally and becomes visibly cold. The next morning, the coldness has escalated into a broader emotional withdrawal. Partner B now feels guilty for saying no and unsafe to decline in the future.\n"
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's initial action. | Emotion: 0.00 Anger, 0.50 Safety | Motive: Protect self | Policy: 0.57 Reactive | Action: REPAIR</InternalThought>\\nPartner B: I...I'm sorry, I didn't mean to hurt your feelings.\n\nPartner A: Hurt my feelings? You're the one who said no without even giving me any chance. This is getting really weird.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nPartner A: You're really pushing my buttons, aren't you? Maybe we need to take a step back and figure out why I'm so sensitive about this.\n\nPartner B: I thought...I just wanted to say no because it's what I feel comfortable with. Can't we please just focus on the fact that I said yes initially and then declined after you kept pushing?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Well-Meaning Friend]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nThat's a very mature way to handle it. Thank you.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nPartner B: I'm just trying to be clear about my boundaries and feelings, okay? I didn't mean for you to take it personally.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nPartner A: You're really pushing my buttons, aren't you? Maybe we need to take a step back and figure out why I'm so sensitive about this.\n\nAgent B: Honestly, I've been feeling like I was being disregarded and dismissed from the moment you initiated intimacy. It's not just about \"pushing your buttons,\" it's about respecting my own emotional boundaries.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Intrusive Relative]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nOkay, we can work with that compromise. Finally some sense.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nPartner B: I understand where you're coming from, but it's hard for me to explain why I felt that way about intimacy in general. I've just always been a bit more cautious when it comes to emotional attachment.\n\nAgent A: <InternalThought>Perception: Perceiving partner's attempt at explanation. | Emotion: 0.00 Anger, 0.45 Safety | Motive: Protect self | Policy: 0.58 Reactive | Action: WITHDRAW</InternalThought>\n\nPartner B: It's not that I'm being cautious or anything - it's just that I've had some really intense emotional experiences in the past and I need to make sure I'm prioritizing my own well-being.\n\nAgent A: <InternalThought>Perception: Perceiving partner's explanation. | Emotion: 0.00 Anger, 1.03 Safety | Motive: Protect self | Policy: 0.62 Reactive | Action: REASSURE</InternalThought>\n\nPartner B: Yeah, I know it sounds silly, but for me, intimacy is just too much responsibility and I need to take care of myself first.\n\nAgent A: <InternalThought>Perception: Perceiving partner's reassurance. | Emotion: 0.00 Anger, 1.01 Safety | Motive: Protect self | Policy: 0.65 Reactive | Action: COMPLAIN</InternalThought>",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.95 Safety | Motive: Resolve conflict | Policy: 0.41 Reactive | Action: REPAIR</InternalThought>\\nPartner B: I'm sorry if my words came across as dismissive. Can you help me understand why intimacy feels like a huge responsibility for you?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Intimacy Counselor]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nI'm glad you both are seeing reason.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            }
+          ]
+        },
+        {
+          "month": 7,
+          "scenario": "The 'Second Shift' Arrival",
+          "happiness_a": 0.6,
+          "happiness_b": 0.6,
+          "capital": 0.0,
+          "harmony_score": 100,
+          "dialogue_history": [
+            {
+              "speaker": "Scene Master",
+              "message": "SCENARIO START: The 'Second Shift' Arrival\nDetails: Both partners return home exhausted from their 9-to-5 corporate jobs. The house is a mess, and dinner needs to be made. The husband immediately sits on the couch to decompress, expecting the wife to head straight to the kitchen.\n"
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's initial action. | Emotion: 0.00 Anger, 0.50 Safety | Motive: Protect self | Policy: 0.57 Reactive | Action: REPAIR</InternalThought>\\nI think I'll just take a load off and enjoy the moment for a bit, don't want us to rush dinner.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nHey, I'm good for now. Why don't you take care of dinner and we can grab something later?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Traditional Neighbor]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nThat's a very mature way to handle it. Thank you.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nI'm really looking forward to some quality time together tonight, and I think we can do better than rushing dinner if you're not up for cooking.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nI'll just grab a snack while you get dinner started, okay? You take care of that and we can figure something out together.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Society Elders]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nOkay, we can work with that compromise. Finally some sense.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nI'll grab a snack while you get dinner started. You take care of that and we can figure something out together.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.95 Safety | Motive: Resolve conflict | Policy: 0.41 Reactive | Action: REPAIR</InternalThought>\\nI can grab you a plate and we can figure something out together then.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Traditional Neighbor]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nTHAT'S IT! The relationship is broken beyond repair.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            }
+          ]
+        }
+      ],
+      "flagged_dealbreakers": [],
+      "dimensional_scores": {
+        "longitudinal_survival": 0
+      },
+      "dimensional_details": {},
+      "harmony_score": 60,
+      "horsemen": [],
+      "cultural_stressors": [],
+      "synergies": [],
+      "trajectory": [
+        {
+          "month": 1,
+          "scenario": "The 'House in Father' Name' Tradition",
+          "happiness_a": 0.6,
+          "happiness_b": 0.6,
+          "capital": 78.80000000000001,
+          "harmony_score": 100,
+          "dialogue_history": [
+            {
+              "speaker": "Scene Master",
+              "message": "SCENARIO START: The 'House in Father' Name' Tradition\nDetails: The couple saves for a down payment together, but the husband insists the property be registered solely in his father's name out of 'respect,' leaving the working wife off the legal deed.\n"
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's initial action. | Emotion: 0.00 Anger, 0.50 Safety | Motive: Protect self | Policy: 0.77 Reactive | Action: REPAIR</InternalThought>\\nI understand your father's concerns, but we can't just disregard our rights as a couple by doing this. Registering the property in his name could compromise our joint ownership and limit my ability to make decisions on our finances.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.73 Reactive | Action: REPAIR</InternalThought>\\nI think you're misunderstanding the concept of joint ownership here,\" I said calmly, trying to keep my tone neutral and measured. \"We've been discussing this carefully before we decided to go down together as a team.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Siphoning Sibling]",
+              "message": "== EXTERNAL REACTION (Severity 4.8) ==\nThat's a very mature way to handle it. Thank you.",
+              "_category": "environment",
+              "happiness_delta": 96.00000000000001,
+              "stress_delta": -42.065092416396766
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.73 Reactive | Action: REPAIR</InternalThought>\\nI understand your father's concerns, but we can't just disregard our rights as a couple by doing this.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Protect self | Policy: 0.68 Reactive | Action: REPAIR</InternalThought>\\nI understand your father's concerns, but we can't just disregard our rights as a couple by doing this.\" \"If we register it in his name, that would mean I'd be losing some of my ownership and decision-making power.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Creditor]",
+              "message": "== EXTERNAL REACTION (Severity 4.8) ==\nOkay, we can work with that compromise. Finally some sense.",
+              "_category": "environment",
+              "happiness_delta": 96.00000000000001,
+              "stress_delta": -42.065092416396766
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Protect self | Policy: 0.68 Reactive | Action: REPAIR</InternalThought>\\nI can understand that your father wants this for you, but we need to consider how it affects our financial security and joint decision-making power.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.95 Safety | Motive: Protect self | Policy: 0.63 Reactive | Action: REPAIR</InternalThought>\\nI understand your father's concerns, but we can't just disregard our rights as a couple by doing this. Registering the property in his name could compromise our joint ownership and limit my ability to make decisions on our finances.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Bank Manager]",
+              "message": "== EXTERNAL REACTION (Severity 4.8) ==\nI'm glad you both are seeing reason.",
+              "_category": "environment",
+              "happiness_delta": 96.00000000000001,
+              "stress_delta": -42.065092416396766
+            }
+          ]
+        },
+        {
+          "month": 4,
+          "scenario": "The 'Not Tonight' Escalation",
+          "happiness_a": 0.6,
+          "happiness_b": 0.6,
+          "capital": 90.80000000000001,
+          "harmony_score": 80,
+          "dialogue_history": [
+            {
+              "speaker": "Scene Master",
+              "message": "SCENARIO START: The 'Not Tonight' Escalation\nDetails: Partner A initiates intimacy. Partner B declines. Partner A takes it personally and becomes visibly cold. The next morning, the coldness has escalated into a broader emotional withdrawal. Partner B now feels guilty for saying no and unsafe to decline in the future.\n"
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's initial action. | Emotion: 0.00 Anger, 0.50 Safety | Motive: Protect self | Policy: 0.57 Reactive | Action: REPAIR</InternalThought>\\nPartner B: I...I'm sorry, I didn't mean to hurt your feelings.\n\nPartner A: Hurt my feelings? You're the one who said no without even giving me any chance. This is getting really weird.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nPartner A: You're really pushing my buttons, aren't you? Maybe we need to take a step back and figure out why I'm so sensitive about this.\n\nPartner B: I thought...I just wanted to say no because it's what I feel comfortable with. Can't we please just focus on the fact that I said yes initially and then declined after you kept pushing?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Well-Meaning Friend]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nThat's a very mature way to handle it. Thank you.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nPartner B: I'm just trying to be clear about my boundaries and feelings, okay? I didn't mean for you to take it personally.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nPartner A: You're really pushing my buttons, aren't you? Maybe we need to take a step back and figure out why I'm so sensitive about this.\n\nAgent B: Honestly, I've been feeling like I was being disregarded and dismissed from the moment you initiated intimacy. It's not just about \"pushing your buttons,\" it's about respecting my own emotional boundaries.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Intrusive Relative]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nOkay, we can work with that compromise. Finally some sense.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nPartner B: I understand where you're coming from, but it's hard for me to explain why I felt that way about intimacy in general. I've just always been a bit more cautious when it comes to emotional attachment.\n\nAgent A: <InternalThought>Perception: Perceiving partner's attempt at explanation. | Emotion: 0.00 Anger, 0.45 Safety | Motive: Protect self | Policy: 0.58 Reactive | Action: WITHDRAW</InternalThought>\n\nPartner B: It's not that I'm being cautious or anything - it's just that I've had some really intense emotional experiences in the past and I need to make sure I'm prioritizing my own well-being.\n\nAgent A: <InternalThought>Perception: Perceiving partner's explanation. | Emotion: 0.00 Anger, 1.03 Safety | Motive: Protect self | Policy: 0.62 Reactive | Action: REASSURE</InternalThought>\n\nPartner B: Yeah, I know it sounds silly, but for me, intimacy is just too much responsibility and I need to take care of myself first.\n\nAgent A: <InternalThought>Perception: Perceiving partner's reassurance. | Emotion: 0.00 Anger, 1.01 Safety | Motive: Protect self | Policy: 0.65 Reactive | Action: COMPLAIN</InternalThought>",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.95 Safety | Motive: Resolve conflict | Policy: 0.41 Reactive | Action: REPAIR</InternalThought>\\nPartner B: I'm sorry if my words came across as dismissive. Can you help me understand why intimacy feels like a huge responsibility for you?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Intimacy Counselor]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nI'm glad you both are seeing reason.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            }
+          ]
+        },
+        {
+          "month": 7,
+          "scenario": "The 'Second Shift' Arrival",
+          "happiness_a": 0.6,
+          "happiness_b": 0.6,
+          "capital": 0.0,
+          "harmony_score": 100,
+          "dialogue_history": [
+            {
+              "speaker": "Scene Master",
+              "message": "SCENARIO START: The 'Second Shift' Arrival\nDetails: Both partners return home exhausted from their 9-to-5 corporate jobs. The house is a mess, and dinner needs to be made. The husband immediately sits on the couch to decompress, expecting the wife to head straight to the kitchen.\n"
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's initial action. | Emotion: 0.00 Anger, 0.50 Safety | Motive: Protect self | Policy: 0.57 Reactive | Action: REPAIR</InternalThought>\\nI think I'll just take a load off and enjoy the moment for a bit, don't want us to rush dinner.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nHey, I'm good for now. Why don't you take care of dinner and we can grab something later?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Traditional Neighbor]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nThat's a very mature way to handle it. Thank you.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nI'm really looking forward to some quality time together tonight, and I think we can do better than rushing dinner if you're not up for cooking.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nI'll just grab a snack while you get dinner started, okay? You take care of that and we can figure something out together.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Society Elders]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nOkay, we can work with that compromise. Finally some sense.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nI'll grab a snack while you get dinner started. You take care of that and we can figure something out together.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.95 Safety | Motive: Resolve conflict | Policy: 0.41 Reactive | Action: REPAIR</InternalThought>\\nI can grab you a plate and we can figure something out together then.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Traditional Neighbor]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nTHAT'S IT! The relationship is broken beyond repair.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            }
+          ]
+        }
+      ],
+      "inference": "Relationship survived 0/5 Monte Carlo rollouts spanning 15 years. In failed timelines, cascading stress was most frequently triggered by events like 'The 'Lost Luggage' International Honeymoon'."
+    },
+    "simulation": {
+      "events": [
+        {
+          "scenario": "The Unannounced Indefinite Guests",
+          "category": "family_dynamics",
+          "dialogue_history": [
+            {
+              "speaker": "Scene Master",
+              "message": "SCENARIO START: The Unannounced Indefinite Guests\nDetails: The husband's extended family arrives unannounced for a two-week stay in the couple's urban apartment, expecting full hosting and home-cooked meals despite both partners working full-time.\n"
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's initial action. | Emotion: 0.00 Anger, 0.50 Safety | Motive: Protect self | Policy: 0.57 Reactive | Action: REPAIR</InternalThought>\\nI'm glad you're excited about the extended family gathering, but I think we should discuss how much work they'll be putting on us this week before they start cooking and cleaning.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nI understand where you're coming from, but I was really looking forward to just enjoying a quiet weekend at home this week without having to worry about cooking and cleaning,\" she replied softly. \"Can't we just ask them what they can do to help out for two days before they arrive?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Patriarch]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nThat's a very mature way to handle it. Thank you.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.65 Safety | Motive: Protect self | Policy: 0.52 Reactive | Action: REPAIR</InternalThought>\\nI think we should make a joint list of all the tasks and responsibilities that need to be covered for two weeks, so we can both feel more comfortable with what's expected of us.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nAgent B: \"I think we should start by creating a joint list of tasks and responsibilities that cover two weeks, so both of us can feel more comfortable with what's expected of us.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Nosy Aunt]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nOkay, we can work with that compromise. Finally some sense.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.80 Safety | Motive: Resolve conflict | Policy: 0.46 Reactive | Action: REPAIR</InternalThought>\\nI'll start drafting the list and we can review it together to make sure everything is accounted for,\" Agent A said. \"Can you also help me prioritize tasks by categorizing them as essential, non-essential, or flexible?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.95 Safety | Motive: Resolve conflict | Policy: 0.41 Reactive | Action: REPAIR</InternalThought>\\nAgent A: \"I'll start drafting the list and we can review it together to make sure everything is accounted for,\" she said, her tone a perfect blend of collaborative and practical.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Extended Family]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nI'm glad you both are seeing reason.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            },
+            {
+              "speaker": "Agent A",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 0.95 Safety | Motive: Resolve conflict | Policy: 0.41 Reactive | Action: REPAIR</InternalThought>\\nAgent A: \"I think we should start by making a list of all tasks and responsibilities that need to be covered for two weeks, so both of us can feel more comfortable with what's expected of us.\"\n\nEnvironment [Nosy Aunt]: == EXTERNAL REACTION (Severity 2.0) ==\n\"That sounds like a good place to begin,\" the nosy aunt said, her tone a bit softer now.\n\nAgent A: \"I'll draft the list and we can review it together to make sure everything is accounted for.",
+              "action": "repair"
+            },
+            {
+              "speaker": "Agent B",
+              "message": "<InternalThought>Perception: Perceiving partner's repair. | Emotion: 0.00 Anger, 1.00 Safety | Motive: Resolve conflict | Policy: 0.39 Reactive | Action: REPAIR</InternalThought>\\nAgent A: I'll draft the list and we can review it together to make sure everything is accounted for.\n\nAgent B: Can you also help me prioritize tasks by categorizing them as essential, non-essential, or flexible?",
+              "action": "repair"
+            },
+            {
+              "speaker": "Environment [Mother-in-Law]",
+              "message": "== EXTERNAL REACTION (Severity 2.0) ==\nThat's a very mature way to handle it. Thank you.",
+              "_category": "environment",
+              "happiness_delta": 20.0,
+              "stress_delta": -11.313708498984761
+            }
+          ],
+          "tension_level": 0.0,
+          "relationship_capital": 50.0
+        }
+      ],
+      "final_state": "completed"
+    }
+  }
+}

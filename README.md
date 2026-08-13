@@ -48,12 +48,12 @@ RAW ANSWERS
                      ▼
 ┌─────────────────────────────────────────┐
 │  Stage 3: The Sandbox (Simulation)      │
-│  Stateful 15-Year Scenario Loop         │
+│  Adaptive 25-Year Scenario Loop         │
 │  · MarriageState persistence            │
 │  · Tension computation (per scenario)   │
 │  · 7-category dialogue generation       │
 │  · Resentment override logic            │
-│  × 100 scenarios (3 per category × 6)   │
+│  · Monte Carlo Longitudinal Sampler     │
 └────────────────────┬────────────────────┘
                      │
                      ▼
@@ -80,6 +80,62 @@ RAW ANSWERS
 ---
 
 ## Stage 1 — The Intake Engine
+
+### Adaptive Evidence-Gathering Intake
+
+ManaMatch's intake is an adaptive evidence-gathering engine, not a fixed
+questionnaire. The current approved bank contains 212 base questions plus
+reviewed clarification probes; the routing and evidence schema are designed to
+scale to a 2,500+ question library only after candidate questions have been
+validated.
+
+```text
+QUESTION BANK
+    ↓
+72-QUESTION CORE SCREEN
+    ↓
+Deterministic EvidenceStore + Initial Persona Hypothesis
+    ↓
+Adaptive Question Selector
+    ├── uncertainty
+    ├── contradiction
+    ├── context gaps
+    ├── domain coverage
+    ├── type diversity / novelty
+    └── fatigue and redundancy controls
+    ↓
+Final Persona → 25-Year Scenario Simulation
+```
+
+The first 72 questions provide broad coverage of every domain represented by
+the current bank. After that, the selector samples from the highest-value
+approved candidates rather than repeatedly asking the same topic. It applies
+domain floors and ceilings, topic cooldowns, question-type diversity, and
+evidence-family discounts. Intake ends at 250 responses, or after at least 150
+responses once critical dimensions are resolved, contradictions are addressed,
+and minimum domain coverage is complete.
+
+Each question carries routing metadata: domain, canonical trait targets,
+question type, context tags, diagnostic value, redundancy/evidence family, and
+minimum spacing. High-value contradictions can activate reviewed clarification
+questions—for example, distinguishing public-harmony preference from a failure
+to advocate for a spouse.
+
+Structured answers are scored deterministically. Free text is sent to Ollama
+only to extract constrained evidence signals; those signals must use canonical
+trait labels and enter the EvidenceStore at lower weight. Ollama never invents
+production questions or assigns final persona scores. Repeated evidence from a
+single question family is discounted, so confidence reflects independent
+question types and contexts rather than raw response count.
+
+The onboarding endpoints expose adaptive state and honest progress rather than
+a misleading fixed percentage:
+
+- `GET /api/onboarding/start/{session_id}/{role}`
+- `POST /api/onboarding/answer`
+
+Responses include `core_profile` or `adaptive_deepening`, unresolved areas,
+the 150-question resolution floor, and the 250-question hard limit.
 
 ### Philosophy of the Questions
 
@@ -228,11 +284,18 @@ These ambivalence profiles modify the agent's simulated internal thought process
 ## Stage 3 — The Simulation Engine
 
 ### Asynchronous Processing Architecture
-Because simulating an entire multi-year relationship across 35+ high-stakes conflict scenarios requires heavy computational resources, the simulation engine is decoupled from the user experience. The moment both users submit their psychological intakes, a FastAPI `BackgroundTask` is spawned. This runs the full simulation silently in the background (typically taking 1-2 minutes). When users or admins attempt to access the Compatibility Dashboard during this window, the backend serves an HTTP `202 Accepted` status, and the frontend dynamically polls via an animated loading UI until the cached report snaps into place.
+Because simulating an entire relationship across 50–150 state-selected events requires meaningful compute, the simulation engine is decoupled from the user experience. The moment both users submit their psychological intakes, a FastAPI `BackgroundTask` is spawned. This runs the full simulation silently in the background. When users or admins attempt to access the Compatibility Dashboard during this window, the backend serves an HTTP `202 Accepted` status, and the frontend dynamically polls via an animated loading UI until the cached report snaps into place.
 
 ### Architecture: Stateful Relationships
 
-The simulation is not a series of isolated events. It operates as a continuous state machine simulating up to 15 years of marriage, managed by the `MarriageState` object that persists across all turns.
+The simulation is not a series of isolated events. It operates as a continuous state machine across 25 years. The planner rebuilds each year's schedule from `MarriageState`, objective `LifeState`, partner `NarrativeState`, scenario history, unresolved causal chains, and the remaining scenario budget.
+
+The scenario library contains exactly 1,000 validated items across 12 domains and 120 recurring scenario families. Twenty percent are positive opportunities. Hard eligibility removes impossible events before scoring; weighted sampling then combines occurrence probability, life phase, persona relevance, causal history, coverage, diagnostic value, and cooldown diversity. Light events resolve without language generation, while deep dialogue rendering can be enabled with `ENABLE_DEEP_DIALOGUE=1`.
+
+Catalog inspection endpoints:
+
+- `GET /api/scenario-catalog/stats`
+- `GET /api/scenario-catalog?domain=family_in_laws&offset=0&limit=50`
 
 ```
 MarriageState:
@@ -363,7 +426,7 @@ The high penalty for `escalate` (−22) reflects John Gottman's research finding
 
 ---
 
-## Stage 4a — The 100 Scenario Catalog
+## Stage 4a — The Longitudinal Life-Event Generator
 
 ### Design Principles
 
@@ -427,7 +490,7 @@ For each compatibility report, the engine selects the **3 highest-weighted scena
 
 Once the multi-turn scenario completes, the entire transcript is evaluated in two passes:
 1. **Mathematical State Machine**: Tracks numerical momentum (Happiness vs. Accumulated Stress limit breaks).
-2. **Generative Psychological Analysis**: The raw dialogue history is fed back into **Llama 3.2** which acts as an impartial clinical evaluator. It analyzes the text for implicit toxicity, passive-aggression, and Gottman's Four Horsemen (Criticism, Contempt, Defensiveness, Stonewalling), outputting a JSON object containing the penalty counts and synergy bonuses.
+2. **Generative Psychological Analysis**: The raw dialogue history is fed back into **Llama 3.2** which acts as an impartial semantic behavioral evaluator. It analyzes the text for implicit toxicity, passive-aggression, and Gottman's Four Horsemen (Criticism, Contempt, Defensiveness, Stonewalling), outputting a JSON object containing the penalty counts and synergy bonuses.
 
 This dual-pass evaluation yields a blended `harmony_score`, combining the rigidity of the state-machine rules with the nuanced contextual understanding of a generative LLM.
 
@@ -505,11 +568,11 @@ The Ashtakoota system compares these Moon Classes to generate a Guna score out o
 5. **Graha Maitri (5 pts)**: Psychological & Intellectual connection
 6. **Gana (6 pts)**: Temperament & Behavioral alignment
 7. **Bhakoot (7 pts)**: Family welfare, Love & Prosperity
-8. **Nadi (8 pts)**: Genetic & Core health compatibility
+8. **Nadi (8 pts)**: Core traditional health compatibility (Note: This is a cultural/traditional practice, not a medical or genetic assessment).
 
 ### Astrological Warnings (Doshas)
 The engine detects classical Doshas (severe mismatches) which traditionally override standard scores:
-- **Nadi Dosha**: When both partners share the same Nadi (health/genetic warning). Penalises the base score and forces an `INAUSPICIOUS` verdict regardless of other matches.
+- **Nadi Dosha**: When both partners share the same Nadi. Penalises the base score and forces an `INAUSPICIOUS` verdict regardless of other matches.
 - **Bhakoot Dosha**: Severe misalignment in love/family harmony (prosperity warning). Heavily penalises the base score.
 
 ### Scoring Tiers
@@ -566,6 +629,9 @@ For traits where both partners being at the same extreme — in either direction
 | `autonomy_need` | 0.50 | Large gap triggers anxious-avoidant attachment pattern |
 
 *Why autonomy_need uses balance, not similarity:* Two people who both have very high autonomy need may lead parallel lives with insufficient connection. Two people with very low autonomy need can become codependent. But the real danger is the gap: a highly independent person paired with a deeply clingy partner is the textbook anxious-avoidant trap, one of the most documented and painful relational dynamics in clinical literature.
+
+### Directional Needs / Provision Matching
+The static compatibility model explicitly evaluates directional *needs* against *provision*. For instance, instead of merely checking if both partners are equally affectionate, it evaluates whether Agent A's need for `emotional_safety` is actively provided by Agent B's `co_regulation_capacity`. This allows the engine to score complementary differences (e.g. an anxious partner matched with a highly secure, soothing partner) rather than punishing them for not being identical.
 
 ---
 

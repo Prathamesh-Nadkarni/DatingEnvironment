@@ -1,0 +1,16 @@
+from enum import Enum
+
+class PersonaConsistencyMode(str, Enum):
+    CLEAN = "clean"
+    CONTEXTUAL = "contextual"
+    NOISY = "noisy"
+    SOCIAL_DESIRABILITY = "social_desirability"
+
+class TestStatus(str, Enum):
+    PASS = "PASS"
+    PASS_WITH_WARNING = "PASS_WITH_WARNING"
+    REGRESSION_WARNING = "REGRESSION_WARNING"
+    SIMULATION_INVARIANT_FAILURE = "SIMULATION_INVARIANT_FAILURE"
+    PERSONA_RECONSTRUCTION_FAILURE = "PERSONA_RECONSTRUCTION_FAILURE"
+    INFRA_FAILURE = "INFRA_FAILURE"
+    FAIL = "FAIL"

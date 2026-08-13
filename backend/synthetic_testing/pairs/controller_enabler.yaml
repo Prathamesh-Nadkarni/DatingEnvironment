@@ -1,0 +1,11 @@
+id: controller_enabler
+version: 1
+person_a: dominant_controller
+person_b: people_pleasing_enabler
+tags:
+- generated_pair
+expected_dynamics:
+  should_show: []
+  should_not_show: []
+directional_expectations: {}
+trajectory_expectations: {}

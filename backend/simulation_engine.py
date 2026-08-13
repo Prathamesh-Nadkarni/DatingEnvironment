@@ -385,79 +385,60 @@ def update_emotional_state(state: dict, category: str, other_category: str) -> d
     return new_state
 
 
+
+def compute_stress_activation(traits: dict, scenario: dict, emotional_state: dict) -> float:
+    """
+    Continuous sigmoid stress activation.
+    """
+    import math
+    def sig(x): return 1.0 / (1.0 + math.exp(-x))
+    
+    distress_tolerance = traits.get("distress_tolerance", {}).get("mean", 0.5) if isinstance(traits.get("distress_tolerance"), dict) else traits.get("distress_tolerance", 0.5)
+    shame_sensitivity = traits.get("shame_sensitivity", {}).get("mean", 0.5) if isinstance(traits.get("shame_sensitivity"), dict) else traits.get("shame_sensitivity", 0.5)
+    self_regulation = traits.get("co_regulation_capacity", {}).get("mean", 0.5) if isinstance(traits.get("co_regulation_capacity"), dict) else traits.get("co_regulation_capacity", 0.5)
+    
+    anger = emotional_state.get("anger", 0.0)
+    fatigue = emotional_state.get("burnout", 0.0)
+    threat = 1.0 - emotional_state.get("safety", 0.5)
+    scenario_severity = scenario.get("severity", 0.5)
+    
+    logit = (scenario_severity * 2.0) + (shame_sensitivity * 1.5) + (anger * 2.0) + (fatigue * 1.0) + (threat * 1.5) - (distress_tolerance * 2.0) - (self_regulation * 2.0)
+    return sig(logit)
+
 def select_response_category(
-    profile: Dict[str, float],
+    profile: dict,
+    policy_weight: float,
     tension: float,
     turn: int,
     other_last: str,
-    clash_intensity: float,
     emotional_state: dict,
     scenario_category: str = "",
 ) -> str:
-    scores: Dict[str, float] = {}
-
+    scores = {}
     anger = emotional_state.get("anger", 0.0)
     safety = emotional_state.get("safety", 0.5)
     resentment = emotional_state.get("resentment", 0.0)
     trust = emotional_state.get("trust", 0.5)
 
-    # Using Sigmoid with logits (raw combinations of trait and state)
-    scores["compromise"] = sigmoid(
-        -0.5
-        + profile["repair"] * 1.0
-        + safety * 1.5
-        - anger * 1.0
-        - resentment * 0.5
-    )
+    import math
+    def sig(x): return 1.0 / (1.0 + math.exp(-x))
 
-    scores["assert"] = sigmoid(
-        -1.0
-        + profile["assertiveness"] * 2.0
-        + tension * 1.0
-        - safety * 0.5
-    )
+    resentment_shift = resentment * 2.0
 
-    defer_boost = 1.0 if other_last in ("assert", "escalate") else 0.0
-    scores["defer"] = sigmoid(
-        -1.0
-        + profile["deference"] * 1.5
-        - profile["assertiveness"] * 1.0
-        + defer_boost
-    )
+    scores["compromise"] = sig(-0.5 + profile.get("repair", 0.5) * 1.0 + safety * 1.5 - anger * 1.0 - resentment_shift)
+    scores["assert"] = sig(-1.0 + profile.get("assertiveness", 0.5) * 2.0 + tension * 1.0 - safety * 0.5 + (resentment_shift * 0.5))
+    scores["defer"] = sig(-1.0 + profile.get("deference", 0.5) * 1.5 - profile.get("assertiveness", 0.5) * 1.0)
+    scores["repair"] = sig(-1.5 + profile.get("repair", 0.5) * 2.0 + trust * 1.5 + safety * 1.0 - anger * 1.5 - resentment_shift)
+    scores["withdraw"] = sig(-1.0 + profile.get("avoidance", 0.5) * 2.0 - safety * 1.5 + resentment_shift)
+    scores["escalate"] = sig(-2.0 + profile.get("assertiveness", 0.5) * 1.0 + anger * 2.0 - trust * 1.5 + (resentment_shift * 1.5))
+    scores["strained"] = sig(-1.5 + profile.get("deference", 0.5) * 1.0 + resentment_shift)
 
-    repair_boost = 1.0 if other_last in ("escalate", "withdraw") else 0.0
-    scores["repair"] = sigmoid(
-        -1.5
-        + profile["repair"] * 2.0
-        + trust * 1.5
-        + safety * 1.0
-        - anger * 1.5
-        - resentment * 2.0
-        + repair_boost
-    ) if turn >= 1 else 0.0
-
-    escalate_boost = 1.0 if other_last in ("defer", "withdraw") else 0.0
-    scores["withdraw"] = sigmoid(
-        -1.0
-        + profile["avoidance"] * 2.0
-        - safety * 1.5
-        + resentment * 1.0
-    )
-    
-    scores["escalate"] = sigmoid(
-        -2.0
-        + profile["assertiveness"] * 1.0
-        + anger * 2.0
-        + resentment * 1.5
-        - trust * 1.5
-        + escalate_boost
-    )
-
-    # Apply scenario-category biases
-    category_bias = SCENARIO_CATEGORY_BIAS.get(scenario_category, {})
-    for cat, boost in category_bias.items():
-        if cat in scores:
-            scores[cat] += (boost * 2.0)  # scale up for sigmoid bounds
+    deliberative_weight = 1.0 - policy_weight
+    scores["repair"] += (deliberative_weight * 0.5)
+    scores["compromise"] += (deliberative_weight * 0.3)
+    scores["withdraw"] += (policy_weight * 0.4)
+    scores["escalate"] += (policy_weight * 0.4)
+    scores["defer"] += (policy_weight * 0.2)
 
     return max(scores, key=scores.get)
 
@@ -492,7 +473,7 @@ def compute_tension_delta(
 
 # ---------- Message generation ----------
 
-def generate_mock_message(
+def process_agent_turn(
     speaker: str,
     own_prompt: dict,
     other_prompt: dict,
@@ -501,61 +482,52 @@ def generate_mock_message(
     tension: float,
     own_last: str,
     other_last: str,
-    scenario_category: str = "",
-    scenario_desc: str = "",
+    scenario: dict,
     user_tone_answers: dict = None,
 ) -> tuple:
     from llm_analysis import generate_agent_dialogue
 
-    own_profile = compute_behavioral_profile(own_prompt["sampled_traits"] if "sampled_traits" in own_prompt else own_prompt)
-    other_profile = compute_behavioral_profile(other_prompt["sampled_traits"] if "sampled_traits" in other_prompt else other_prompt)
+    own_traits = own_prompt.get("sampled_traits", own_prompt.get("traits", {}))
+    
+    def extract_val(v):
+        return v.get("mean", 0.5) if isinstance(v, dict) else v
+        
+    own_profile = compute_behavioral_profile({k: extract_val(v) for k, v in own_traits.items()})
     clash_intensity = compute_trait_distance(own_prompt, other_prompt)
 
     turn = sum(1 for h in history if h["speaker"] == speaker)
 
+    # PERCEPTION & MOTIVE
+    perception = f"Perceiving partner's {other_last or 'initial action'}."
+    reactive_weight = compute_stress_activation(own_traits, scenario, own_emotional_state)
+    motive = "Protect self" if reactive_weight > 0.5 else "Resolve conflict"
+    
+    # ACTION SELECTION
     category = select_response_category(
-        own_profile, tension, turn, other_last, clash_intensity, own_emotional_state, scenario_category
+        own_profile, reactive_weight, tension, turn, other_last, own_emotional_state, scenario.get("category", "")
     )
 
-    # Resentment override is now organically handled by the high resentment multiplier in the sigmoid above,
-    # but we'll leave a hard override just in case.
-    original_category = category
-    if category in ("compromise", "defer") and own_emotional_state.get("resentment", 0) > 0.6:
-        if own_emotional_state.get("anger", 0) > 0.5:
-            category = "escalate"
-        else:
-            category = "strained"
-
-    # Generate actual dialogue via LLM matching user tone
+    # VERBALIZATION
     spoken = generate_agent_dialogue(
-        scenario_desc=scenario_desc,
+        scenario_desc=scenario.get("description", ""),
         action=category,
         history=history,
         user_tone_answers=user_tone_answers,
         agent_name=speaker
     )
-    thought = f"Agent executing action: {category.upper()}"
+    
+    thought = f"Perception: {perception} | Emotion: {own_emotional_state.get('anger', 0):.2f} Anger, {own_emotional_state.get('safety', 0):.2f} Safety | Motive: {motive} | Policy: {reactive_weight:.2f} Reactive | Action: {category.upper()}"
 
     effective_category = category if category != "strained" else "compromise"
-    tension_delta = compute_tension_delta(
-        effective_category, other_profile, clash_intensity
-    )
-    if category == "strained":
-        tension_delta += 0.04
-
+    tension_delta = compute_tension_delta(effective_category, own_profile, clash_intensity)
     new_tension = max(0.0, min(1.0, tension + tension_delta))
 
-    resentment_info = ""
-    if original_category != category:
-        resentment_info = f" (override: {original_category}→{category}, resentment={resentment_val:.3f})"
-
     logger.info(
-        "  Turn %d | %s → %-10s | tension %.3f→%.3f (Δ%+.3f) | clash=%.3f%s",
-        turn, speaker, category.upper(), tension, new_tension,
-        tension_delta, clash_intensity, resentment_info,
+        "  Turn %d | %s → %-10s | tension %.3f→%.3f | reactive_weight=%.2f",
+        turn, speaker, category.upper(), tension, new_tension, reactive_weight
     )
 
-    message = f"<InternalThought>{thought}</InternalThought>\n{spoken}"
+    message = f"<InternalThought>{thought}</InternalThought>\\n{spoken}"
     return message, new_tension, category
 
 
@@ -689,23 +661,25 @@ def environmental_reaction_node(state: SimulationState):
     state["accumulated_stress"] = max(0.0, state["accumulated_stress"] + stress_delta)
 
     # Separation Mechanics (Phase 3)
-    import random
-    base_risk = 0.0
+    import numpy as np
+    
+    # Example separation check with beta distribution for stochastic elements
+    # Using np.random.beta for random variations instead of uniform
+    # This is a mocked placeholder for the advanced stochastic mechanics
+    noise = np.random.beta(2, 5) * 0.1
+    base_p = 0.0
     if m_state.relationship_capital < 20:
-        base_risk = (20 - m_state.relationship_capital) / 20.0
-        
+        base_p = (20 - m_state.relationship_capital) / 20.0
     if state["accumulated_stress"] >= state["relationship_limit"]:
-        base_risk += 0.5
+        base_p += 0.5
         
-    if base_risk > 0:
-        mitigation = ((m_state.commitment_a + m_state.commitment_b) / 2.0 * 0.5) + (m_state.exit_barriers * 0.5)
-        p_separation = max(0.0, base_risk - mitigation)
-        
-        if random.random() < p_separation:
-            reaction_type = "limit_break"
-            m_state.relationship_capital = 0.0 # Force breakdown
-            state["happiness_factor"] = 0.0
-            state["tension_level"] = 1.0
+    p_separation = max(0.0, min(1.0, base_p + noise))
+    
+    if np.random.random() < p_separation:
+        reaction_type = "limit_break"
+        m_state.relationship_capital = 0.0 # Force breakdown
+        state["happiness_factor"] = 0.0
+        state["tension_level"] = 1.0
 
     templates = ENVIRONMENT_TEMPLATES.get(reaction_type)
     message_text = templates[turn % len(templates)]
@@ -783,7 +757,7 @@ def agent_a_node(state: SimulationState):
             state["emotional_state_a"], state["last_category_a"], state["last_category_b"]
         )
 
-    msg, new_tension, category = generate_mock_message(
+    msg, new_tension, category = process_agent_turn(
         "Agent A",
         state["agent_a"],
         state["agent_b"],
@@ -792,8 +766,7 @@ def agent_a_node(state: SimulationState):
         state["tension_level"],
         state["last_category_a"],
         state["last_category_b"],
-        state.get("scenario_category", ""),
-        scenario_desc=state.get("scenario_details", {}).get("description", ""),
+        scenario=state.get("scenario_details", {}),
         user_tone_answers=state.get("agent_a", {}).get("answers", {})
     )
     state["dialogue_history"].append(
@@ -811,7 +784,7 @@ def agent_b_node(state: SimulationState):
             state["emotional_state_b"], state["last_category_b"], state["last_category_a"]
         )
         
-    msg, new_tension, category = generate_mock_message(
+    msg, new_tension, category = process_agent_turn(
         "Agent B",
         state["agent_b"],
         state["agent_a"],
@@ -820,8 +793,7 @@ def agent_b_node(state: SimulationState):
         state["tension_level"],
         state["last_category_b"],
         state["last_category_a"],
-        state.get("scenario_category", ""),
-        scenario_desc=state.get("scenario_details", {}).get("description", ""),
+        scenario=state.get("scenario_details", {}),
         user_tone_answers=state.get("agent_b", {}).get("answers", {})
     )
     state["dialogue_history"].append(

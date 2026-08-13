@@ -18,12 +18,14 @@ obs_logger.addHandler(obs_handler)
 obs_logger.propagate = False
 
 import scenarios
+from scenario_catalog import get_catalog, get_catalog_for_api
 from intake_questions import get_intake_data
 from persona_synthesis import analyze_answers
 from simulation_engine import run_simulation
 from evaluation_engine import compute_harmony_index
 from compatibility_engine import run_full_compatibility_report
 from astrology import get_astro_fingerprint, get_astakoota_score
+from state_models import MarriageState
 
 app = FastAPI(title="MiroFish Agentic Matchmaking API")
 
@@ -98,10 +100,24 @@ def get_admin_telemetry():
                         k, v = pair.split(":", 1)
                         event_obj[k.strip().lower().replace("(ms)", "_ms")] = v.strip()
                 events.append(event_obj)
-            except Exception as e:
-                continue
-                
+            except Exception:
+                pass
     return {"events": events}
+
+@app.get("/api/admin/synthetic-reports")
+def get_synthetic_reports():
+    import glob
+    import json
+    reports = []
+    reports_dir = os.path.join(os.path.dirname(__file__), "synthetic_testing", "reports")
+    if os.path.exists(reports_dir):
+        for filepath in glob.glob(os.path.join(reports_dir, "*.json")):
+            try:
+                with open(filepath, "r") as f:
+                    reports.append(json.load(f))
+            except Exception as e:
+                logger.error(f"Failed to load synthetic report {filepath}: {e}")
+    return {"reports": reports}
 
 class SurveySubmission(BaseModel):
     session_id: str
@@ -111,7 +127,129 @@ class SurveySubmission(BaseModel):
 
 @app.get("/api/onboarding/questions")
 def get_questions():
+    # Legacy endpoint, keeping it for now
     return {"sections": get_intake_data()}
+
+try:  # Support both ``uvicorn main:app`` and ``import backend.main``.
+    from .adaptive_router import AdaptiveIntakeState, AdaptiveQuestionRouter
+    from .evidence_fusion import ConsensusEngine, EvidenceModality
+    from .llm_analysis import analyze_behavioral_evidence_primary, verify_behavioral_evidence
+except ImportError:
+    from adaptive_router import AdaptiveIntakeState, AdaptiveQuestionRouter
+    from evidence_fusion import ConsensusEngine, EvidenceModality
+    from llm_analysis import analyze_behavioral_evidence_primary, verify_behavioral_evidence
+
+router = AdaptiveQuestionRouter()
+fusion_engine = ConsensusEngine()
+
+@app.get("/api/onboarding/start/{session_id}/{role}")
+def start_onboarding(session_id: str, role: str):
+    if session_id not in db["sessions"]:
+        db["sessions"][session_id] = {}
+    if role not in db["sessions"][session_id]:
+        db["sessions"][session_id][role] = {"answers": {}, "evidence_log": [], "adaptive_intake": {}}
+    
+    session_role = db["sessions"][session_id][role]
+    intake_state = AdaptiveIntakeState.from_session(session_role)
+    session_role["adaptive_intake"] = intake_state.to_session()
+    next_q = router.select_next(intake_state)
+    return {"question": next_q, "progress": router.get_progress(intake_state)}
+
+class SingleAnswer(BaseModel):
+    session_id: str
+    role: str
+    question_id: str
+    answer: Any
+
+@app.post("/api/onboarding/answer")
+def submit_single_answer(submission: SingleAnswer, background_tasks: BackgroundTasks):
+    session_id = submission.session_id
+    role = submission.role
+    
+    if session_id not in db["sessions"] or role not in db["sessions"][session_id]:
+        return {"error": "Session not found"}
+        
+    session_role = db["sessions"][session_id][role]
+    q_data = router.get_question_by_id(submission.question_id)
+    if not q_data:
+        return {"error": "Question not found"}
+    if submission.question_id in session_role.get("answers", {}):
+        return {"error": "Question already answered"}
+
+    intake_state = AdaptiveIntakeState.from_session(session_role)
+    router.update_state(intake_state, submission.question_id, submission.answer)
+    session_role["answers"] = intake_state.answers
+
+    # Evaluate Evidence
+    # Simplified version: If format is free text, run multi-model
+    fusion_result = None
+    if q_data.get("format") in ["short_answer", "text_input"]:
+        primary_res = analyze_behavioral_evidence_primary(q_data.get("text", ""), str(submission.answer), session_role["evidence_log"])
+        
+        # Determine if verifier is needed
+        if primary_res.get("confidence", 1.0) < 0.65 or len(primary_res.get("contradictions", [])) > 0:
+            verifier_res = verify_behavioral_evidence(q_data.get("text", ""), str(submission.answer), session_role["evidence_log"])
+            
+            # Simple scalar fallback for demonstration
+            val_p = primary_res.get("trait_evidence", [{}])[0].get("value", 0.5) if primary_res.get("trait_evidence") else 0.5
+            val_v = verifier_res.get("trait_evidence", [{}])[0].get("value", 0.5) if verifier_res.get("trait_evidence") else 0.5
+            
+            fusion_result = fusion_engine.fuse_evidence(
+                dimension=primary_res.get("trait_evidence", [{}])[0].get("trait", "general"),
+                primary_val=val_p,
+                verifier_val=val_v,
+                primary_conf=primary_res.get("confidence", 0.5),
+                verifier_conf=verifier_res.get("confidence", 0.5)
+            )
+            fusion_payload = fusion_result.model_dump() if hasattr(fusion_result, "model_dump") else fusion_result.dict()
+            session_role["evidence_log"].append(fusion_payload)
+            if fusion_result.fused_evidence:
+                router.add_model_evidence(
+                    intake_state,
+                    submission.question_id,
+                    [{
+                        "trait": fusion_result.dimension,
+                        "value": fusion_result.fused_evidence["value"],
+                    }],
+                    fusion_result.fused_evidence["confidence"],
+                )
+        else:
+            session_role["evidence_log"].append({"primary": primary_res})
+            router.add_model_evidence(
+                intake_state,
+                submission.question_id,
+                primary_res.get("trait_evidence", []),
+                primary_res.get("confidence", 0.0),
+            )
+
+    session_role["adaptive_intake"] = intake_state.to_session()
+    progress = router.get_progress(intake_state)
+    if progress["complete"]:
+        persona_prompt = analyze_answers(session_role["answers"])
+        # The adaptive evidence store contains the high-resolution uncertainty
+        # model.  It replaces the legacy sparse distributions, while the legacy
+        # synthesis continues to provide clusters, narrative, and ambivalence.
+        persona_prompt["traits"] = intake_state.trait_distributions
+        session_role["prompt"] = persona_prompt
+        session = db["sessions"][session_id]
+        if (
+            "user_a" in session and "prompt" in session["user_a"]
+            and "user_b" in session and "prompt" in session["user_b"]
+            and session.get("report_status") not in {"generating", "completed"}
+        ):
+            session["report_status"] = "generating"
+            background_tasks.add_task(generate_and_cache_report, session_id)
+    next_q = None if progress["complete"] else router.select_next(intake_state)
+    fusion_payload = None
+    if fusion_result:
+        fusion_payload = fusion_result.model_dump() if hasattr(fusion_result, "model_dump") else fusion_result.dict()
+    return {
+        "status": "complete" if progress["complete"] else "success",
+        "fusion_result": fusion_payload,
+        "next_question": next_q,
+        "progress": progress,
+    }
+
 
 def generate_and_cache_report(session_id: str):
     session = db["sessions"].get(session_id, {})
@@ -213,6 +351,41 @@ def check_session_status(session_id: str):
 def get_scens():
     return {"scenarios": scenarios.get_scenarios()}
 
+
+@app.get("/api/scenario-catalog/stats")
+def get_scenario_catalog_stats():
+    catalog = get_catalog()
+    domain_counts: Dict[str, int] = {}
+    for scenario in catalog:
+        key = scenario.primary_domain.value
+        domain_counts[key] = domain_counts.get(key, 0) + 1
+    return {
+        "total": len(catalog),
+        "families": len({scenario.family_id for scenario in catalog}),
+        "positive": sum(scenario.positive for scenario in catalog),
+        "safety_relevant": sum(scenario.safety_relevant for scenario in catalog),
+        "domains": domain_counts,
+    }
+
+
+@app.get("/api/scenario-catalog")
+def browse_scenario_catalog(
+    domain: Optional[str] = None,
+    offset: int = 0,
+    limit: int = 50,
+):
+    catalog = get_catalog_for_api()
+    if domain:
+        catalog = [item for item in catalog if item["primary_domain"] == domain]
+    safe_offset = max(0, offset)
+    safe_limit = max(1, min(200, limit))
+    return {
+        "total": len(catalog),
+        "offset": safe_offset,
+        "limit": safe_limit,
+        "scenarios": catalog[safe_offset:safe_offset + safe_limit],
+    }
+
 class SimulationRequest(BaseModel):
     session_id: str
     scenario_id: Optional[str] = None
@@ -243,7 +416,15 @@ def start_simulation(req: SimulationRequest):
     sampled_b = simple_sample(agent_b)
     
     # 3. Execute LangGraph Simulation
-    result = run_simulation(agent_a, agent_b, sampled_a, sampled_b, scenario_data, max_turns=req.max_turns)
+    result = run_simulation(
+        agent_a,
+        agent_b,
+        sampled_a,
+        sampled_b,
+        scenario_data,
+        MarriageState(),
+        max_turns=req.max_turns,
+    )
     
     # 4. Behavioral Analytics & Harmony Index
     analysis = compute_harmony_index(result["dialogue_history"])

@@ -1,0 +1,11 @@
+name: deep
+simulation:
+  years: 15
+  max_events: 60
+  max_turns_per_event: 8
+monte_carlo:
+  rollouts: 50
+  workers: 1
+ollama:
+  semantic_evaluation: true
+  generate_full_dialogue: true

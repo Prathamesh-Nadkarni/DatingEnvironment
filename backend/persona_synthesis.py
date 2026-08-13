@@ -11,6 +11,7 @@ class TraitEvidence(BaseModel):
     source_question: str
     context: Dict[str, str] = Field(default_factory=dict) # e.g. {"actor": "parents", "stress": "public_conflict"}
     evidence_type: str # "perception", "emotion", "impulse", "behavior", "reflection"
+    evidence_family: Optional[str] = None
 
 class EvidenceStore:
     def __init__(self):
@@ -35,20 +36,47 @@ class EvidenceStore:
                 
             mean_val = sum(ev.value * ev.weight for ev in ev_list) / total_weight
             
-            # Simple confidence proxy: more evidence = higher confidence, capped at 0.95
             evidence_count = len(ev_list)
-            confidence = min(0.95, 0.3 + (evidence_count * 0.1))
-            
-            # Contradiction proxy: variance in the values
             variance = sum((ev.value - mean_val) ** 2 for ev in ev_list) / evidence_count if evidence_count > 1 else 0.0
-            contradiction_score = min(1.0, variance * 2.0)
+
+            # Correlated questions must not create false confidence. The first
+            # response in an evidence family has full weight, then .6 and .4.
+            family_seen = {}
+            evidence_types = set()
+            contexts = set()
+            context_values = {}
+            for ev in ev_list:
+                family = getattr(ev, "evidence_family", ev.source_question)
+                family_seen[family] = family_seen.get(family, 0) + 1
+                discount = [1.0, 0.6, 0.4][min(2, family_seen[family] - 1)]
+                evidence_types.add(ev.evidence_type)
+                context_key = str(ev.context or {})
+                contexts.add(context_key)
+                context_values.setdefault(context_key, []).append(ev.value)
+            evidence_count = len(ev_list)
+            independent_families = len(family_seen)
+            confidence = min(
+                0.95,
+                0.1 + independent_families * 0.13 + len(evidence_types) * 0.08
+                + min(0.12, len(contexts) * 0.03),
+            )
+            within_context_variance = max(
+                (
+                    sum((value - sum(values) / len(values)) ** 2 for value in values) / len(values)
+                    if len(values) > 1 else 0.0
+                )
+                for values in context_values.values()
+            )
+            contradiction_score = min(1.0, within_context_variance * 4.0)
+            context_dependence = min(1.0, max(0.0, variance * 4.0 - contradiction_score * 0.3))
             
             results[trait] = {
                 "mean": round(mean_val, 3),
                 "confidence": round(confidence, 3),
                 "evidence_count": evidence_count,
+                "variance": round(variance, 3),
                 "contradiction_score": round(contradiction_score, 3),
-                "context_variance": round(variance, 3)
+                "context_dependence": round(context_dependence, 3)
             }
             
         return results
@@ -475,8 +503,20 @@ class PersonaEngine:
                             value=0.5 + shift,
                             weight=abs(shift),
                             source_question=q_id,
-                            evidence_type="behavior"
+                            context={"section": q_id.split('.')[0]},
+                            evidence_type="observed_choice"
                         ))
+                        
+                # Add psychological probe evidence if present
+                if emotion_val:
+                    for dim in ["shame_sensitivity", "distress_tolerance", "burnout_vulnerability"]: # Simple heuristic for now
+                        self.evidence_store.add_evidence(TraitEvidence(
+                            trait=dim, value=0.5, weight=0.1, source_question=q_id, evidence_type="emotion"
+                        ))
+                if reflection_val:
+                    self.evidence_store.add_evidence(TraitEvidence(
+                        trait="identity_rigidity", value=0.5, weight=0.1, source_question=q_id, evidence_type="reflection"
+                    ))
 
             if q_id in SCALE_MAPPINGS:
                 self._apply_scale_mapping(q_id, action_val)
@@ -562,30 +602,19 @@ class PersonaEngine:
         return f"This persona is a {clusters['power']} operator who values {clusters['emotion']} emotional dynamics and approaches the future as a {clusters['future']}."
 
     def _generate_prompt(self, clusters, summary, raw_answers):
-        # SPRINT 3: Evidence Aggregation
+        # SPRINT 5: Evidence Aggregation
         # Instead of compiling legacy distributions, we aggregate from our rich EvidenceStore.
         distributions = self.evidence_store.aggregate_traits()
         
-        # SPRINT 3: Reactive vs Deliberative Policy calculation
-        # We calculate an 'effective_policy' using a simplified stress activation model
-        # For this prototype, we'll assume higher burnout/shame increases the reactive_weight
-        burnout = self.enacted_traits["burnout_vulnerability"]["mean"]
-        shame = self.enacted_traits["shame_sensitivity"]["mean"]
-        stress_activation = min(1.0, (burnout + shame) / 2.0)
-        
-        # effective_policy = (reactive_policy * reactive_weight) + (deliberate_policy * (1 - reactive_weight))
-        # Here we just represent this concept as a text modifier for the LLM
-        policy_directive = f"STRESS ACTIVATION: {round(stress_activation, 2)}\n"
-        if stress_activation > 0.6:
-            policy_directive += "REACTIVE POLICY DOMINANT: Under stress, this persona defaults to instinctual, protective behaviors rather than deliberative ideals."
-        else:
-            policy_directive += "DELIBERATIVE POLICY DOMINANT: Under stress, this persona is able to self-regulate and act according to their ideals."
+        # SPRINT 5: Stress activation is now dynamically calculated during simulation in simulation_engine.py
+        # We only pass the baseline traits here.
+        policy_directive = "DYNAMIC POLICY INJECTION: Policy will be determined at runtime based on sigmoid stress activation function."
             
         text_context = "\n".join([f"Q({k}): {v}" for k, v in self.text_answers.items()])
         
         formatted_dists = {}
         for dim, data in distributions.items():
-            formatted_dists[dim] = f"Mean: {data['mean']} (Conf: {data['confidence']}, Contradiction: {data['contradiction_score']})"
+            formatted_dists[dim] = f"Mean: {data['mean']} (Conf: {data['confidence']}, Variance: {data['variance']}, Contradiction: {data['contradiction_score']}, Context_Dep: {data['context_dependence']})"
             
         system_prompt = f"""You are the 'Inner Parliament' for this persona.
 CONTEXT: {summary}

@@ -1,0 +1,11 @@
+id: growth_growth
+version: 1
+person_a: growth_oriented
+person_b: growth_oriented
+tags:
+- generated_pair
+expected_dynamics:
+  should_show: []
+  should_not_show: []
+directional_expectations: {}
+trajectory_expectations: {}

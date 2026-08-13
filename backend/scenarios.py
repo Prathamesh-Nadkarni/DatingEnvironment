@@ -2089,11 +2089,90 @@ SCENARIOS = [
     },
 ]
 
+ORDINARY_FRICTION = [
+    {
+        'id': 'chore_friction',
+        'category': 'hygiene_domestic',
+        'title': 'The Forgotten Chores',
+        'description': 'One partner repeatedly forgets to do their assigned chore (e.g. taking out the trash), leaving the other to pick up the slack.',
+        'severity': 0.1,
+        'dealbreaker': False,
+    },
+    {
+        'id': 'sleep_schedule',
+        'category': 'daily_rituals',
+        'title': 'Mismatched Sleep Cycles',
+        'description': 'One partner is a night owl who stays up late with the lights/TV on, disturbing the early bird.',
+        'severity': 0.15,
+        'dealbreaker': False,
+    },
+    {
+        'id': 'minor_spending',
+        'category': 'financial',
+        'title': 'Unnecessary Purchases',
+        'description': 'One partner makes a $500 discretionary purchase without consulting the other.',
+        'severity': 0.2,
+        'dealbreaker': False,
+    }
+]
+
+POSITIVE_EVENTS = [
+    {
+        'id': 'anniversary_trip',
+        'category': 'positive_milestone',
+        'title': 'The Perfect Anniversary Trip',
+        'description': 'The couple goes on a beautifully planned vacation where they connect deeply.',
+        'severity': -0.3, # Negative severity means it reduces stress and boosts connection
+        'dealbreaker': False,
+    },
+    {
+        'id': 'career_promotion',
+        'category': 'positive_milestone',
+        'title': 'Major Career Win',
+        'description': 'One partner gets a massive promotion, increasing financial stability and shared joy.',
+        'severity': -0.2,
+        'dealbreaker': False,
+    }
+]
+
+import random
+
+def generate_life_timeline(num_events: int = 30) -> list:
+    """
+    Monte Carlo life-event generator.
+    Samples from the major SCENARIOS, ORDINARY_FRICTION, and POSITIVE_EVENTS
+    to create a longitudinal timeline (e.g. 15 years).
+    """
+    timeline = []
+    major_pool = list(SCENARIOS)
+    friction_pool = list(ORDINARY_FRICTION)
+    positive_pool = list(POSITIVE_EVENTS)
+    
+    for _ in range(num_events):
+        roll = random.random()
+        if roll < 0.2: # 20% chance of positive event
+            event = random.choice(positive_pool)
+        elif roll < 0.6: # 40% chance of ordinary friction
+            event = random.choice(friction_pool)
+        else: # 40% chance of major conflict
+            if major_pool:
+                event = random.choice(major_pool)
+                major_pool.remove(event) # Don't repeat major life crises if possible
+            else:
+                event = random.choice(friction_pool)
+                
+        timeline.append(event)
+        
+    return timeline
+
 def get_scenarios():
     return SCENARIOS
 
 def get_scenarios_by_category():
-    by_category = {}
-    for s in SCENARIOS:
-        by_category.setdefault(s['category'], []).append(s)
-    return by_category
+    grouped = {}
+    for scenario in SCENARIOS:
+        cat = scenario.get("category", "uncategorized")
+        if cat not in grouped:
+            grouped[cat] = []
+        grouped[cat].append(scenario)
+    return grouped

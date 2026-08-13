@@ -8,6 +8,25 @@ class LifePhase(str, Enum):
     CHILDCARE = "childcare"
     ESTABLISHED_FAMILY = "established_family"
     MIDLIFE = "midlife"
+    DUAL_CAREGIVING = "dual_caregiving"
+    MATURE_PARTNERSHIP = "mature_partnership"
+
+    @classmethod
+    def for_year(cls, year: int) -> "LifePhase":
+        """Return the 25-year life phase used by the annual scenario planner."""
+        if year <= 2:
+            return cls.NEWLYWED
+        if year <= 5:
+            return cls.CAREER_BUILDING
+        if year <= 9:
+            return cls.CHILDCARE
+        if year <= 13:
+            return cls.ESTABLISHED_FAMILY
+        if year <= 17:
+            return cls.MIDLIFE
+        if year <= 21:
+            return cls.DUAL_CAREGIVING
+        return cls.MATURE_PARTNERSHIP
 
 class RelationshipInjury(BaseModel):
     id: str
@@ -23,8 +42,9 @@ class TraitDistribution(BaseModel):
     mean: float
     confidence: float
     evidence_count: int = 0
+    variance: float = 0.0
     contradiction_score: float = 0.0
-    context_variance: float = 0.0
+    context_dependence: float = 0.0
 
 class PersonaContext(BaseModel):
     # Layer A: Foundation (Stored as generic dict for flexibility or mapped)
@@ -60,7 +80,8 @@ class MarriageState(BaseModel):
     trust_b: float = 0.5
     emotional_safety_a: float = 0.5
     emotional_safety_b: float = 0.5
-    connection: float = 0.5
+    connection_a: float = 0.5
+    connection_b: float = 0.5
     admiration_a: float = 0.5
     admiration_b: float = 0.5
     commitment_a: float = 0.5
@@ -75,9 +96,7 @@ class MarriageState(BaseModel):
     unresolved_hurt_a: float = 0.0
     unresolved_hurt_b: float = 0.0
 
-    # Individual Happiness & Needs
-    happiness_a: float = 0.5
-    happiness_b: float = 0.5
+    # Individual Needs
     need_fulfillment_a: float = 0.5
     need_fulfillment_b: float = 0.5
 
@@ -86,8 +105,10 @@ class MarriageState(BaseModel):
     intimacy_satisfaction_a: float = 0.5
     intimacy_satisfaction_b: float = 0.5
     family_boundary_health: float = 0.5
-    fairness_a: float = 0.5
-    fairness_b: float = 0.5
+    perceived_fairness_a: float = 0.5
+    perceived_fairness_b: float = 0.5
+    feeling_heard_a: float = 0.5
+    feeling_heard_b: float = 0.5
 
     # Timeline & History
     marriage_month: int = 0
@@ -97,45 +118,45 @@ class MarriageState(BaseModel):
     
     @property
     def current_life_phase(self) -> LifePhase:
-        if self.marriage_month < 24:
-            return LifePhase.NEWLYWED
-        elif self.marriage_month < 60:
-            return LifePhase.CAREER_BUILDING
-        elif self.marriage_month < 120:
-            return LifePhase.CHILDCARE
-        elif self.marriage_month < 240:
-            return LifePhase.ESTABLISHED_FAMILY
-        else:
-            return LifePhase.MIDLIFE
+        year = max(1, (self.marriage_month + 11) // 12)
+        return LifePhase.for_year(year)
     
+    @property
+    def happiness_a(self) -> float:
+        return self.get_happiness("Agent A")
+        
+    @property
+    def happiness_b(self) -> float:
+        return self.get_happiness("Agent B")
+
     def get_happiness(self, agent_id: str) -> float:
-        """Returns the individual happiness for the specified agent (Agent A or Agent B)."""
+        """Computes the individual happiness for the specified agent."""
         is_a = agent_id == "Agent A"
         safety = self.emotional_safety_a if is_a else self.emotional_safety_b
         needs = self.need_fulfillment_a if is_a else self.need_fulfillment_b
         trust = self.trust_a if is_a else self.trust_b
-        fairness = self.fairness_a if is_a else self.fairness_b
+        fairness = self.perceived_fairness_a if is_a else self.perceived_fairness_b
         intimacy = self.intimacy_satisfaction_a if is_a else self.intimacy_satisfaction_b
         resentment = self.resentment_a if is_a else self.resentment_b
         burnout = self.burnout_a if is_a else self.burnout_b
+        connection = self.connection_a if is_a else self.connection_b
         
-        # Empirical Tuning (Phase 1 V4): Gottman ratio suggests negative sentiment overrides positives heavily.
+        # Happiness as an emergent property of state
         happiness = (
             0.20 * safety
             + 0.15 * needs
-            + 0.15 * self.connection
+            + 0.15 * connection
             + 0.20 * trust
             + 0.15 * fairness
             + 0.15 * intimacy
-            - 0.50 * resentment  # Strong Gottman penalty for contempt/resentment
-            - 0.25 * burnout     # High penalty for burnout/exhaustion
+            - 0.50 * resentment
+            - 0.25 * burnout
         )
         return max(0.0, min(1.0, happiness))
         
     def update_happiness(self):
-        """Updates internal happiness variables."""
-        self.happiness_a = self.get_happiness("Agent A")
-        self.happiness_b = self.get_happiness("Agent B")
+        """Deprecated: Happiness is now a computed property."""
+        pass
         
     def apply_event_impact(self, event_type: str, severity: float):
         """Applies generic life events to the relationship state."""
@@ -153,6 +174,7 @@ class MarriageState(BaseModel):
             # Compound severity
             last_injury = prior[-1]
             effective_severity += last_injury.severity * last_injury.recurrence_multiplier
+        effective_severity = max(0.0, min(1.0, effective_severity))
             
         new_injury = RelationshipInjury(
             id=f"{injury_type}_{self.marriage_month}",
@@ -178,25 +200,173 @@ class MarriageState(BaseModel):
         
         self.update_happiness()
         return effective_severity
-        
+
     def repair_injury(self, victim: str, injury_type: str, repair_effectiveness: float):
         """Attempts to repair active injuries."""
-        active = [i for i in self.injuries if i.victim == victim and i.type == injury_type and not i.resolved]
-        
+        active = [
+            i for i in self.injuries
+            if i.victim == victim and i.type == injury_type and not i.resolved
+        ]
+
         for injury in active:
-            if repair_effectiveness > injury.severity * 0.8: # Must be a strong repair to resolve
+            if repair_effectiveness > injury.severity * 0.8:
                 injury.resolved = True
                 self.successful_repairs += 1
-                
-                # Restore some trust
+
                 if victim == "Agent A":
                     self.trust_a = min(1.0, self.trust_a + (injury.trust_damage * 0.5))
-                    self.unresolved_hurt_a = max(0.0, self.unresolved_hurt_a - injury.severity * 0.5)
+                    self.unresolved_hurt_a = max(
+                        0.0, self.unresolved_hurt_a - injury.severity * 0.5
+                    )
                 else:
                     self.trust_b = min(1.0, self.trust_b + (injury.trust_damage * 0.5))
-                    self.unresolved_hurt_b = max(0.0, self.unresolved_hurt_b - injury.severity * 0.5)
-                    
-                # Restore capital
+                    self.unresolved_hurt_b = max(
+                        0.0, self.unresolved_hurt_b - injury.severity * 0.5
+                    )
+
                 self.relationship_capital = min(100.0, self.relationship_capital + 5.0)
-                
+
         self.update_happiness()
+
+
+# ---------------------------------------------------------------------------
+# Persistent world and relationship-narrative state for the longitudinal
+# simulator.  These models intentionally remain separate from MarriageState:
+# LifeState stores objective facts, while NarrativeState stores beliefs each
+# partner has formed about the relationship.
+# ---------------------------------------------------------------------------
+
+
+class ResidenceState(BaseModel):
+    arrangement: str = "independent_rental"
+    ownership: str = "renting"
+    region: str = "urban"
+    stability: float = 0.7
+
+
+class CareerState(BaseModel):
+    employed: bool = True
+    level: str = "early_career"
+    workload: float = 0.5
+    satisfaction: float = 0.5
+    income_units: float = 1.0
+    relocation_possible: bool = True
+
+
+class FinancialState(BaseModel):
+    savings_units: float = 1.0
+    debt_units: float = 0.0
+    stability: float = 0.6
+    finances_joint: bool = True
+    hidden_obligations: bool = False
+
+
+class ChildState(BaseModel):
+    id: str
+    age: int = 0
+    health: float = 1.0
+    living_at_home: bool = True
+
+
+class ParentState(BaseModel):
+    id: str
+    side: str
+    alive: bool = True
+    health: float = 0.8
+    financial_dependency: float = 0.2
+    lives_with_couple: bool = False
+
+
+class HealthState(BaseModel):
+    health: float = 0.9
+    chronic_condition: bool = False
+    caregiving_load: float = 0.0
+
+
+class LifeState(BaseModel):
+    """Objective facts that determine whether a scenario can occur."""
+
+    year: int = 1
+    residence: ResidenceState = Field(default_factory=ResidenceState)
+    career_a: CareerState = Field(default_factory=CareerState)
+    career_b: CareerState = Field(default_factory=CareerState)
+    finances: FinancialState = Field(default_factory=FinancialState)
+    children: List[ChildState] = Field(default_factory=list)
+    parents_a: List[ParentState] = Field(
+        default_factory=lambda: [ParentState(id="parent_a_1", side="a")]
+    )
+    parents_b: List[ParentState] = Field(
+        default_factory=lambda: [ParentState(id="parent_b_1", side="b")]
+    )
+    health_a: HealthState = Field(default_factory=HealthState)
+    health_b: HealthState = Field(default_factory=HealthState)
+    family_network: Dict[str, Any] = Field(
+        default_factory=lambda: {"has_sibling_a": True, "has_sibling_b": True}
+    )
+    social_network: Dict[str, Any] = Field(default_factory=dict)
+    plans: Dict[str, Any] = Field(
+        default_factory=lambda: {"children_intent": "open", "retirement_age": 65}
+    )
+    flags: List[str] = Field(default_factory=list)
+
+    @property
+    def phase(self) -> LifePhase:
+        return LifePhase.for_year(self.year)
+
+    @property
+    def has_children(self) -> bool:
+        return bool(self.children)
+
+    def advance_year(self) -> None:
+        self.year += 1
+        for child in self.children:
+            child.age += 1
+
+
+class PartnerNarrative(BaseModel):
+    feels_prioritized: float = 0.5
+    partner_is_reliable: float = 0.5
+    partner_understands_me: float = 0.5
+    partner_defends_me: float = 0.5
+    partner_is_fair: float = 0.5
+    conflict_is_repairable: float = 0.5
+    relationship_is_safe: float = 0.5
+
+    def apply_delta(self, field_name: str, delta: float) -> None:
+        if not hasattr(self, field_name):
+            return
+        current = float(getattr(self, field_name))
+        setattr(self, field_name, max(0.0, min(1.0, current + delta)))
+
+
+class NarrativeState(BaseModel):
+    partner_a: PartnerNarrative = Field(default_factory=PartnerNarrative)
+    partner_b: PartnerNarrative = Field(default_factory=PartnerNarrative)
+    active_narratives: List[str] = Field(default_factory=list)
+
+
+class ScenarioHistoryRecord(BaseModel):
+    scenario_id: str
+    family_id: str
+    year: int
+    primary_domain: str
+    severity: float
+    outcome: str
+    memory_tags: List[str] = Field(default_factory=list)
+    activated_followups: List[str] = Field(default_factory=list)
+
+
+class YearSnapshot(BaseModel):
+    year: int
+    scenarios_experienced: int
+    happiness_a: float
+    happiness_b: float
+    trust_a: float
+    trust_b: float
+    resentment_a: float
+    resentment_b: float
+    connection: float
+    relationship_capital: float
+    new_injuries: int = 0
+    repaired_injuries: int = 0
+    active_narratives: List[str] = Field(default_factory=list)

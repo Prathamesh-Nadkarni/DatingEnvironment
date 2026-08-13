@@ -1,0 +1,11 @@
+id: traditional_egalitarian
+version: 1
+person_a: family_first_traditionalist
+person_b: egalitarian_careerist
+tags:
+- generated_pair
+expected_dynamics:
+  should_show: []
+  should_not_show: []
+directional_expectations: {}
+trajectory_expectations: {}

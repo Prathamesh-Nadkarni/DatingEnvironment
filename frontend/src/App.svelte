@@ -98,18 +98,17 @@
     }
   });
 
-  $: currentSection = sections[currentSectionIndex];
-  $: currentQuestion = currentSection?.questions[currentQuestionIndex];
-  $: totalQuestionsInSection = currentSection?.questions.length || 0;
+  let currentQuestion: any = null;
+  let absoluteQuestionIndex = 0;
+  let totalQuestions = 40; // Estimated for adaptive progress bar
+  let progressPercent = 0;
   
-  $: totalQuestions = sections.reduce((acc, sec) => acc + sec.questions.length, 0);
-  $: absoluteQuestionIndex = sections.slice(0, currentSectionIndex).reduce((acc, sec) => acc + sec.questions.length, 0) + currentQuestionIndex;
-  $: progressPercent = totalQuestions > 0 ? Math.round((absoluteQuestionIndex / totalQuestions) * 100) : 0;
+  $: progressPercent = Math.min(100, Math.round((absoluteQuestionIndex / totalQuestions) * 100));
   
-  $: hasAnsweredCurrent = answers[currentQuestion?.id] !== undefined && 
-                          (currentQuestion?.format === 'probe_group' 
+  $: hasAnsweredCurrent = currentQuestion && answers[currentQuestion.id] !== undefined && 
+                          (currentQuestion.format === 'probe_group' 
                             ? (Object.keys(answers[currentQuestion.id] || {}).length === currentQuestion.probes.length && Object.values(answers[currentQuestion.id]).every(v => v !== ''))
-                            : (Array.isArray(answers[currentQuestion?.id]) ? answers[currentQuestion?.id].length > 0 : answers[currentQuestion?.id] !== ''));
+                            : (Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id].length > 0 : answers[currentQuestion.id] !== ''));
 
   let introSlide = true;
 
@@ -165,14 +164,58 @@
       shareLink = `${window.location.origin}${window.location.pathname}?session=${sessionId}&role=user_b`;
   }
 
+  async function fetchNextQuestion() {
+      loading = true;
+      try {
+          const res = await fetch(`${API_URL}/api/onboarding/start/${sessionId}/${role}`);
+          if (res.ok) {
+              const data = await res.json();
+              if (data.question) {
+                  currentQuestion = data.question;
+              } else {
+                  await submitSurvey();
+              }
+          }
+      } catch(e) {
+          console.error(e);
+      }
+      loading = false;
+  }
+
   async function handleNext() {
     if ("vibrate" in navigator) navigator.vibrate(20);
     isTransitioning = true;
+    
     if (currentQuestion) {
         logTelemetry('question_answered', currentQuestion.id, { 
-            section: currentSection.section,
+            section: currentQuestion.section_name,
             answer: answers[currentQuestion.id]
         });
+        
+        // Submit answer to adaptive router
+        try {
+            const res = await fetch(`${API_URL}/api/onboarding/answer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    role: role,
+                    question_id: currentQuestion.id,
+                    answer: answers[currentQuestion.id]
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.next_question) {
+                    currentQuestion = data.next_question;
+                    absoluteQuestionIndex++;
+                } else {
+                    await submitSurvey();
+                }
+            }
+        } catch(e) {
+            console.error("Error submitting answer to adaptive router", e);
+        }
     }
     
     setTimeout(async () => {
@@ -187,13 +230,7 @@
         } else if (demographicsSlide) {
           logTelemetry('button_click', 'submit_demographics');
           demographicsSlide = false;
-        } else if (currentQuestionIndex < totalQuestionsInSection - 1) {
-          currentQuestionIndex++;
-        } else if (currentSectionIndex < sections.length - 1) {
-          currentSectionIndex++;
-          currentQuestionIndex = 0;
-        } else {
-          await submitSurvey();
+          if (!currentQuestion) await fetchNextQuestion();
         }
         questionStartTime = Date.now();
         isTransitioning = false;
@@ -253,11 +290,13 @@
 </svelte:head>
 
 <main class="app-root">
+  {#if !isAdmin}
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="global-logo">
       <span class="logo-mana">Mana</span><span class="logo-match">Match</span>
   </div>
+  {/if}
   {#if isAdmin}
     <Admin />
   {:else}

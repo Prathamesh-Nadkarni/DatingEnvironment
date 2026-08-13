@@ -1,0 +1,12 @@
+name: quick
+person_answer_generation:
+  use_cache: true
+simulation:
+  years: 1
+  max_events: 5
+  max_turns_per_event: 3
+monte_carlo:
+  rollouts: 1
+  workers: 1
+ollama:
+  semantic_evaluation: false

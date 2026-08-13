@@ -1,12 +1,14 @@
 import logging
+import os
 from statistics import mean
 from typing import Dict, List, Any, Tuple, Union
 
 from simulation_engine import get_trait, run_simulation
 from evaluation_engine import compute_harmony_index
-from scenarios import get_scenarios_by_category
+from scenarios import get_scenarios_by_category, get_scenarios
 from llm_analysis import analyze_text_compatibility
 from intake_questions import INTAKE_SECTIONS
+from longitudinal_simulation import run_monte_carlo as run_longitudinal_monte_carlo
 
 logger = logging.getLogger("mirofish.compatibility")
 
@@ -302,7 +304,7 @@ def generate_timeline(all_scenarios: List[dict], years: int = 15) -> List[dict]:
 
 # ---------- Multi-scenario compatibility report ----------
 
-def run_full_compatibility_report(
+def _run_legacy_full_compatibility_report(
     agent_a: dict,
     agent_b: dict,
     answers_a: dict = None,
@@ -421,3 +423,58 @@ def run_full_compatibility_report(
         "trajectory": median_run["life_log"],
         "inference": inference_text
     }
+
+
+def run_full_compatibility_report(
+    agent_a: dict,
+    agent_b: dict,
+    answers_a: dict = None,
+    answers_b: dict = None,
+    max_turns: int = 4,
+) -> Dict[str, Any]:
+    """Run adaptive 25-year lives, re-planning from state every year.
+
+    ``answers_*`` and ``max_turns`` remain in the public signature for API
+    compatibility.  Persona synthesis has already incorporated the answers;
+    only deep scenarios need dialogue, so the longitudinal core resolves light
+    and normal events through deterministic behavioral state transitions.
+    """
+    del answers_a, answers_b, max_turns
+    dialogue_renderer = None
+    if os.environ.get("ENABLE_DEEP_DIALOGUE", "").lower() in {"1", "true", "yes"}:
+        def dialogue_renderer(persona_a, persona_b, scenario, marriage_state):
+            sampled_a = {
+                trait: get_trait(persona_a, trait) for trait in persona_a.get("traits", {})
+            }
+            sampled_b = {
+                trait: get_trait(persona_b, trait) for trait in persona_b.get("traits", {})
+            }
+            state_copy = (
+                marriage_state.model_copy(deep=True)
+                if hasattr(marriage_state, "model_copy")
+                else marriage_state.copy(deep=True)
+            )
+            result = run_simulation(
+                persona_a,
+                persona_b,
+                sampled_a,
+                sampled_b,
+                scenario.to_engine_dict(),
+                state_copy,
+                max_turns=4,
+            )
+            return result["dialogue_history"]
+
+    report = run_longitudinal_monte_carlo(
+        agent_a,
+        agent_b,
+        rollouts=5,
+        years=25,
+        dialogue_renderer=dialogue_renderer,
+    )
+    trait_scores = compute_trait_compatibility(agent_a, agent_b)
+    report["trait_compatibility"] = trait_scores
+    report["dimensional_scores"].update({
+        key: int(round(value * 100)) for key, value in trait_scores.items()
+    })
+    return report

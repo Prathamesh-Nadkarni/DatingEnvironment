@@ -1,0 +1,11 @@
+{
+  "persona_id": "secure_collaborator",
+  "persona_version": 1,
+  "questionnaire_version": "v1",
+  "ollama_model": "llama3.2:1b",
+  "seed": 42,
+  "answers": {
+    "q1": "[Generation failed]"
+  },
+  "generation_metadata": {}
+}
